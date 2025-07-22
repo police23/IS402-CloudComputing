@@ -1,0 +1,287 @@
+/* CSS cho ImportForm */
+
+/* Định dạng cho label giống BookForm */
+.account-form label {
+  font-size: 0.95em;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.importform-flex-row {
+  display: flex;
+  gap: 24px;
+}
+
+.importform-flex-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.importform-flex-column {
+  flex: 1;
+}
+
+.importform-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.importform-table {
+  width: 100%;
+  margin-bottom: 8px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  border: 1px solid #eaeaea;
+}
+
+.importform-table th {
+  padding: 8px 6px;
+  min-width: 0;
+  width: auto;
+  text-align: left;
+  background-color: #f5f5f5;
+  border-bottom: 2px solid #ddd;
+}
+
+.importform-table th.importform-th-book,
+.importform-table td.importform-td-book {
+  text-align: left;
+  padding-left: 12px;
+}
+
+.importform-table th.importform-th-book { min-width: 260px; width: 260px; }
+.importform-table th.importform-th-qty { min-width: 100px; width: 100px; text-align: center; }
+.importform-table th.importform-th-price { min-width: 130px; width: 130px; text-align: center; }
+.importform-table th.importform-th-total { min-width: 130px; width: 130px; text-align: center; }
+.importform-table th.importform-th-action { min-width: 60px; width: 60px; text-align: center; }
+
+.importform-table td {
+  padding: 8px 6px;
+  vertical-align: middle;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.importform-table td.importform-td-qty { width: 100px; text-align: center; }
+.importform-table td.importform-td-price { width: 130px; text-align: center; }
+.importform-table td.importform-td-total { width: 130px; text-align: center; }
+.importform-table td.importform-td-action { width: 60px; text-align: center; }
+
+.importform-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.importform-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.importform-total {
+  font-weight: 600;
+  color: #095e5a;
+}
+
+.importform-summary {
+  display: flex;
+  justify-content: flex-end;
+  gap: 32px;
+  margin-top: 18px;
+}
+
+.importform-summary-box {
+  min-width: 220px;
+}
+
+.importform-summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.importform-summary-final {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 18px;
+  color: #095e5a;
+}
+
+.importform-add-btn {
+  background: #198754;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.importform-remove-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  margin: 0 auto;
+  display: block;
+}
+
+.importform-remove-btn .fa-trash {
+  color: #e74c3c;
+  font-size: 18px;
+}
+
+/* New styles moved from inline styles */
+.importform-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.importform-modal-content {
+  max-width: 900px;
+  width: 90%;
+  min-width: 350px;
+  min-height: 200px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.importform-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #eee;
+  border-radius: 8px 8px 0 0;
+  background: #fff;
+}
+
+.importform-body {
+  padding: 24px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  max-height: 70vh;
+}
+
+.importform-header-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #095e5a;
+}
+
+.importform-header-icon {
+  color: #095e5a;
+  margin-right: 10px;
+}
+
+.importform-icon {
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.importform-section-label {
+  font-weight: 600;
+  font-size: 1.05em;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.importform-group-margin-top {
+  margin-top: 18px;
+}
+
+.importform-actions-margin-top {
+  margin-top: 24px;
+}
+
+.importform-table-header-row {
+  background: #f5f5f5;
+}
+
+.importform-full-width {
+  width: 100%;
+}
+
+.importform-table-container {
+  overflow-x: auto;
+  margin-bottom: 12px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.importform-book-select {
+  width: 100%;
+  min-width: 220px;
+  max-width: 350px;
+  padding: 8px;
+  margin: 0;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  display: block;
+}
+
+.importform-quantity-input {
+  width: 80px;
+  min-width: 50px;
+  max-width: 90px;
+  padding: 8px;
+  margin: 0 auto;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  text-align: center;
+  display: block;
+}
+
+.importform-price-input {
+  width: 110px;
+  min-width: 90px;
+  max-width: 130px;
+  padding: 8px;
+  margin: 0 auto;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  text-align: right;
+  display: block;
+}
+
+.importform-total-input {
+  width: 110px;
+  min-width: 90px;
+  max-width: 130px;
+  padding: 8px;
+  margin: 0 auto;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  background: #f8f9fa;
+  color: #333;
+  text-align: right;
+  display: block;
+}
+
+.importform-readonly-input {
+  background: #f8f9fa;
+  color: #333;
+}
+
+.importform-button {
+  font-size: 16px;
+  padding: 8px 22px;
+}

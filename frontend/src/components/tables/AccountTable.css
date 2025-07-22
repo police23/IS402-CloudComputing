@@ -1,0 +1,453 @@
+/* Basic styles for AccountTable */
+
+.account-table {
+    width: 100%;
+    border-spacing: 0;
+    color: #333;
+    background: #fff;
+    table-layout: fixed;
+    font-size: 14px;
+}
+
+.account-table th {
+    background-color: #f8f9fa;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.account-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    font-size: 14px;
+    word-break: break-word;
+    vertical-align: middle;
+}
+
+/* Removed redundant .account-table th style as it's defined above */
+.account-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.account-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.account-table tbody tr.selected {
+    background-color: #f0f0f0;
+}
+
+.account-table tbody tr.selected:hover {
+    background-color: #e0e0e0;
+}
+
+/* Actions buttons within the table */
+.account-table .actions {
+    white-space: nowrap;
+}
+
+.account-table .actions button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background-color: transparent;
+    color: #666;
+    cursor: pointer;
+    margin: 0 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.account-table .actions button:hover {
+    background-color: #f1f1f1;
+}
+
+.account-table .actions button.lock-button:hover {
+    color: #dc3545;
+}
+
+.account-table .actions button.unlock-button:hover {
+    color: #28a745;
+}
+
+.account-table .actions button.delete-button:hover {
+    color: #dc3545;
+}
+
+.account-table .actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Data tools - search and add button container */
+.data-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.add-button {
+    background-color: #095e5a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.add-button:hover {
+    background-color: #074542;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+
+
+.search-container {
+    position: relative;
+    width: 350px;
+    max-width: 100%;
+    flex-shrink: 0;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border-radius: 30px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(9, 94, 90, 0.2);
+    border-color: #095e5a;
+    background-color: #fff;
+}
+
+.search-button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #095e5a;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.search-button:hover {
+    background-color: rgba(9, 94, 90, 0.1);
+}
+
+
+
+/* Pagination styles */
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.pagination-info {
+    color: #666;
+    font-size: 14px;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.pagination-button {
+    min-width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.pagination-button:hover {
+    background-color: #f1f1f1;
+}
+
+.pagination-button.active {
+    background-color: #095e5a;
+    color: white;
+    border-color: #095e5a;
+}
+
+.pagination-button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+
+
+/* Message container for notifications */
+.message-container {
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    animation: fadeIn 0.3s ease;
+}
+
+.success-message {
+    background-color: #f0f9e8;
+    border-left: 4px solid #4F8A10;
+    color: #4F8A10;
+}
+
+.error-message {
+    background-color: #fff6f6;
+    border-left: 4px solid #dc3545;
+    color: #dc3545;
+}
+
+.message-icon {
+    font-size: 20px;
+}
+
+.message-content {
+    flex: 1;
+}
+
+.message-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.message-text {
+    margin: 5px 0;
+}
+
+.message-note {
+    font-size: 12px;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* Animation effects */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Spinner loading */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    margin: 10px auto;
+    border: 3px solid rgba(9, 94, 90, 0.1);
+    border-radius: 50%;
+    border-top-color: #095e5a;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+
+/* Căn chỉnh các cột để fit perfectly màn hình */
+.account-table th:nth-child(1),
+.account-table td:nth-child(1) {
+    width: 20%;
+    text-align: left;
+    padding-left: 16px;
+}
+
+.account-table th:nth-child(2),
+.account-table td:nth-child(2) {
+    width: 22%;
+    text-align: left;
+}
+
+/* Cột Liên hệ trở đi - dịch sang trái */
+.account-table th:nth-child(3),
+.account-table td:nth-child(3) {
+    width: 20%;
+    text-align: left;
+    padding-left: 0px;
+}
+
+.account-table th:nth-child(4),
+.account-table td:nth-child(4) {
+    width: 15%;
+    text-align: left;
+    padding-left: 0px;
+}
+
+.account-table th:nth-child(5),
+.account-table td:nth-child(5) {
+    width: 10%;
+    text-align: left;
+    padding-left: 0px;
+}
+
+.account-table th:nth-child(6),
+.account-table td:nth-child(6) {
+    width: 10%;
+    text-align: center;
+    padding-left: 0px;
+}
+
+/* Đảm bảo tất cả các hàng trong table đều được căn chuẩn */
+.account-table tr {
+    text-align: left;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 12px;
+    text-align: center;
+    min-width: 80px;
+    text-transform: capitalize;
+}
+
+.status-active {
+    background-color: #1e90ff;
+    color: #fff;
+}
+
+.status-inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Responsive adjustments để fit màn hình */
+@media (max-width: 1200px) {
+  .search-container {
+    width: 300px;
+  }
+  
+  .data-tools {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 992px) {
+  .search-container {
+    width: 250px;
+  }
+  
+  .account-table th,
+  .account-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-container {
+    width: 100%;
+    max-width: none;
+  }
+  
+  .data-tools {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+  
+  .add-button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .account-table th,
+  .account-table td {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  
+  /* Điều chỉnh width các cột cho mobile */
+  .account-table th:nth-child(1),
+  .account-table td:nth-child(1) {
+    width: 25%;
+  }
+  
+  .account-table th:nth-child(2),
+  .account-table td:nth-child(2) {
+    width: 25%;
+  }
+  
+  .account-table th:nth-child(3),
+  .account-table td:nth-child(3) {
+    width: 20%;
+  }
+  
+  .account-table th:nth-child(4),
+  .account-table td:nth-child(4) {
+    width: 15%;
+  }
+  
+  .account-table th:nth-child(5),
+  .account-table td:nth-child(5) {
+    width: 10%;
+  }
+  
+  .account-table th:nth-child(6),
+  .account-table td:nth-child(6) {
+    width: 5%;
+  }
+}
+
+@media (max-width: 576px) {
+  .account-table-container {
+    overflow-x: auto;
+  }
+  
+  .account-table {
+    min-width: 600px;
+  }
+}
+
+/* Container cho bảng - fit perfectly với màn hình */
+.account-table-container {
+    width: 100%;
+    height: auto;
+    overflow: auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

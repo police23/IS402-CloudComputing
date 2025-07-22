@@ -1,0 +1,256 @@
+.notification {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    min-width: 260px;
+    z-index: 9999;
+    margin: 0;
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    border-radius: 8px;
+    padding: 14px 24px 18px 18px;
+    background: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    color: #222;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.notification.success {
+    border-left: 5px solid #48B162;
+    background-color: #48B162; /* Thêm màu nền xanh lá */
+    color: #ffffff; /* Thay đổi màu chữ thành trắng */
+}
+.notification.error {
+    border-left: 5px solid #d32f2f;
+    color: #d32f2f;
+}
+.notification .notification-message {
+    flex: 1;
+}
+.notification .notification-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #888;
+    cursor: pointer;
+    margin-left: 10px;
+    padding: 0 4px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+.notification .notification-close:hover {
+    color: #d32f2f;
+}
+.progress-bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+    background: #eee;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+}
+.progress-bar::after {
+    content: "";
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: #48B162;
+    animation: progressBarAnim 5s linear;
+}
+.notification.error .progress-bar::after {
+    background: #d32f2f;
+}
+/* Giảm width cột mã phiếu */
+.damaged-book-table th:nth-child(2),
+.damaged-book-table td:nth-child(2) {
+  width: 8%;
+  min-width: 60px;
+  max-width: 90px;
+}
+
+.damaged-book-table-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+  margin-top: 20px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.damaged-book-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9em;
+}
+
+.damaged-book-table th,
+.damaged-book-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  white-space: normal;
+  word-wrap: break-word;
+  vertical-align: middle;
+  min-width: 10px;
+  background-clip: padding-box;
+  max-width: 100%;
+  text-align: left;
+}
+
+.damaged-book-table td {
+  vertical-align: middle;
+}
+
+/* Cột checkbox */
+.damaged-book-table th:first-child,
+.damaged-book-table td:first-child {
+  width: 1%;
+}
+
+/* Cột tên sách */
+.damaged-book-table th:nth-child(2),
+.damaged-book-table td:nth-child(2) {
+  width: 20%;
+}
+
+/* Cột tác giả */
+.damaged-book-table th:nth-child(3),
+.damaged-book-table td:nth-child(3) {
+  width: 15%;
+}
+
+/* Cột mô tả hư hỏng */
+.damaged-book-table th:nth-child(4),
+.damaged-book-table td:nth-child(4) {
+  width: 25%;
+}
+
+/* Cột ngày phát hiện */
+.damaged-book-table th:nth-child(5),
+.damaged-book-table td:nth-child(5) {
+  width: 15%;
+}
+
+
+
+.damaged-book-table th {
+  font-weight: 600;
+  color: #000000c2;
+  background-color: #f9f9f9;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.damaged-book-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+.damaged-book-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+/* Checkbox styles */
+.damaged-book-table input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #095E5A;
+}
+
+/* Selected row styles */
+.damaged-book-table tbody tr.selected {
+  background-color: #f0f0f0;
+}
+
+.damaged-book-table tbody tr.selected:hover {
+  background-color: #e0e0e0;
+}
+
+.damaged-book-table tbody tr:hover td {
+  background-color: inherit;
+}
+
+/* Status styles */
+
+
+.damaged-book-table.actions {
+  gap: 9px;
+  text-align: center;
+}
+
+/* Pagination styles */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 1rem;
+}
+
+.pagination-info {
+  color: #666;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pagination-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #f5f5f5;
+}
+
+.pagination-button.active {
+  background-color: #095E5A;
+  color: white;
+  border-color: #095E5A;
+}
+
+.pagination-button:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Giảm width input mã phiếu trong advanced search */
+.advanced-search-panel .search-field input[type="text"]:first-child {
+  width: 20px;
+}
+
+/* Giảm width input mã phiếu trong advanced search */
+.advanced-search-panel .search-field input.advanced-search-id {
+  width: 140px !important;
+  padding-right: 0;
+}
+
+@media (max-width: 768px) {
+  .damaged-book-table {
+    min-width: 900px;
+  }
+  .damaged-book-table th,
+  .damaged-book-table td {
+    padding: 8px 10px;
+    font-size: 0.9em;
+  }
+}

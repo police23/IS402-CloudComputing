@@ -1,0 +1,107 @@
+.order-success-page {
+  min-height: 100vh;
+  background: #f7fafc;
+}
+.order-success-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 32px 24px 24px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.order-success-icon-wrapper {
+  position: relative;
+  margin-bottom: 24px;
+}
+.order-success-icon-bg {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #e6fffa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: 0 2px 12px rgba(110,198,198,0.12);
+  position: relative;
+}
+.order-success-emoji {
+  font-size: 48px;
+}
+.order-success-check {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+}
+.order-success-title {
+  color: #38b2ac;
+  font-weight: 800;
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+.order-success-desc {
+  color: #4a5568;
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.order-info-box {
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 20px 28px;
+  margin: 0 0 24px 0;
+  min-width: 440px;
+  max-width: 600px;
+  box-shadow: 0 1px 8px rgba(110,198,198,0.07);
+  text-align: left;
+}
+.order-info-title {
+  color: #319795;
+  font-weight: 700;
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+.order-info-row {
+  margin-bottom: 8px;
+}
+.order-info-code {
+  color: #2b6cb0;
+}
+.order-info-method {
+  color: #319795;
+}
+.order-info-total {
+  color: #e53e3e;
+  font-weight: 700;
+}
+.order-success-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+.btn-back-home, .btn-view-orders {
+  min-width: 140px;
+  margin: 8px 8px 0 8px;
+  padding: 12px 0;
+  border: none;
+  border-radius: 6px;
+  background: #38b2ac;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: inline-block;
+}
+.btn-back-home:hover, .btn-view-orders:hover {
+  background: #319795;
+}
+.btn-view-orders {
+  min-width: 180px;
+}

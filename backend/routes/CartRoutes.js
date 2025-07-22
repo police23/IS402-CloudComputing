@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const CartController = require('../controllers/CartController');
+const { verifyToken } = require('../middlewares/authMiddleware');
+router.use(verifyToken);
+router.get('/', CartController.getCart);
+router.post('/', CartController.addToCart);
+router.put('/quantity', CartController.updateQuantity);
+router.delete('/:bookID', CartController.removeFromCart);
+router.get('/total', CartController.getCartTotal);
+module.exports = router;

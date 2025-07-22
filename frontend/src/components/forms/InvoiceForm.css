@@ -1,0 +1,241 @@
+/* CSS cho InvoiceForm */
+
+.invoiceform-flex-row {
+  display: flex;
+  gap: 24px;
+}
+.invoiceform-flex-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.invoiceform-flex-column {
+  flex: 1;
+}
+.invoiceform-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.invoiceform-table {
+  width: 100%;
+  margin-bottom: 8px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.invoiceform-table th {
+  padding: 6px;
+  min-width: 0;
+  width: auto;
+}
+.invoiceform-table th.invoiceform-th-book { min-width: 180px; width: 180px; }
+.invoiceform-table th.invoiceform-th-qty { min-width: 70px; width: 70px; }
+.invoiceform-table th.invoiceform-th-price { min-width: 100px; width: 100px; }
+.invoiceform-table th.invoiceform-th-discount { min-width: 80px; width: 80px; }
+.invoiceform-table th.invoiceform-th-total { min-width: 110px; width: 110px; }
+.invoiceform-table th.invoiceform-th-action { min-width: 40px; width: 40px; }
+
+.invoiceform-table td {
+  padding: 6px;
+}
+.invoiceform-table td.invoiceform-td-book { width: 180px; }
+.invoiceform-table td.invoiceform-td-qty { width: 70px; }
+.invoiceform-table td.invoiceform-td-price { width: 100px; }
+.invoiceform-table td.invoiceform-td-discount { width: 80px; }
+.invoiceform-table td.invoiceform-td-total { width: 110px; text-align: right; padding-right: 8px; }
+.invoiceform-table td.invoiceform-td-action { width: 40px; }
+
+.invoiceform-thanh-tien {
+  font-weight: 600;
+  color: #095e5a;
+}
+.invoiceform-summary {
+  display: flex;
+  justify-content: flex-end;
+  gap: 32px;
+  margin-top: 18px;
+}
+.invoiceform-summary-box {
+  min-width: 220px;
+}
+.invoiceform-summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.invoiceform-summary-final {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 18px;
+  color: #095e5a;
+}
+.invoiceform-add-btn {
+  font-size: 16px;
+  padding: 8px 22px;
+}
+.invoiceform-remove-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.invoiceform-remove-btn .fa-trash {
+  color: #e74c3c;
+  font-size: 18px;
+}
+
+/* New styles moved from inline styles */
+.invoiceform-modal-content {
+  max-width: 1200px;
+  min-width: 1000px;
+}
+
+.invoiceform-header-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #095e5a;
+}
+
+.invoiceform-header-icon {
+  color: #095e5a;
+  margin-right: 10px;
+}
+
+.invoiceform-icon {
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.invoiceform-section-label {
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 0;
+}
+
+.invoiceform-group-margin-top {
+  margin-top: 18px;
+}
+
+.invoiceform-actions-margin-top {
+  margin-top: 24px;
+}
+
+.invoiceform-table-header-row {
+  background: #f5f5f5;
+}
+
+.invoiceform-full-width {
+  width: 100%;
+}
+
+.invoiceform-select {
+  width: 100%;
+  min-width: 160px;
+}
+
+.invoiceform-discount-input {
+  width: 90px;
+  text-align: right;
+}
+
+.invoiceform-button {
+  font-size: 16px;
+  padding: 8px 22px;
+}
+
+/* Add/modify these styles to fix the z-index issue */
+.modal-backdrop {
+  z-index: 1050; /* Increase z-index to be higher than search components */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.invoiceform-modal-content {
+  z-index: 1051;
+  position: relative;
+  min-height: 400px;
+  max-height: 90vh;
+  max-width: 1050px;
+  min-width: 500px;
+  width: 98vw;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 0;
+  margin: 0 auto;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}
+
+.invoiceform-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+  border-radius: 12px 12px 0 0;
+}
+
+.invoiceform-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex-grow: 1;
+  position: relative;
+  z-index: auto;
+}
+
+.invoiceform-promo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.invoiceform-promo-row select {
+  height: 32px;
+  font-size: 16px;
+  min-width: 140px;
+  padding: 0 8px;
+}
+
+.invoiceform-promo-row select:focus {
+  border: 1.5px solid #095e5a;
+  outline: none;
+}
+
+.invoiceform-promo-row .save-button {
+  height: 32px;
+  font-size: 12px;
+  padding: 0 10px;
+  min-width: 0;
+  border-radius: 7px;
+  white-space: nowrap;
+  font-weight: 500;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 700px) {
+  .invoiceform-promo-row select, .invoiceform-promo-row .save-button {
+    height: 38px;
+    font-size: 15px;
+    min-width: 120px;
+    padding: 0 10px;
+  }
+}

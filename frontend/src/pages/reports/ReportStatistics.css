@@ -1,0 +1,83 @@
+.report-statistics-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  max-width: 900px;
+  margin: 0 auto;
+  margin-top: 25px;
+}
+
+.report-title {
+  margin-bottom: 20px;
+}
+
+.report-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 24px;
+}
+
+.report-tab-btn {
+  padding: 12px 28px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  font-weight: 600;
+  color: #444;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+  transition: color 0.2s, border-bottom 0.2s;
+}
+
+.report-tab-btn.active {
+  color: #095e5a;
+  border-bottom: 3px solid #095e5a;
+}
+
+.report-filter-row {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  justify-content: center; /* căn giữa hàng chọn tháng/năm */
+}
+
+.report-filter-row label {
+  font-weight: 500;
+  color: #095e5a;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.report-filter-row select,
+.report-filter-row input[type="number"] {
+  padding: 7px 14px;
+  border: 1.5px solid #b2b2b2;
+  border-radius: 6px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  background: #f8f9fa;
+  color: #222;
+  margin-left: 8px;
+}
+
+.report-filter-row select:focus,
+.report-filter-row input[type="number"]:focus {
+  border-color: #095e5a;
+  background: #fff;
+}
+
+.report-filter-row select {
+  min-width: 60px;
+}
+
+.report-filter-row input[type="number"] {
+  width: 100px;
+}

@@ -1,0 +1,41 @@
+.login-link {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+.login-button-link {
+  background: none;
+  border: none;
+  color: #4A90E2;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+  padding: 0 2px;
+  transition: color 0.2s;
+}
+.login-button-link:hover {
+  color: #2A70C2;
+}
+.register-button {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 0.625rem;
+  background: #095e5a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.register-button:hover:not(:disabled) {
+  background-color: #046c6c;
+}
+.register-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+.register-form label,
+.register-form .input-group label {
+  font-weight: 600;
+}

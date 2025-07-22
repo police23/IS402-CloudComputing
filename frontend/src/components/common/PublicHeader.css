@@ -1,0 +1,181 @@
+/* Public Header Styles với màu xanh #6ec6c6 */
+.homepage-header {
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(110,198,198,0.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px;
+  height: 70px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-logo {
+  font-size: 2.1rem;
+  font-weight: bold;
+  color: #6ec6c6;
+  cursor: pointer;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+}
+
+.header-logo-img {
+  height: 46px;
+  width: auto;
+}
+
+.header-nav {
+  display: flex;
+  gap: 36px;
+}
+
+.header-nav span {
+  font-size: 1.6rem;
+  color: #6ec6c6;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-nav span:hover {
+  background: #e6f7f7;
+  color: #4da6a6;
+}
+
+.header-nav span svg {
+  flex-shrink: 0;
+}
+
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f0f9f9;
+  color: #6ec6c6;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+}
+
+.header-icon:hover {
+  background: #6ec6c6;
+  color: #fff;
+}
+
+/* Cart badge styles */
+.cart-icon {
+  position: relative;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #e53e3e;
+  color: #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 20px;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.header-login-btn {
+  margin-left: 12px;
+  background: #6ec6c6;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 12px 28px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.header-login-btn:hover {
+  background: #5bb8b8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .homepage-header {
+    padding: 0 20px;
+    height: 65px;
+  }
+  
+  .header-nav {
+    gap: 24px;
+  }
+  
+  .header-nav span {
+    font-size: 1.5rem;
+  }
+  
+  .header-icons {
+    gap: 15px;
+  }
+  
+  .header-login-btn {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+  }
+  
+  .cart-badge {
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    min-width: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .homepage-header {
+    padding: 0 16px;
+    height: 60px;
+  }
+  
+  .header-nav {
+    display: none;
+  }
+  
+  .header-logo {
+    font-size: 1.9rem;
+  }
+  
+  .header-logo-img {
+    height: 40px;
+  }
+  
+  .cart-badge {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    min-width: 16px;
+  }
+}

@@ -1,0 +1,510 @@
+.homepage-container {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #6ec6c6;
+  min-height: 100vh;
+}
+.homepage-banner {
+  background: linear-gradient(90deg, #6ec6c6 0%, #5bb8b8 100%);
+  color: #fff;
+  padding: 40px 0 20px 0;
+  text-align: center;
+}
+.homepage-hero {
+  background-size: cover;
+  background-position: center;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.homepage-hero-noimg {
+  background: linear-gradient(90deg, #6ec6c6 0%, #5bb8b8 100%);
+}
+.hero-content {
+  background: rgba(255,255,255,0.85);
+  padding: 36px 48px;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(110,198,198,0.10);
+}
+.hero-content h1 {
+  font-size: 2.5rem;
+  color: #6ec6c6;
+  margin-bottom: 12px;
+}
+.hero-content p {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 18px;
+}
+.homepage-search {
+  display: flex;
+  justify-content: center;
+  margin: 32px 0 20px 0;
+}
+.homepage-search input {
+  width: 350px;
+  padding: 12px 16px;
+  border: 1.5px solid #6ec6c6;
+  border-radius: 6px 0 0 6px;
+  outline: none;
+  font-size: 17px;
+}
+.homepage-search button {
+  padding: 12px 28px;
+  border: none;
+  background: #6ec6c6;
+  color: #fff;
+  border-radius: 0 6px 6px 0;
+  font-size: 17px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.homepage-search button:hover {
+  background: #5bb8b8;
+}
+.homepage-categories {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+.category-card {
+  background: #fff;
+  border: 2px solid #6ec6c6;
+  color: #6ec6c6;
+  padding: 18px 28px 12px 28px;
+  border-radius: 18px;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 110px;
+  box-shadow: 0 2px 8px rgba(110,198,198,0.07);
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.category-card:hover {
+  background: #6ec6c6;
+  color: #fff;
+  border: 2px solid #5bb8b8;
+}
+.category-icon {
+  font-size: 2rem;
+  margin-bottom: 6px;
+}
+.homepage-products {
+  max-width: 1200px;
+  margin: 0 auto 36px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 36px 24px;
+}
+.homepage-products h2 {
+  color: #6ec6c6;
+  margin-bottom: 18px;
+  font-size: 1.6rem;
+}
+.products-slider {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  overflow-x: visible;
+  padding-bottom: 8px;
+  justify-content: center;
+}
+.product-card {
+  width: 150px;
+  flex: 1 1 200px;
+  background: #f0f9f9;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  padding: 20px 14px 22px 14px;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.product-card:hover {
+  box-shadow: 0 4px 18px rgba(110,198,198,0.18);
+  transform: translateY(-4px) scale(1.03);
+}
+.product-card img {
+  width: 120px;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+.product-card h3 {
+  font-size: 18px;
+  margin: 10px 0 6px 0;
+  color: #222;
+}
+.product-card p {
+  color: #6ec6c6;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+.product-card button {
+  background: #6ec6c6;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.product-card button:hover {
+  background: #5bb8b8;
+}
+.homepage-promo {
+  max-width: 1200px;
+  margin: 0 auto 40px auto;
+  background: #f0f9f9;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(110,198,198,0.10);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.homepage-promo-noimg {
+  background: #f0f9f9;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(110,198,198,0.10);
+  padding: 32px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 40px auto;
+  max-width: 1200px;
+}
+.promo-img {
+  width: 320px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 16px 0 0 16px;
+}
+.promo-content {
+  flex: 1;
+  padding: 32px 24px;
+  text-align: left;
+}
+.promo-content h2 {
+  color: #6ec6c6;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+.promo-banner {
+  color: #6ec6c6;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+.homepage-login-btn {
+  margin-top: 8px;
+  background: #6ec6c6;
+  color: #fff;
+  border: none;
+  border-radius: 22px;
+  padding: 10px 32px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(110,198,198,0.13);
+  transition: background 0.2s, color 0.2s;
+}
+.homepage-login-btn:hover {
+  background: #5bb8b8;
+  color: #fff;
+}
+/* Header styles đã được định nghĩa trong PublicHeader.css */
+
+/* Banner Slider */
+.banner-slider {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  height: 320px;
+  margin: 0 auto 36px auto;
+  overflow: hidden;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(110,198,198,0.13);
+  background: #e6f7f7;
+}
+.banner-slide {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0;
+  transition: opacity 0.7s;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0 0 36px 48px;
+}
+.banner-slide.active {
+  opacity: 1;
+  z-index: 2;
+}
+.banner-content {
+  background: rgba(255,255,255,0.85);
+  padding: 28px 38px;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(110,198,198,0.10);
+}
+.banner-content h2 {
+  color: #6ec6c6;
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+.banner-content p {
+  color: #333;
+  font-size: 1.1rem;
+}
+.banner-controls {
+  position: absolute;
+  bottom: 18px;
+  right: 32px;
+  z-index: 3;
+  display: flex;
+  gap: 10px;
+}
+.banner-controls button {
+  background: #6ec6c6;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.banner-controls button:hover {
+  background: #5bb8b8;
+}
+.banner-dots {
+  position: absolute;
+  bottom: 18px;
+  left: 32px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+.banner-dots span {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #b3e6e6;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.banner-dots span.active {
+  background: #6ec6c6;
+}
+
+/* Section chung */
+.homepage-section {
+  max-width: 1200px;
+  margin: 0 auto 36px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 36px 24px;
+}
+.homepage-section h2 {
+  color: #6ec6c6;
+  margin-bottom: 18px;
+  font-size: 1.6rem;
+}
+
+/* Sách mới, bán chạy */
+.products-slider {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 32px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+.product-card {
+  background: #f0f9f9;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  width: 210px;
+  min-width: 210px;
+  padding: 20px 14px 22px 14px;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.product-card:hover {
+  box-shadow: 0 4px 18px rgba(110,198,198,0.18);
+  transform: translateY(-4px) scale(1.03);
+}
+.product-card img {
+  width: 120px;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+.product-card h3 {
+  font-size: 18px;
+  margin: 10px 0 6px 0;
+  color: #222;
+}
+.product-card p {
+  color: #6ec6c6;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+.product-card button {
+  background: #6ec6c6;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.product-card button:hover {
+  background: #5bb8b8;
+}
+
+/* Khuyến mãi */
+.homepage-promo-list .promo-list {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.promo-card {
+  background: #f0f9f9;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(110,198,198,0.10);
+  display: flex;
+  align-items: center;
+  min-width: 320px;
+  max-width: 420px;
+  flex: 1;
+  padding: 18px 18px 18px 0;
+  overflow: hidden;
+}
+.promo-card img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 14px 0 0 14px;
+  margin-right: 18px;
+}
+.promo-info h3 {
+  color: #6ec6c6;
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+.promo-info p {
+  color: #6ec6c6;
+  font-size: 1rem;
+}
+.promo-card-custom {
+  background: #e6f7f7;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(110,198,198,0.10);
+  padding: 22px 28px 18px 28px;
+  min-width: 260px;
+  max-width: 320px;
+  flex: 1 1 260px;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.promo-card-custom:hover {
+  box-shadow: 0 4px 18px rgba(110,198,198,0.18);
+  transform: translateY(-4px) scale(1.03);
+}
+.promo-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.promo-code {
+  background: #6ec6c6;
+  color: #fff;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
+.promo-discount {
+  color: #ff4d4f;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+.promo-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 6px;
+}
+.promo-min {
+  color: #6ec6c6;
+  margin-bottom: 4px;
+}
+.promo-time {
+  color: #888;
+  font-size: 0.98rem;
+  margin-top: 2px;
+}
+
+@media (max-width: 900px) {
+  .banner-slider, .homepage-section {
+    max-width: 98vw;
+    padding: 18px 4vw;
+  }
+  .products-slider, .promo-list {
+    gap: 16px;
+  }
+  .product-card, .promo-card {
+    min-width: 160px;
+    width: 160px;
+    padding: 12px;
+  }
+  .promo-card img {
+    width: 70px;
+    height: 70px;
+  }
+}
+@media (max-width: 600px) {
+  .banner-slider, .homepage-section {
+    max-width: 100vw;
+    padding: 10px 2vw;
+  }
+  .products-slider, .promo-list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .product-card, .promo-card {
+    width: 100%;
+    min-width: 0;
+    align-items: flex-start;
+  }
+  .promo-card img {
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
+  }
+}
+

@@ -1,0 +1,138 @@
+/* BookForm Styles */
+.bookform-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.bookform-modal-content {
+  width : 75vw;
+  height: 600px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.bookform-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+  border-radius: 8px 8px 0 0;
+}
+
+.bookform-header h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.bookform-header .book-icon {
+  color: #095e5a;
+  margin-right: 10px;
+}
+
+.bookform-body {
+  padding: 20px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 70px);
+}
+
+.account-form .form-group {
+  margin-bottom: 18px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.account-form label {
+  font-size: 0.95em;
+  font-weight: 470;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.account-form .icon {
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.account-form input,
+.account-form select,
+.account-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.account-form input.error,
+.account-form select.error,
+.account-form textarea.error {
+  border-color: #ff0000;
+}
+
+.account-form .error-message {
+  color: #ff0000;
+  font-size: 0.9em;
+  margin-top: 4px;
+}
+
+.form-columns {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.form-column {
+  flex: 1 1 0;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-actions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-button {
+  padding: 10px 15px;
+  background-color: #f2f2f2;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.save-button {
+  padding: 10px 15px;
+  background-color: #095e5a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.save-button:hover {
+  background-color: #074340;
+}
+
+.cancel-button:hover {
+  background-color: #e0e0e0;
+}

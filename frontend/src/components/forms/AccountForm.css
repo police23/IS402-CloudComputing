@@ -1,0 +1,172 @@
+
+/* AccountForm.css - Cleaned up */
+
+.form-icon {
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.header-icon {
+  color: #095e5a;
+  margin-right: 10px;
+}
+
+.account-form .form-group {
+  margin-bottom: 18px;
+}
+
+.account-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 1.18rem;
+  font-weight: 470;
+}
+
+.form-columns {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.form-column {
+  width: 100%;
+}
+
+.account-form input[type="text"],
+.account-form input[type="email"],
+.account-form input[type="password"],
+.account-form select,
+.account-form textarea {
+  height: 48px !important;
+  min-height: unset !important;
+  max-height: unset !important;
+  padding: 14px;
+  font-size: 1.22rem;
+  box-sizing: border-box;
+  resize: none;
+  text-align: left !important;
+}
+
+.account-form input.error,
+.account-form select.error,
+.account-form textarea.error {
+  border-color: #e74c3c;
+  background: #fdf2f2;
+  text-align: left !important;
+}
+
+.account-form .error-message {
+  color: #e74c3c;
+  font-size: 1.08rem;
+  margin-top: 4px;
+}
+
+.gender-options {
+  display: flex;
+  gap: 30px;
+  margin-top: 10px;
+  padding: 8px 0;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+}
+
+.radio-label {
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 1.18rem;
+}
+
+.radio-input {
+  margin: 0;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.form-actions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.save-button,
+.cancel-button {
+  height: 48px;
+  font-size: 1.28rem;
+  font-weight: 700;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+}
+
+.save-button {
+  background-color: #095e5a;
+  color: white;
+}
+
+.cancel-button {
+  background-color: #f2f2f2;
+  color: #222;
+}
+
+.save-button:hover {
+  background-color: #074340;
+}
+
+.cancel-button:hover {
+  background-color: #e0e0e0;
+}
+
+.account-form-modal {
+  width: 100%;
+  padding-top: 64px;
+  padding-bottom: 56px;
+}
+
+.accountform-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.accountform-modal-content {
+  width: 800px;
+  max-width: 95vw;
+  min-width: 350px;
+  min-height: 200px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.accountform-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #eee;
+  border-radius: 8px 8px 0 0;
+  background: #fff;
+}
+
+.accountform-modal-body {
+  padding: 24px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  max-height: 70vh;
+}

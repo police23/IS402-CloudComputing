@@ -1,0 +1,110 @@
+/* 
+* global-buttons.css
+* File CSS toàn cục cho các nút trên toàn bộ ứng dụng
+* Được thiết kế để đảm bảo tính nhất quán giữa các component
+* Cần import file này ở mức cao nhất trong ứng dụng (ví dụ: main.jsx hoặc App.jsx)
+*/
+
+/* 
+* Lưu ý về độ ưu tiên CSS:
+* File này nên được import sau cùng để có độ ưu tiên cao nhất
+* Sử dụng !important cho các thuộc tính quan trọng để đảm bảo ghi đè các style khác
+*/
+
+/* ===== BUTTON STYLES ===== */
+/* Định dạng chung cho tất cả các button có class .btn */
+.btn {
+  padding: 9px 16px !important;
+  border-radius: 12px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: all 0.3s ease !important;
+  border: none !important;
+  font-weight: bold !important;
+}
+
+.btn svg {
+  font-size: 14px !important;
+}
+
+/* Nút Thêm (màu xanh lá) */
+.btn-add {
+  background-color: #398b4e !important;
+  color: white !important;
+}
+
+.btn-add:hover {
+  background-color: #275c34 !important;
+}
+
+/* Nút Sửa (màu xanh dương) */
+.btn-edit {
+  background-color: #4A7CAE !important;
+  color: white !important;
+}
+
+.btn-edit:hover {
+  background-color: rgb(12, 58, 128) !important;
+}
+
+.btn-edit:disabled {
+  background-color: #ccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
+}
+
+/* Nút Xóa (màu đỏ) */
+.btn-delete {
+  background-color: #AE4A4A !important;
+  color: white !important;
+}
+
+.btn-delete:hover {
+  background-color: rgb(139, 20, 20) !important;
+}
+
+.btn-delete:disabled {
+  background-color: #ccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
+}
+
+/* ===== ACTION BUTTONS CONTAINER ===== */
+/* Định dạng cho container chứa các nút */
+.action-buttons {
+  display: flex !important;
+  gap: 10px !important;
+  order: 1 !important; /* Đảm bảo nút nằm bên trái */
+}
+
+/* ===== FORM ACTION BUTTONS ===== */
+/* Định dạng cho các nút trong form */
+.form-actions .btn {
+  min-width: 100px !important;
+}
+
+/* ===== TABLE ACTION BUTTONS ===== */
+/* Định dạng cho các nút trong bảng */
+.table-actions {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin: 20px 0 !important;
+  flex-wrap: wrap !important;
+  gap: 15px !important;
+}
+
+/* ===== RESPONSIVE STYLES ===== */
+@media (max-width: 768px) {
+  .btn {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+  
+  .action-buttons {
+    flex-wrap: wrap !important;
+  }
+}

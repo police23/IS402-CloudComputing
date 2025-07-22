@@ -1,0 +1,212 @@
+/* Address Form Modal */
+.address-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.address-form-modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.address-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 16px 24px;
+  border-bottom: 1px solid #e0f7fa;
+}
+
+.address-form-header h3 {
+  color: #095e5a;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #e74c3c;
+}
+
+.address-form-content {
+  padding: 24px;
+}
+
+.address-form-content .form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.address-form-content .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #095e5a;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.address-form-content .form-group input,
+.address-form-content .form-group select,
+.address-form-content .form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1.4rem;
+  transition: all 0.3s ease;
+  background: #f8fffe;
+}
+
+.address-form-content .form-group input:focus,
+.address-form-content .form-group select:focus,
+.address-form-content .form-group textarea:focus {
+  outline: none;
+  border-color: #095e5a;
+  box-shadow: 0 0 0 3px rgba(9,94,90,0.1);
+}
+
+.address-form-content .form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.address-form-content .form-row {
+  display: flex;
+  gap: 16px;
+  align-items: stretch; /* Make all columns the same height */
+  margin-bottom: 0;
+}
+
+.address-form-content .form-row .form-group {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.address-form-content .form-row .form-group label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #095e5a;
+  font-size: 1.4rem;
+  white-space: normal;
+}
+
+.address-form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px 24px 24px 24px;
+  border-top: 1px solid #e0f7fa;
+}
+
+/* Button styles */
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  min-height: 44px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-add {
+  background: linear-gradient(135deg, #095e5a 0%, #0d7a75 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(9,94,90,0.3);
+}
+
+.btn-add:hover:not(:disabled) {
+  background: linear-gradient(135deg, #074a47 0%, #095e5a 100%);
+  box-shadow: 0 4px 12px rgba(9,94,90,0.4);
+  transform: translateY(-1px);
+}
+
+.btn:not(.btn-add) {
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.btn:not(.btn-add):hover:not(:disabled) {
+  background: #e9ecef;
+  color: #495057;
+  transform: translateY(-1px);
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+  .address-form-content .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  .address-form-content .form-row .form-group {
+    margin-bottom: 20px;
+  }
+  .address-form-content .form-row .form-group:last-child {
+    margin-bottom: 0;
+  }
+  .address-form-modal {
+    margin: 10px;
+    max-height: 95vh;
+  }
+  .address-form-overlay {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .address-form-header,
+  .address-form-content,
+  .address-form-actions {
+    padding: 16px;
+  }
+  .address-form-content .form-group label {
+    font-size: 1.3rem;
+  }
+  .address-form-content .form-group input,
+  .address-form-content .form-group select,
+  .address-form-content .form-group textarea {
+    font-size: 1.3rem;
+    padding: 10px;
+  }
+}

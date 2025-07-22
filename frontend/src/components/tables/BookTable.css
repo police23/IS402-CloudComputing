@@ -1,0 +1,485 @@
+.book-table-container {
+  background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+}
+
+.book-table {
+  width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.9em;
+}
+
+.book-table th,
+.book-table td {
+  padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    white-space: normal;
+    word-wrap: break-word;
+    vertical-align: middle;
+    min-width: 10px;
+    background-clip: padding-box;
+    max-width: 100%;
+    text-align: left;
+}
+
+.book-table td {
+    vertical-align: middle;
+}
+
+/* Cột checkbox */
+.book-table th:first-child,
+.book-table td:first-child {
+    width: 1%;
+}
+
+/* Cột tên sách */
+.book-table th:nth-child(2),
+.book-table td:nth-child(2) {
+    width: 20%;
+}
+
+/* Cột tác giả */
+.book-table th:nth-child(3),
+.book-table td:nth-child(3) {
+    width: 15%;
+}
+
+/* Cột thể loại */
+.book-table th:nth-child(4),
+.book-table td:nth-child(4) {
+    width: 12%;
+}
+
+/* Cột nhà xuất bản */
+.book-table th:nth-child(5),
+.book-table td:nth-child(5) {
+    width: 15%;
+}
+
+/* Cột giá */
+.book-table th:nth-child(6),
+.book-table td:nth-child(6) {
+    width: 10%;
+}
+
+/* Cột số lượng */
+.book-table th:nth-child(7),
+.book-table td:nth-child(7) {
+    width: 10%;
+}
+
+/* Cột trạng thái */
+.book-table th:nth-child(8),
+.book-table td:nth-child(8) {
+    width: 10%;
+}
+
+.book-table th {
+    font-weight: 600;
+    color: #000000c2;
+    background-color: #f9f9f9;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.book-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.book-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+/* Checkbox styles */
+.book-table input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #095E5A;
+}
+
+/* Selected row styles */
+.book-table tbody tr.selected {
+    background-color: #f0f0f0;
+}
+
+.book-table tbody tr.selected:hover {
+    background-color: #e0e0e0;
+}
+
+.book-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.book-table tbody tr:hover td {
+    background-color: inherit;
+}
+
+/* Status styles */
+.book-table .status-active {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+    border: 1px solid rgba(25, 135, 84, 0.2);
+    border-radius: 12px;
+    padding: 4px 8px;
+    display: inline-block;
+}
+
+.book-table .status-inactive {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    border-radius: 12px;
+    padding: 4px 8px;
+    display: inline-block;
+}
+
+.book-table .status-out {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    border-radius: 12px;
+    padding: 4px 8px;
+    display: inline-block;
+}
+
+.book-table.actions {
+    gap: 9px;
+    text-align: center;
+}
+
+/* Table container */
+.book-table-container {
+    margin-top: 20px;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Pagination styles */
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+}
+
+.pagination-info {
+    color: #666;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.pagination-button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background-color: #f5f5f5;
+}
+
+.pagination-button.active {
+    background-color: #095E5A;
+    color: white;
+    border-color: #095E5A;
+}
+
+.pagination-button:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .book-table {
+        min-width: 1000px;
+    }
+    
+    .book-table th,
+    .book-table td {
+        padding: 10px 12px;
+    }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .book-table th,
+  .book-table td {
+    padding: 8px 10px;
+    font-size: 0.9em;
+  }
+  
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+  
+  /* Advanced search panel responsive */
+  .advanced-search-panel {
+    width: calc(100vw - 20px);
+    margin-left: -10px;
+    padding: 12px;
+  }
+  
+  .search-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .search-field.price-field,
+  .search-field.status-field {
+    flex: 1;
+  }
+  
+  .price-range-container {
+    gap: 6px;
+  }
+  
+  .price-range-container input {
+    min-width: 60px;
+  }
+}
+
+/* Điều chỉnh icon và khoảng cách trong action-buttons */
+.action-buttons .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.action-buttons .btn svg {
+    margin-right: 6px;
+    transform: translateY(-2px);
+}
+
+/* Notification styles */
+.notification.error {
+  background-color: white;
+  color: black;
+  border: 1px solid #f44336;
+}
+
+.notification.error .notification-message {
+  color: black;
+}
+
+.notification.error .notification-close {
+  color: black;
+}
+
+.notification.error .progress-bar {
+  background-color: #f44336;
+}
+
+/* Advanced search styles */
+.search-container {
+  display: flex;
+  position: relative;
+  width: 100%;
+  margin-left: -20px; /* Increased from -10px to move further left */
+}
+
+/* Search field selector dropdown */
+.search-field-selector {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+  padding: 8px 12px;
+  font-size: 0.9em;
+  color: #555;
+  cursor: pointer;
+  min-width: 122px; /* Increased from 120px */
+  outline: none;
+}
+
+.search-field-selector:focus {
+  border-color: #095E5A;
+  background-color: #fff;
+}
+
+/* Adjust search input to fit with selector and work as both input and select */
+.search-input {
+  flex-grow: 1;
+  border-radius: 0 !important;
+  border-left: none;
+  border-right: none;
+  height: 38px;
+  padding: 8px 16px; /* Increased padding from 8px 12px */
+  font-size: 0.95em; /* Slightly increased font size */
+  border: 1px solid #ddd;
+  outline: none;
+  min-width: 200px; /* Increased from 350px */
+}
+
+/* Ensure select elements in search also look consistent */
+.search-input:focus {
+  border-color: #095E5A;
+}
+
+/* Style for when search input is a select dropdown */
+select.search-input {
+  cursor: pointer;
+  background-color: white;
+}
+
+.filter-button {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  transition: background-color 0.2s;
+  border-radius: 0 4px 4px 0;
+}
+
+.filter-button.active {
+  background-color: #095E5A;
+  color: white;
+  border-color: #095E5A;
+}
+
+.filter-button:hover {
+  background-color: #e9e9e9;
+}
+
+.filter-button.active:hover {
+  background-color: #074e4a;
+}
+
+/* Advanced search panel - position it absolutely so it doesn't affect layout flow */
+.search-filter-container {
+  position: relative;
+}
+
+.advanced-search-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  width: calc(100vw - 40px);
+  max-width: calc(100% + 40px);
+  margin-left: -20px;
+}
+
+/* Responsive cho advanced search panel */
+@media (min-width: 768px) {
+  .advanced-search-panel {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    right: 0;
+  }
+}
+
+.search-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+
+.search-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Giảm width cho field khoảng giá */
+.search-field.price-field {
+  /* flex: 0.5; */
+  width: 800px; 
+}
+
+/* Giảm width cho field trạng thái */
+.search-field.status-field {
+  /* flex: 0.25; */
+  width: 350px; /* Increased from 120px */
+}
+
+.search-field label {
+  font-size: 1.35rem; /* Increased from 0.85rem */
+  margin-bottom: 6px; /* Slightly increased from 4px */
+  color: #555;
+  font-weight: 600; /* Increased from 500 for better visibility */
+}
+
+.search-field input,
+.search-field select {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.search-field input:focus,
+.search-field select:focus {
+  outline: none;
+  border-color: #095E5A;
+}
+
+.price-range-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price-range-container input {
+  flex: 1;
+  min-width: 70px;
+  max-width: 123px;
+}
+
+.price-range-separator {
+  color: #777;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* Fix search actions layout - center the reset button */
+.search-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+/* Update the search reset button to have red background with white text */
+.search-reset-button {
+  padding: 8px 15px;
+  background-color: #dc3545; /* Red background */
+  color: white; /* White text */
+  border: 1px solid #dc3545; /* Red border */
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-reset-button:hover {
+  background-color: #c82333; /* Darker red on hover */
+  border-color: #bd2130;
+}

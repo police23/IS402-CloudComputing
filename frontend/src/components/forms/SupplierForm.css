@@ -1,0 +1,76 @@
+.supplier-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.supplier-modal-content {
+  width: 800px;
+  max-width: 95vw;
+  min-width: 350px;
+  min-height: 200px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.supplier-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #eee;
+  border-radius: 8px 8px 0 0;
+  background: #fff;
+}
+
+.supplier-modal-body {
+  padding: 24px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  max-height: 70vh;
+}
+
+.supplier-modal-header-icon {
+  color: #095e5a;
+  margin-right: 10px;
+}
+
+.supplier-form-layout {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.supplier-form-column {
+  flex: 1;
+  min-width: 300px;
+}
+
+.supplier-form-group {
+  margin-bottom: 18px;
+}
+
+.supplier-form-label {
+  font-size: 1.25em;
+  font-weight: 600;
+}
+
+.supplier-form-icon {
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.supplier-form-actions {
+  margin-top: 15px;
+}

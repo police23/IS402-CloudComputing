@@ -1,0 +1,19 @@
+{
+  "testEnvironment": "node",
+  "testMatch": [
+    "**/__tests__/**/*.js",
+    "**/?(*.)+(spec|test).js"
+  ],
+  "collectCoverage": true,
+  "coverageDirectory": "coverage",
+  "coverageReporters": ["text", "lcov", "html"],  "collectCoverageFrom": [
+    "controllers/**/*.js",
+    "services/**/*.js",
+    "models/**/*.js",
+    "utils/**/*.js",
+    "!utils/hashPassword.js",
+    "!**/*.test.js",
+    "!**/*.spec.js"
+  ],
+  "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"]
+}

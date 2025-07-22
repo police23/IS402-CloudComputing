@@ -1,0 +1,194 @@
+.stock-table-title {
+  margin-top: 24px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.old-stock-title {
+  margin-top: 32px;
+}
+
+.stock-table {
+  width: 100%;
+  border-spacing: 0;
+  color: #333;
+  background: #fff;
+  table-layout: fixed;
+  font-size: 14px;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.stock-table th, .stock-table td {
+  border: 1px solid #e0e0e0;
+  padding: 8px 8px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.stock-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.stock-table th:hover {
+  background-color: #eaeaea;
+}
+
+.stock-table tfoot td {
+  background: #f8f9fa;
+  font-weight: 600;
+}
+
+.stock-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.stock-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Cột STT */
+.stock-table th:nth-child(1),
+.stock-table td:nth-child(1) {
+  width: 40px;
+  max-width: 40px;
+  text-align: center;
+}
+
+/* Cột Tên sách */
+.stock-table th:nth-child(2),
+.stock-table td:nth-child(2) {
+  width: 180px;
+  max-width: 220px;
+  word-break: break-word;
+}
+
+/* Cột Thể loại */
+.stock-table th:nth-child(3),
+.stock-table td:nth-child(3) {
+  width: 120px;
+  max-width: 140px;
+  word-break: break-word;
+}
+
+/* Cột Số lượng tồn */
+.stock-table th:nth-child(4),
+.stock-table td:nth-child(4) {
+  width: 70px;
+  text-align: center;
+}
+
+/* Cột Giá trị tồn kho */
+.stock-table th:nth-child(5),
+.stock-table td:nth-child(5) {
+  width: 110px;
+  text-align: center !important;
+  white-space: nowrap;
+  border-top: 1px solid #e0e0e0 !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  border-left: 1px solid #e0e0e0 !important;
+  border-right: 1px solid #e0e0e0 !important;
+}
+
+/* Căn giữa số ở dòng tổng (tfoot) cho cột số lượng và giá trị tồn kho */
+.stock-table tfoot td:nth-child(4),
+.stock-table tfoot td:nth-child(5) {
+  text-align: center !important;
+}
+
+/* Ghi đè căn giữa cho số ở dòng tổng nếu dùng class .footer-value-cell */
+.stock-table tfoot td.footer-value-cell {
+  text-align: center !important;
+}
+
+.import-table-container {
+  width: 100%;
+  overflow-x: auto;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.stock-low {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.no-data-message {
+  color: #d32f2f;
+  margin-top: 24px;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.footer-total-cell {
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Stock Summary */
+.stock-summary {
+  margin-top: 24px;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  border-left: 4px solid #398b4e;
+}
+
+.stock-summary h4 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.summary-items {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+}
+
+.summary-item .label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.summary-item .value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #398b4e;
+}
+
+@media (max-width: 768px) {
+  .summary-items {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .summary-item {
+    min-width: auto;
+  }
+}

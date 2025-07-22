@@ -1,0 +1,233 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s ease-in-out;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 90%;
+  max-width: 900px;
+  min-width: 640px;
+}
+
+.modal-header {
+  padding: 20px 30px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+  border-radius: 12px 12px 0 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #095e5a;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+  padding: 5px;
+  transition: all 0.3s;
+}
+
+.close-button:hover {
+  color: #333;
+  transform: scale(1.1);
+}
+
+.modal-body {
+  padding: 30px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.customer-info {
+  margin-bottom: 10px; /* Reduced from 30px to 10px */
+  width: 100%;
+  text-align: left;
+}
+
+.customer-info h3,
+.order-details h3 {
+  color: #095e5a;
+  font-size: 18px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.info-grid {
+  display: flex;
+  width: 100%;
+  margin-bottom: 20px;
+  text-align: left;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 0; /* Important to prevent flex items from overflowing */
+}
+
+.info-item label {
+  font-weight: 500;
+  color: #666;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.info-item span {
+  color: #333;
+  font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order-details {
+  width: 100%;
+  margin-top: -5px; /* Added a small negative margin to move it up */
+}
+
+.details-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 20px;
+}
+
+.details-table th,
+.details-table td {
+  padding: 15px 20px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.details-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+.details-table th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.details-table th:last-child {
+  border-top-right-radius: 8px;
+}
+
+.details-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.details-table td {
+  font-size: 14px;
+}
+
+.details-table tfoot {
+  font-weight: 600;
+}
+
+.details-table tfoot td {
+  border-top: 2px solid #eee;
+}
+
+.total-label {
+  text-align: right;
+  color: #095e5a;
+  font-size: 16px;
+  font-weight: 600;
+  padding-right: 30px !important;
+}
+
+.total-amount {
+  color: #095e5a;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* New styles for splitting customer info into two columns */
+.info-columns {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.info-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    margin: 20px;
+  }
+
+  .modal-header {
+    padding: 15px 20px;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .info-grid {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .info-item {
+    width: 100%;
+  }
+  
+  .details-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

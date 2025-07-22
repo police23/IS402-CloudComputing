@@ -1,0 +1,132 @@
+
+.book-details-modal-content {
+  width: 700px;
+  max-width: 95vw;
+}
+
+
+.book-details-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px 40px;
+  align-items: stretch;
+}
+
+.book-details-layout > .book-details-column:last-child {
+  margin-left: 50px;
+}
+
+.book-details-layout > .book-details-column:first-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.book-details-layout > .book-details-column:last-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+@media (min-width: 600px) {
+  .book-details-layout {
+    align-items: start;
+  }
+}
+
+.book-details-column {
+  display: contents;
+}
+
+.details-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+  min-height: 38px;
+}
+
+.details-label {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #333;
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+.details-value {
+  margin-left: 8px;
+  font-size: 1.08em;
+  color: #095e5a;
+  word-break: break-word;
+  flex: 1;
+}
+
+.book-details-column {
+  flex: 1 1 0;
+  min-width: 260px;
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.details-group {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.details-label {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #333;
+  min-width: 140px;
+}
+
+.details-icon {
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.details-value {
+  margin-left: 8px;
+  font-size: 1.08em;
+  color: #095e5a;
+  word-break: break-word;
+}
+
+.book-details-header-icon {
+  color: #095e5a;
+  margin-right: 10px;
+}
+
+.book-details-layout {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.book-details-column {
+  flex: 1;
+  min-width: 260px;
+}
+
+.details-group {
+  margin-bottom: 18px;
+}
+
+.details-label {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #333;
+}
+
+.details-icon {
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.details-value {
+  margin-left: 8px;
+  font-size: 1.08em;
+  color: #095e5a;
+}

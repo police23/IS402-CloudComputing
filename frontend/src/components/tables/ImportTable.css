@@ -1,0 +1,117 @@
+/* ImportTable - Cleaned CSS */
+
+.import-table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: hidden !important;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 20px;
+}
+
+.import-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    min-width: 0 !important;
+    max-width: 100%;
+    table-layout: fixed;
+}
+
+.import-table th,
+.import-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    background-clip: padding-box;
+    text-align: left;
+    vertical-align: middle;
+    word-break: break-word;
+}
+
+.import-table th {
+    font-weight: 600;
+    color: #000000c2;
+    background-color: #f9f9f9;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.import-table tbody tr:hover {
+    background-color: #f5f5f5;
+    transition: background-color 0.2s;
+}
+
+.import-table tbody tr.selected {
+    background-color: #f0f0f0;
+}
+
+.import-table th:first-child,
+.import-table td:first-child { width: 5%; }
+.import-table th:nth-child(2), .import-table td:nth-child(2) { width: 13%; }
+.import-table th:nth-child(3), .import-table td:nth-child(3) { width: 13%; }
+.import-table th:nth-child(4), .import-table td:nth-child(4) { width: 28%; }
+.import-table th:nth-child(5), .import-table td:nth-child(5) { width: 13%; }
+.import-table th:nth-child(6), .import-table td:nth-child(6) { width: 13%; }
+.import-table th:last-child, .import-table td:last-child {
+    text-align: left !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 7%;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-width: 0 !important;
+    max-width: 100%;
+}
+
+.import-table .btn-view {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    color: #095E5A !important;
+    font-size: 20px !important;
+    cursor: pointer;
+    display: flex !important;
+    justify-content: flex-start;
+    align-items: center;
+    transition: transform 0.15s, color 0.15s;
+}
+.import-table .btn-view:focus,
+.import-table .btn-view:focus-visible {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+.import-table .btn-view:hover {
+    background: none !important;
+    color: #074e4a !important;
+    transform: scale(1.18);
+}
+
+.import-table td:last-child:hover,
+.import-table th:last-child:hover,
+.import-table td:last-child:focus,
+.import-table td:last-child:active,
+.import-table tbody tr:hover td:last-child,
+.import-table tbody tr.selected:hover td:last-child {
+    background: none !important;
+}
+
+@media (max-width: 768px) {
+    .import-table {
+        min-width: 0 !important;
+        max-width: 100%;
+    }
+    .import-table th,
+    .import-table td {
+        padding: 10px 12px;
+    }
+}

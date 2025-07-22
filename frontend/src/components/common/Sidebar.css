@@ -1,0 +1,185 @@
+.sidebar {
+  width: 230px;
+  background: linear-gradient(180deg, #095e5a 0%, #064440 100%);
+  color: white;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  justify-content: space-between;
+}
+
+.sidebar-logo {
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.sidebar-logo img {
+  width: 160px;
+  height: auto;
+}
+
+.sidebar-menu {
+  width: 100%;
+  margin-top: 35px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.sidebar-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 15px;
+  transition: all 0.3s;
+  border-left: 4px solid transparent;
+}
+
+.menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-left-color: rgba(255, 255, 255, 0.5);
+}
+
+.menu-item:hover .menu-icon {
+  color: white;
+}
+
+.menu-item.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-left-color: #4caf50;
+  font-weight: 600;
+}
+
+.menu-item.active .menu-icon {
+  color: white;
+}
+
+.menu-icon {
+  margin-right: 12px;
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  color: white;
+}
+
+@media (max-width: 992px) {
+  .sidebar {
+    width: 70px;
+    overflow: hidden;
+  }
+
+  .sidebar-logo img {
+    width: 50px;
+  }
+
+  .menu-item {
+    padding: 12px;
+    justify-content: center;
+  }
+
+  .menu-icon {
+    margin-right: 0;
+    font-size: 18px;
+  }
+
+  .menu-text {
+    display: none;
+  }
+}
+
+.sidebar.collapsed {
+  width: 70px;
+  overflow: hidden;
+}
+
+/* Đảm bảo NavLink hoạt động đúng với active class */
+.menu-item.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-left-color: #4caf50;
+  font-weight: 600;
+}
+
+.sidebar.collapsed .sidebar-logo {
+  padding: 15px 0;
+}
+
+.sidebar.collapsed .sidebar-logo img {
+  width: 50px;
+}
+
+.sidebar.collapsed .menu-item {
+  padding: 12px;
+  justify-content: center;
+}
+
+.sidebar.collapsed .menu-icon {
+  margin-right: 0;
+  font-size: 18px;
+}
+
+.sidebar.collapsed .menu-text {
+  display: none;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 15px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-toggle-btn {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  transform: scale(1.05);
+}
+
+.sidebar.collapsed .sidebar-footer {
+  padding: 15px 0;
+}
