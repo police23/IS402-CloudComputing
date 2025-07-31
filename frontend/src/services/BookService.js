@@ -96,3 +96,26 @@ export const getLatestBooks = async () => {
     throw new Error('Failed to fetch latest books');
   }
 };
+
+
+// Lấy top 10 sách bán chạy (có ảnh) theo tháng/năm
+export const getTop10MostSoldBooksAll = async (month, year) => {
+  try {
+    const res = await axios.get(`http://localhost:5000/api/reports/top10-all?month=${month}&year=${year}`);
+    const books = res.data;
+    // Trả về đúng format cho HomePage: name, price, image
+    return books.map(book => ({
+      id: book.id,
+      name: book.title,
+      price: book.price ? Number(book.price).toLocaleString('vi-VN') + 'đ' : '',
+      image: book.image_path
+        ? (book.image_path.startsWith('/uploads')
+            ? 'http://localhost:5000' + book.image_path
+            : book.image_path)
+        : '/assets/no-image.png',
+      total_sold: book.total_sold
+    }));
+  } catch (error) {
+    return [];
+  }
+};

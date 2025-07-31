@@ -15,7 +15,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [cartItemCount, setCartItemCount] = useState(0);
-    const [loading, setLoading] = useState(true);    // Load user from localStorage on mount
+    const [loading, setLoading] = useState(true);   
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         const storedToken = localStorage.getItem('token');
@@ -23,13 +23,11 @@ export const AuthProvider = ({ children }) => {
         if (storedUser) {
             try {
                 const parsed = JSON.parse(storedUser);
-                // Kiểm tra có phải object user hợp lệ không
                 if (parsed && typeof parsed === "object" && (parsed.id || parsed.username)) {
-                    // Nếu có token, kiểm tra trạng thái tài khoản trên server
                     if (storedToken) {
                         authService.validateToken()
                             .then(serverUser => {
-                                // Nếu tài khoản đã bị khóa, đăng xuất
+                                
                                 if (serverUser.is_active === 0) {
                                     localStorage.removeItem('user');
                                     localStorage.removeItem('token');
@@ -40,7 +38,7 @@ export const AuthProvider = ({ children }) => {
                                 }
                             })
                             .catch(() => {
-                                // Nếu không thể xác thực, giữ nguyên thông tin user đã có
+                            
                                 setUser(parsed);
                             })
                             .finally(() => {
@@ -51,14 +49,14 @@ export const AuthProvider = ({ children }) => {
                         setLoading(false);
                     }
                 } else {
-                    // Nếu không hợp lệ (có thể là HTML), xóa đi
+                    
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     setUser(null);
                     setLoading(false);
                 }
             } catch (e) {
-                // Nếu parse lỗi (có thể là HTML), xóa đi
+                
                 localStorage.removeItem('user');
                 localStorage.removeItem('token');
                 setUser(null);
@@ -69,7 +67,6 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    // Load cart count when user changes
     useEffect(() => {
         if (user) {
             loadCartCount();
@@ -83,7 +80,7 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await getCart();
             if (response.success) {
-                // Đếm số loại sách khác nhau
+                
                 setCartItemCount(response.data.length);
             } else {
                 setCartItemCount(0);
@@ -94,30 +91,26 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Function to determine redirect path based on role_id
     const getRoleBasedRedirect = () => {
         if (!user) return '/';
-
-        // Check role_id or role property
         const roleId = user.role_id || (user.role === 'ADMIN' ? 1 : user.role === 'SALESPERSON' ? 2 : user.role === 'INVENTORY' ? 3 : 0);
 
         switch (roleId) {
             case 1:
-                return '/admin'; // Admin dashboard
+                return '/admin'; 
             case 2:
-                return '/sales'; // Sales dashboard
+                return '/sales'; 
             case 3:
-                return '/inventory'; // Inventory dashboard
+                return '/inventory'; 
             case 5:
-                return '/order-manager'; // Order manager dashboard
+                return '/order-manager'; 
             case 6:
-                return '/shipper'; // Shipper dashboard
+                return '/shipper'; 
             default:
-                return '/'; // Default to login page
+                return '/';
         }
     };
 
-    // Add this function to get a human-readable role label
     const getRoleLabel = (roleId) => {
         switch (roleId) {
             case 1:
@@ -132,7 +125,7 @@ export const AuthProvider = ({ children }) => {
     };    // Login function
     const login = async (username, password) => {
         try {
-            // Real API authentication
+            
             console.log("Attempting login to API via authService");
             const response = await authService.login(username, password);
 

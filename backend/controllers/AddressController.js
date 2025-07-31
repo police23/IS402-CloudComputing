@@ -2,7 +2,7 @@ const addressService = require('../services/AddressService');
 
 const getAddressesByUserID = async (req, res) => {
     try {
-        const userId = req.user.id; // Lấy từ middleware auth
+        const userId = req.user.id; 
         const addresses = await addressService.getAddressesByUserID(userId);
         
         res.json({
@@ -48,7 +48,6 @@ const updateAddress = async (req, res) => {
         const userId = req.user.id;
         const addressId = parseInt(req.params.id);
         const addressData = req.body;
-        
         const updatedAddress = await addressService.updateAddress(addressId, addressData, userId);
         
         res.json({

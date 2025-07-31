@@ -169,28 +169,29 @@ const getTop10MostSoldBooksOnline = async (month, year) => {
 const getTop10MostSoldBooksAll = async (month, year) => {
     month = Number(month);
     year = Number(year);
-    console.log("[ReportModel] getTop10MostSoldBooksAll - month:", month, "year:", year);
+
     const [rows] = await db.query(`
-        SELECT b.id, b.title, SUM(total_sold) AS total_sold
+        SELECT b.id, b.title, b.price, img.image_path, SUM(combined.total_sold) AS total_sold
         FROM (
-            SELECT d.book_id, b.title, SUM(d.quantity) AS total_sold
+            SELECT d.book_id, SUM(d.quantity) AS total_sold
             FROM invoice_details d
             JOIN invoices i ON d.invoice_id = i.id
-            JOIN books b ON d.book_id = b.id
             WHERE MONTH(i.created_at) = ? AND YEAR(i.created_at) = ?
-            GROUP BY d.book_id, b.title
+            GROUP BY d.book_id
 
             UNION ALL
 
-            SELECT od.book_id, b.title, SUM(od.quantity) AS total_sold
+            SELECT od.book_id, SUM(od.quantity) AS total_sold
             FROM order_details od
             JOIN orders o ON od.order_id = o.id
-            JOIN books b ON od.book_id = b.id
             WHERE MONTH(o.order_date) = ? AND YEAR(o.order_date) = ?
-            GROUP BY od.book_id, b.title
+            GROUP BY od.book_id
         ) AS combined
         JOIN books b ON combined.book_id = b.id
-        GROUP BY b.id, b.title
+        LEFT JOIN (
+            SELECT book_id, MIN(image_path) AS image_path FROM book_images GROUP BY book_id
+        ) img ON b.id = img.book_id
+        GROUP BY b.id, b.title, b.price, img.image_path
         ORDER BY total_sold DESC
         LIMIT 10
     `, [month, year, month, year]);

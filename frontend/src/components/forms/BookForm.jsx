@@ -19,7 +19,7 @@ import { openModal, closeModal } from "../../utils/modalUtils";
 const BookForm = ({ book, onSubmit, onClose }) => {
   const currentYear = new Date().getFullYear();
   const years = [];
-  for (let y = 1900; y <= currentYear; y++) {
+  for (let y = 2020; y <= currentYear; y++) {
     years.push(y);
   }
 

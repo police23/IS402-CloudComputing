@@ -36,9 +36,9 @@ const ShipperTable = ({ type = "delivering" }) => {
       } else if (type === "delivered") {
         response = await getDeliveredOrdersByShipperID();
       } else {
-        response = [];
+        response = { orders: [] };
       }
-      const mappedOrders = (response.data || response).map(order => ({
+      const mappedOrders = (response.orders || []).map(order => ({
         id: order.id,
         orderNumber: String(order.id),
         customer: order.full_name || order.user_name || order.customer_name || "",

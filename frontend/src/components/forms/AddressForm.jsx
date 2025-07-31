@@ -4,7 +4,7 @@ import {
   faMapMarkerAlt, faTimes, faCheck, faSpinner 
 } from "@fortawesome/free-solid-svg-icons";
 import { addAddress, updateAddress } from '../../services/AddressService';
-import './AddNewAddress.css';
+import './AddressForm.css';
 
 const AddNewAddress = ({ 
   isOpen, 

@@ -1,8 +1,70 @@
+/* Popup notification styles */
+.notification {
+  position: fixed;
+  top: 40px;
+  right: 40px;
+  z-index: 9999;
+  min-width: 340px;
+  max-width: 90vw;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.13), 0 1.5px 8px rgba(9,94,90,0.08);
+  border: 2.5px solid #4caf50;
+  padding: 28px 32px 18px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #222;
+  transition: all 0.3s cubic-bezier(.4,2,.6,1);
+  animation: fadeInPop .3s;
+}
+.notification.error {
+  border-color: #e74c3c;
+  color: #c0392b;
+}
+.notification .notification-message {
+  margin: 0 0 18px 0;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 500;
+  word-break: break-word;
+}
+.notification .notification-close {
+  background: none;
+  border: none;
+  color: #222;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-top: 8px;
+  align-self: center;
+  transition: color 0.2s;
+}
+.notification .notification-close:hover {
+  color: #e74c3c;
+}
+.notification .fa-exclamation-circle {
+  color: #e74c3c;
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+.notification .fa-check {
+  color: #4caf50;
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+@keyframes fadeInPop {
+  from { opacity: 0; transform: translateY(-30px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 html, body, #root {
   width: 100%;
   min-width: 0;
   overflow-x: hidden;
   box-sizing: border-box;
+  font-size: 20px; /* Tăng kích cỡ chữ mặc định */
 }
 *, *::before, *::after {
   box-sizing: inherit;
@@ -35,7 +97,7 @@ html, body, #root {
 }
 
 .profile-header h2 {
-  font-size: 2rem;
+  font-size: 2.4rem; /* Tăng kích cỡ chữ tiêu đề */
   color: #095e5a;
   font-weight: 700;
   margin: 0;
@@ -84,7 +146,7 @@ html, body, #root {
   color: #095e5a;
   padding: 7px 18px;
   border-radius: 20px;
-  font-size: 1.1rem;
+  font-size: 1.3rem; /* Tăng kích cỡ chữ vai trò */
   margin-top: 8px;
   font-weight: 600;
   border: 1.5px solid #b2ebf2;
@@ -103,12 +165,14 @@ html, body, #root {
   align-items: center;
 }
 
+
+/* Make each info field one row, bigger font */
 .profile-form-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
   width: 100%;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .profile-form-column {
@@ -116,36 +180,61 @@ html, body, #root {
 }
 
 .form-row {
-  margin-bottom: 0;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
+  flex-direction: row;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 18px;
+  width: 100%;
 }
 
 .form-row label {
   color: #095e5a;
-  font-size: 1.08rem;
+  font-size: 1.45rem !important;
   font-weight: 700;
-  margin-bottom: 2px;
+  min-width: 160px;
+  max-width: 220px;
   text-align: left;
+  margin-bottom: 0;
+  margin-right: 0;
+  padding-left: 0;
+  margin-left: -18px;
 }
 
 .form-row span,
-.form-row input, 
-.form-row textarea,
-.form-row select {
+.form-row input {
+  flex: 1;
   width: 100%;
-  padding: 12px 14px;
+  padding: 16px 18px 16px 10px;
   border: 1.5px solid #e0e0e0;
-  border-radius: 8px;
-  min-height: 40px;
+  border-radius: 10px;
+  height: 32px !important;
   box-sizing: border-box;
   font-family: inherit;
-  font-size: 1.08rem;
+  font-size: 1.45rem !important; 
   background: #f8fffe;
   transition: all 0.3s ease;
   color: #222;
+  font-weight: 500;
+  margin-left: 0px;
+}
+
+.form-row textarea,
+.form-row select {
+  flex: 1;
+  width: 100%;
+  padding: 16px 18px 16px 10px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  min-height: 48px;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 1.25rem; /* Tăng kích cỡ chữ select và textarea */
+  background: #f8fffe;
+  transition: all 0.3s ease;
+  color: #222;
+  font-weight: 500;
+  margin-left: -8px;
 }
 
 .form-row span {
@@ -155,6 +244,7 @@ html, body, #root {
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
+  font-size: 1.25rem; /* Tăng kích cỡ chữ span */
 }
 
 .profile-actions {
@@ -210,8 +300,28 @@ html, body, #root {
     border-radius: 12px;
   }
   .profile-form-columns {
-    grid-template-columns: 1fr;
     gap: 18px;
+  }
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 18px;
+  }
+  .form-row label {
+    min-width: unset;
+    max-width: unset;
+    text-align: left;
+    margin-bottom: 8px;
+    padding-left: 0;
+    margin-left: -8px;
+  }
+  .form-row span,
+  .form-row input, 
+  .form-row textarea,
+  .form-row select {
+    padding-left: 6px;
+    margin-left: -4px;
   }
 }
 @media (max-width: 600px) {

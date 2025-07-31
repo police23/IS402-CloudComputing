@@ -9,7 +9,7 @@
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    font-size: 0.9em; /* Đồng bộ font size */
+    font-size: 0.85em;
 }
 
 .supplier-table th,
@@ -23,6 +23,7 @@
     background-clip: padding-box;
     max-width: 100%;
     text-align: left;
+    font-size: 0.85em;
 }
 
 .supplier-table td {
@@ -167,5 +168,6 @@
     .supplier-table th,
     .supplier-table td {
         padding: 10px 12px;
+        font-size: 0.8em;
     }
 }

@@ -27,7 +27,7 @@ exports.validateToken = async (req, res) => {
     try {
         const userId = req.user.id;
         
-        const userModel = require('../models/userModel');
+        const userModel = require('../models/UserModel');
         const user = await userModel.getUserById(userId);
         
         if (!user) {

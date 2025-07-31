@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 import PublicHeader from '../../components/common/PublicHeader';
-import { getLatestBooks } from '../../services/BookService';
+import { getLatestBooks, getTop10MostSoldBooksAll } from '../../services/BookService';
+import { addToCart as addToCartAPI } from '../../services/CartService';
 import { getAllPromotions } from '../../services/PromotionService';
 
-// Dữ liệu mẫu banner
 const banners = [
   {
     id: 1,
@@ -27,12 +27,7 @@ const banners = [
   }
 ];
 
-const bestSellers = [
-  { id: 5, name: 'Đắc Nhân Tâm', price: '95.000đ', image: '/assets/book2.jpg' },
-  { id: 6, name: 'Nhà Giả Kim', price: '150.000đ', image: '/assets/book3.jpg' },
-  { id: 7, name: 'Muôn Kiếp Nhân Sinh', price: '135.000đ', image: '/assets/book7.jpg' },
-  { id: 8, name: 'Đi Tìm Lẽ Sống', price: '99.000đ', image: '/assets/book8.jpg' },
-];
+// Xóa bestSellers cứng, sẽ lấy động từ backend
 
 const promotions = [
   {
@@ -91,10 +86,21 @@ function BannerSlider() {
 function BookSection({ title, books }) {
   const navigate = useNavigate();
   
-  const handleAddToCart = (book) => {
-    // Simulate adding to cart
-    console.log(`Đã thêm "${book.name}" vào giỏ hàng`);
-    alert(`Đã thêm "${book.name}" vào giỏ hàng!`);
+  const handleAddToCart = async (book) => {
+    if (!book.id) {
+      alert('Không xác định được sách để thêm vào giỏ hàng!');
+      return;
+    }
+    try {
+      const res = await addToCartAPI(book.id, 1);
+      if (res && res.success) {
+        alert(`Đã thêm "${book.name || book.title || ''}" vào giỏ hàng!`);
+      } else {
+        alert(res && res.message ? res.message : 'Thêm vào giỏ hàng thất bại!');
+      }
+    } catch (err) {
+      alert('Có lỗi khi thêm vào giỏ hàng!');
+    }
   };
   
   const handleViewBook = (book) => {
@@ -157,6 +163,7 @@ function PromoSection({ promotions }) {
 function HomePage() {
   const [latestBooks, setLatestBooks] = useState([]);
   const [promotions, setPromotions] = useState([]);
+  const [bestSellers, setBestSellers] = useState([]);
   const BACKEND_URL = "http://localhost:5000";
 
   useEffect(() => {
@@ -166,6 +173,14 @@ function HomePage() {
     getAllPromotions()
       .then(data => setPromotions(Array.isArray(data) ? data : []))
       .catch(() => setPromotions([]));
+
+    // Lấy tháng/năm hiện tại
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
+    getTop10MostSoldBooksAll(month, year)
+      .then(data => setBestSellers(data))
+      .catch(() => setBestSellers([]));
   }, []);
 
   return (

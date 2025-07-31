@@ -228,9 +228,11 @@
 }
 
 .modal-content {
-  /* ...existing code... */
   min-width: 640px;
   max-width: 900px;
+  min-height: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
   /* hoặc width: 800px; nếu muốn cố định */
 }
 

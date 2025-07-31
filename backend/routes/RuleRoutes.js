@@ -1,5 +1,5 @@
 const express = require("express");
-const ruleController = require("../controllers/ruleController");
+const ruleController = require("../controllers/RuleController");
 const router = express.Router();
 
 // Route lấy quy định

@@ -17,7 +17,8 @@
 
 .order-table th,
 .order-table td {
-    padding: 12px 16px;
+    padding: 10px 14px;
+    font-size: 16.5px !important;
     border-bottom: 1px solid #e0e0e0;
     white-space: normal;
     word-wrap: break-word;
@@ -28,10 +29,30 @@
     text-align: left;
 }
 
-.order-table td {
-    vertical-align: middle;
+
+.order-table tbody tr {
+    transition: background-color 0.2s;
 }
 
+.order-table th,
+.order-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e0e0e0;
+    white-space: normal;
+    word-wrap: break-word;
+    vertical-align: middle;
+    min-width: 10px;
+    background-clip: padding-box;
+    max-width: 100%;
+    text-align: left;
+    font-size: 13px;
+}
+
+.order-table tbody tr.selected:hover {
+    background-color: #e0e0e0;
+}
+
+.order-table tbody tr:hover {
 .order-table th {
     font-weight: 600;
     color: #000000c2;
@@ -40,22 +61,8 @@
     top: 0;
     z-index: 2;
     border-bottom: 2px solid #e0e0e0;
+    font-size: 13px;
 }
-
-.order-table tbody tr {
-    transition: background-color 0.2s;
-}
-
-.order-table tbody tr.selected {
-    background-color: #f0f0f0;
-}
-
-.order-table tbody tr.selected:hover {
-    background-color: #e0e0e0;
-}
-
-.order-table tbody tr:hover {
-    background-color: #f5f5f5;
 }
 
 .order-table tbody tr:hover td {
@@ -64,7 +71,7 @@
 
 .order-table-loading {
     text-align: center;
-    margin: 40px 0;
+  font-size: 12.5px;
     font-size: 18px;
     color: #888;
 }
@@ -73,27 +80,47 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+.order-items-table th {
+  background: #f5f5f5;
+  text-align: left;
+  padding: 6px 8px;
+  font-weight: 600;
+  color: #222;
+  font-size: 12.5px;
+}
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 15px;
   font-weight: 500;
-  background: #fff;
+.order-items-table td {
+  padding: 6px 8px;
+  text-align: left;
+  font-size: 12.5px;
+}
   color: #333;
   cursor: pointer;
   transition: background 0.2s, color 0.2s, border 0.2s;
-  outline: none;
+.order-details-col {
+  font-size: 13.5px;
+}
 }
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background: #f5f5f5;
+.order-details-summary-row {
+  font-size: 14px;
+  margin-bottom: 2px;
+}
   color: #aaa;
 }
 .btn-confirm {
   background: #095e5a !important;
   color: #fff !important;
-  border: 1.5px solid #095e5a !important;
+.order-details-final {
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 6px;
+}
 }
 .btn-confirm:hover:not(:disabled) {
   background: #064440 !important;
@@ -217,10 +244,12 @@
   padding: 8px;
   font-weight: 600;
   color: #222;
+  font-size: 13.5px;
 }
 .order-items-table td {
   padding: 8px;
   text-align: left;
+  font-size: 13.5px;
 }
 .order-items-table td:not(:first-child),
 .order-items-table th:not(:first-child) {

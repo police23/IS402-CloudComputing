@@ -10,7 +10,7 @@
     border-radius: 8px;
     padding: 14px 24px 18px 18px;
     background: #fff;
-    font-size: 15px;
+    font-size: 0.9em;
     font-weight: 500;
     color: #222;
     transition: opacity 0.2s;
@@ -87,7 +87,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 0.9em;
+  font-size: 0.85em;
 }
 
 .damaged-book-table th,
@@ -101,6 +101,7 @@
   background-clip: padding-box;
   max-width: 100%;
   text-align: left;
+  font-size: 0.85em;
 }
 
 .damaged-book-table td {
@@ -251,6 +252,6 @@
   .damaged-book-table th,
   .damaged-book-table td {
     padding: 8px 10px;
-    font-size: 0.9em;
+    font-size: 0.8em;
   }
 }

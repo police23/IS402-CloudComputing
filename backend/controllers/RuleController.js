@@ -1,4 +1,4 @@
-const ruleService = require("../services/ruleService");
+const ruleService = require("../services/RuleService");
 const getRules = async (req, res) => {
     try {
         const rules = await ruleService.getRules();

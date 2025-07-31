@@ -7,22 +7,24 @@
 
 .book-table {
   width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: 0.9em;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.85em;
 }
 
 .book-table th,
+
 .book-table td {
   padding: 12px 16px;
-    border-bottom: 1px solid #e0e0e0;
-    white-space: normal;
-    word-wrap: break-word;
-    vertical-align: middle;
-    min-width: 10px;
-    background-clip: padding-box;
-    max-width: 100%;
-    text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  white-space: normal;
+  word-wrap: break-word;
+  vertical-align: middle;
+  min-width: 10px;
+  background-clip: padding-box;
+  max-width: 100%;
+  text-align: left;
+  font-size: 0.85em;
 }
 
 .book-table td {
@@ -209,14 +211,14 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .book-table {
-        min-width: 1000px;
-    }
-    
-    .book-table th,
-    .book-table td {
-        padding: 10px 12px;
-    }
+  .book-table {
+    min-width: 1000px;
+  }
+  .book-table th,
+  .book-table td {
+    padding: 10px 12px;
+    font-size: 0.9em;
+  }
 }
 
 /* Responsive styles */
@@ -226,33 +228,27 @@
     padding: 8px 10px;
     font-size: 0.9em;
   }
-  
   .modal-content {
     width: 95%;
     padding: 15px;
   }
-  
   /* Advanced search panel responsive */
   .advanced-search-panel {
     width: calc(100vw - 20px);
     margin-left: -10px;
     padding: 12px;
   }
-  
   .search-row {
     flex-direction: column;
     gap: 10px;
   }
-  
   .search-field.price-field,
   .search-field.status-field {
     flex: 1;
   }
-  
   .price-range-container {
     gap: 6px;
   }
-  
   .price-range-container input {
     min-width: 60px;
   }
@@ -322,11 +318,11 @@
   border-left: none;
   border-right: none;
   height: 38px;
-  padding: 8px 16px; /* Increased padding from 8px 12px */
-  font-size: 0.95em; /* Slightly increased font size */
+  padding: 8px 16px;
+  font-size: 0.9em;
   border: 1px solid #ddd;
   outline: none;
-  min-width: 200px; /* Increased from 350px */
+  min-width: 200px;
 }
 
 /* Ensure select elements in search also look consistent */
@@ -423,10 +419,10 @@ select.search-input {
 }
 
 .search-field label {
-  font-size: 1.35rem; /* Increased from 0.85rem */
-  margin-bottom: 6px; /* Slightly increased from 4px */
+  font-size: 0.9em;
+  margin-bottom: 6px;
   color: #555;
-  font-weight: 600; /* Increased from 500 for better visibility */
+  font-weight: 600;
 }
 
 .search-field input,

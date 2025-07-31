@@ -5,7 +5,6 @@ import OrderTable from "../../components/tables/OrderTable";
 import ProfilePage from "../profile/ProfilePage";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./OrderManagementPanel.css";
 
 const orderManagerMenuItems = [
   {
@@ -14,7 +13,7 @@ const orderManagerMenuItems = [
     icon: <i className="fa fa-shopping-cart"></i>,
     showActions: true,
   },
-  // Xóa tab confirmed-orders khỏi sidebar
+
   {
     path: "profile",
     label: "Thông tin tài khoản",

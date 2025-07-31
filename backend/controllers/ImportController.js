@@ -1,4 +1,4 @@
-const importService = require("../services/importService");
+const importService = require("../services/ImportService");
 
 const getAllImports = async (req, res) => {
     try {

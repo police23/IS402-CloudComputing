@@ -28,7 +28,8 @@
   border-radius: 12px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   animation: modalFadeIn 0.3s ease-in-out;
-  max-height: 90vh;
+  min-height: 600px;
+  max-height: 85vh;
   overflow-y: auto;
   overflow-x: hidden;
   width: 90%;

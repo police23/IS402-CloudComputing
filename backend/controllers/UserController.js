@@ -45,12 +45,12 @@ exports.getUser = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        console.log('Received body:', req.body); // Log dữ liệu nhận được
+        console.log('Received body:', req.body); 
         const result = await userService.createUser(req.body);
-        console.log('Create result:', result); // Log kết quả trả vền
+        console.log('Create result:', result); 
         res.status(201).json(result);
     } catch (err) {
-        console.error('Create user error:', err); // Log lỗi chi tiết
+        console.error('Create user error:', err); 
         const statusCode = err.status || 500;   
         const message = err.message || 'Failed to create user';
         res.status(statusCode).json({ error: message });

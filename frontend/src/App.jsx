@@ -14,9 +14,9 @@ import OrderSuccessPage from './pages/order-success/OrderSuccessPage.jsx';
 import ZaloPayResultPage from './pages/ZaloPayResultPage';
 import AboutPage from './pages/about/AboutPage';
 import RegisterForm from './components/auth/RegisterForm';
-import AccountPage from './pages/profile/AccountPage';
+import ProfilePage from './pages/profile/ProfilePage.jsx';
 import MyOrdersPage from './pages/my-orders/MyOrdersPage.jsx';
-import OrderManagementPanel from './pages/panel/OrderManagementPanel.jsx';
+import OrderManagementPanel from './pages/panel/OrderManagerPanel.jsx';
 import ShipperPanel from './pages/panel/ShipperPanel.jsx';
 import AccountManagementPage from './pages/account-management/AccountManagementPage';
 
@@ -90,7 +90,7 @@ function App() {
       <Route path="/register" element={<LoginPage />} />
 
       {/* Account page - accessible for both guests and logged in users */}
-      <Route path="/account" element={<AccountPage />} />
+      <Route path="/account" element={<ProfilePage />} />
 
       {/* My Orders page - accessible for logged in users */}
       <Route path="/my-orders" element={<MyOrdersPage />} />

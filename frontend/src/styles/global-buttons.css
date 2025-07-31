@@ -1,18 +1,3 @@
-/* 
-* global-buttons.css
-* File CSS toàn cục cho các nút trên toàn bộ ứng dụng
-* Được thiết kế để đảm bảo tính nhất quán giữa các component
-* Cần import file này ở mức cao nhất trong ứng dụng (ví dụ: main.jsx hoặc App.jsx)
-*/
-
-/* 
-* Lưu ý về độ ưu tiên CSS:
-* File này nên được import sau cùng để có độ ưu tiên cao nhất
-* Sử dụng !important cho các thuộc tính quan trọng để đảm bảo ghi đè các style khác
-*/
-
-/* ===== BUTTON STYLES ===== */
-/* Định dạng chung cho tất cả các button có class .btn */
 .btn {
   padding: 9px 16px !important;
   border-radius: 12px !important;

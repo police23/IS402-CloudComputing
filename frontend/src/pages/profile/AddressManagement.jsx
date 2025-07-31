@@ -4,7 +4,7 @@ import {
   faPlus, faTrash, faStar, faMapMarkerAlt, faEdit, faSpinner 
 } from "@fortawesome/free-solid-svg-icons";
 import { getAddresses, deleteAddress, setDefaultAddress } from '../../services/AddressService';
-import AddNewAddress from './AddNewAddress';
+import AddNewAddress from '../../components/forms/AddressForm';
 import './AddressManagement.css';
 
 const AddressManagement = ({ onNotification }) => {

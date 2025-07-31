@@ -1,111 +1,156 @@
 const db = require("../db");
 
-const getOrdersByUserID = async (userID) => {
-    const [orders] = await db.query(
-        `SELECT o.*, s.name AS shipping_method_name FROM orders o
-         JOIN shipping_methods s ON s.id = o.shipping_method_id
-         WHERE o.user_id = ?`,
+
+const getOrdersByUserID = async (userID, page = 1, pageSize = 10) => {
+    const offset = (page - 1) * pageSize;
+    const [[{ total }]] = await db.query(
+        `SELECT COUNT(*) as total FROM orders WHERE user_id = ?`,
         [userID]
     );
-    for (const ors of orders) {
-        const [details] = await db.query(
-            `SELECT od.id, b.id as book_id, b.title, b.author, quantity, unit_price
-             FROM order_details od
-             JOIN books b ON b.id = od.book_id
-             WHERE order_id = ?`,
-            [ors.id]
-        );
-        ors.orderDetails = details;
-    }
-    return orders;
-};
-
-const getOrdersByStatus = async (status) => {
     const [orders] = await db.query(
-        `SELECT o.*, s.name AS shipping_method_name FROM orders o
+        `SELECT o.*, s.name AS shipping_method_name
+         FROM orders o
          JOIN shipping_methods s ON s.id = o.shipping_method_id
-         WHERE o.status = ?`,
-        [status]
+         WHERE o.user_id = ?
+         ORDER BY o.order_date DESC
+         LIMIT ? OFFSET ?`,
+        [userID, pageSize, offset]
     );
-    
-    for (const ors of orders) {
-        const [details] = await db.query(
-            `SELECT od.id, b.id as book_id, b.title, b.author, quantity, unit_price
-             FROM order_details od
-             JOIN books b ON b.id = od.book_id
-             WHERE order_id = ?`,
-            [ors.id]
-        );
-        ors.orderDetails = details;
+    if (orders.length === 0) return { orders: [], total };
+    const orderIds = orders.map(o => o.id);
+    const [details] = await db.query(
+        `SELECT od.id, od.order_id, b.id as book_id, b.title, b.author, od.quantity, od.unit_price
+         FROM order_details od
+         JOIN books b ON b.id = od.book_id
+         WHERE od.order_id IN (${orderIds.map(() => '?').join(',')})`,
+        orderIds
+    );
+    const detailsByOrderId = {};
+    for (const detail of details) {
+        if (!detailsByOrderId[detail.order_id]) detailsByOrderId[detail.order_id] = [];
+        detailsByOrderId[detail.order_id].push(detail);
     }
-    return orders;
+    for (const order of orders) {
+        order.orderDetails = detailsByOrderId[order.id] || [];
+    }
+    return { orders, total };
 };
 
-const getOrdersByStatusAndUser = async (status, userID) => {
-    const [orders] = await db.query(
-        `SELECT o.*, s.name AS shipping_method_name FROM orders o
-         JOIN shipping_methods s ON s.id = o.shipping_method_id
-         WHERE o.status = ? AND o.user_id = ?`,
-        [status, userID]
-    );
-    
-    for (const ors of orders) {
-        const [details] = await db.query(
-            `SELECT od.id, b.id as book_id, b.title, b.author, quantity, unit_price
-             FROM order_details od
-             JOIN books b ON b.id = od.book_id
-             WHERE order_id = ?`,
-            [ors.id]
-        );
-        ors.orderDetails = details;
-    }
-    return orders;
-};
 
-const getAllOrdersByStatus = async (status) => {
+const getAllOrdersByStatus = async (status, page = 1, pageSize = 10) => {
+    // Map 'processing' status từ FE sang 'pending' trong DB
+    const dbStatus = status === 'processing' ? 'pending' : status;
+    const offset = (page - 1) * pageSize;
+    const [[{ total }]] = await db.query(
+        `SELECT COUNT(*) as total FROM orders WHERE status = ?`,
+        [dbStatus]
+    );
     const [orders] = await db.query(
         `SELECT o.*, s.name AS shipping_method_name, u.full_name, u.phone
          FROM orders o
          JOIN shipping_methods s ON s.id = o.shipping_method_id
          JOIN users u ON u.id = o.user_id
-         WHERE o.status = ?`,
-        [status]
+         WHERE o.status = ?
+         ORDER BY o.order_date DESC
+         LIMIT ? OFFSET ?`,
+        [dbStatus, pageSize, offset]
     );
-    
-    for (const order of orders) {
-        const [details] = await db.query(
-            `SELECT b.title, od.quantity, od.unit_price
-             FROM order_details od
-             JOIN books b ON b.id = od.book_id
-             WHERE od.order_id = ?`, 
-            [order.id]
-        );
-        order.orderDetails = details;
+    if (orders.length === 0) return { orders: [], total };
+    const orderIds = orders.map(o => o.id);
+    const [details] = await db.query(
+        `SELECT od.id, od.order_id, b.id as book_id, b.title, b.author, od.quantity, od.unit_price
+         FROM order_details od
+         JOIN books b ON b.id = od.book_id
+         WHERE od.order_id IN (${orderIds.map(() => '?').join(',')})`,
+        orderIds
+    );
+
+    const detailsByOrderId = {};
+    for (const detail of details) {
+        if (!detailsByOrderId[detail.order_id]) detailsByOrderId[detail.order_id] = [];
+        detailsByOrderId[detail.order_id].push(detail);
     }
-    return orders;
+    for (const order of orders) {
+        order.orderDetails = detailsByOrderId[order.id] || [];
+    }
+
+    return { orders, total };
 };
 
-const getOrdersByShipperID = async (shipperID, status) => {
+const getOrdersByStatusAndUser = async (status, userID, page = 1, pageSize = 10) => {
+    const offset = (page - 1) * pageSize;
+    const [[{ total }]] = await db.query(
+        `SELECT COUNT(*) as total FROM orders WHERE status = ? AND user_id = ?`,
+        [status, userID]
+    );
     const [orders] = await db.query(
-        `SELECT o.*, s.name AS shipping_method_name, u.full_name, u.phone, oa.completion_date FROM orders o
+        `SELECT o.*, s.name AS shipping_method_name
+         FROM orders o
          JOIN shipping_methods s ON s.id = o.shipping_method_id
+         WHERE o.status = ? AND o.user_id = ?
+         ORDER BY o.order_date DESC
+         LIMIT ? OFFSET ?`,
+        [status, userID, pageSize, offset]
+    );
+    if (orders.length === 0) return { orders: [], total };
+    const orderIds = orders.map(o => o.id);
+    const [details] = await db.query(
+        `SELECT od.id, od.order_id, b.id as book_id, b.title, b.author, od.quantity, od.unit_price
+         FROM order_details od
+         JOIN books b ON b.id = od.book_id
+         WHERE od.order_id IN (${orderIds.map(() => '?').join(',')})`,
+        orderIds
+    );
+    const detailsByOrderId = {};
+    for (const detail of details) {
+        if (!detailsByOrderId[detail.order_id]) detailsByOrderId[detail.order_id] = [];
+        detailsByOrderId[detail.order_id].push(detail);
+    }
+    for (const order of orders) {
+        order.orderDetails = detailsByOrderId[order.id] || [];
+    }
+    return { orders, total };
+};
+
+
+const getOrdersByShipperID = async (shipperID, status, page = 1, pageSize = 10) => {
+    const offset = (page - 1) * pageSize;
+    const [[{ total }]] = await db.query(
+        `SELECT COUNT(*) as total
+         FROM orders o
          JOIN order_assignments oa ON oa.order_id = o.id
-         JOIN users u ON u.id = o.user_id
          WHERE oa.shipper_id = ? AND o.status = ?`,
         [shipperID, status]
     );
-    
-    for (const ors of orders) {
-        const [details] = await db.query(
-            `SELECT b.title, b.author, quantity, unit_price
-             FROM order_details od
-             JOIN books b ON b.id = od.book_id
-             WHERE order_id = ?`,
-            [ors.id]
-        );
-        ors.orderDetails = details;
+    const [orders] = await db.query(
+        `SELECT o.*, s.name AS shipping_method_name, u.full_name, u.phone, oa.completion_date
+         FROM orders o
+         JOIN shipping_methods s ON s.id = o.shipping_method_id
+         JOIN order_assignments oa ON oa.order_id = o.id
+         JOIN users u ON u.id = o.user_id
+         WHERE oa.shipper_id = ? AND o.status = ?
+         ORDER BY o.order_date DESC
+         LIMIT ? OFFSET ?`,
+        [shipperID, status, pageSize, offset]
+    );
+    if (orders.length === 0) return { orders: [], total };
+    const orderIds = orders.map(o => o.id);
+    const [details] = await db.query(
+        `SELECT b.title, b.author, od.quantity, od.unit_price, od.order_id
+         FROM order_details od
+         JOIN books b ON b.id = od.book_id
+         WHERE od.order_id IN (${orderIds.map(() => '?').join(',')})`,
+        orderIds
+    );
+    const detailsByOrderId = {};
+    for (const detail of details) {
+        if (!detailsByOrderId[detail.order_id]) detailsByOrderId[detail.order_id] = [];
+        detailsByOrderId[detail.order_id].push(detail);
     }
-    return orders;
+    for (const order of orders) {
+        order.orderDetails = detailsByOrderId[order.id] || [];
+    }
+    return { orders, total };
 };
 
 const createOrder = async (orderData) => {
@@ -130,10 +175,11 @@ const createOrder = async (orderData) => {
     return result;
 };
 
-const updateOrderStatus = async (orderId, status) => {
+
+const confirmOrder = async (orderId) => {
     const [result] = await db.query(
-        `UPDATE orders SET status = ? WHERE id = ?`,
-        [status, orderId]
+        `UPDATE orders SET status = 'confirmed' WHERE id = ?`,
+        [orderId]
     );
     if (result.affectedRows === 0) {
         throw new Error("Order not found");
@@ -141,38 +187,49 @@ const updateOrderStatus = async (orderId, status) => {
     return result;
 };
 
-const updateCompletionDate = async (orderId) => {
-    const [result] = await db.query(
+const completeOrder = async (orderId) => {
+    const [orderResult] = await db.query(
+        `UPDATE orders SET status = 'delivered' WHERE id = ?`,
+        [orderId]
+    );
+    const [assignResult] = await db.query(
         `UPDATE order_assignments SET completion_date = NOW() WHERE order_id = ?`,
         [orderId]
     );
-    return result;
+    return { orderResult, assignResult };
 };
 
 const assignOrderToShipper = async (orderId, shipperId, assignedBy) => {
-    const [result] = await db.query(
-        `UPDATE orders SET status = 'delivering' WHERE id = ?`,
-        [orderId]
-    );
-    if (result.affectedRows === 0) {
-        throw new Error("Order not found or already assigned");
+    if (!orderId || !shipperId || !assignedBy) {
+        console.error('assignOrderToShipper missing params:', { orderId, shipperId, assignedBy });
+        throw new Error('Thiếu thông tin orderId, shipperId hoặc assignedBy');
     }
-    await db.query(
-        `INSERT INTO order_assignments (order_id, assigned_by, shipper_id, assigned_at, completion_date)
-         VALUES (?, ?, ?, NOW(), NULL)`,
-        [orderId, assignedBy, shipperId]
-    );
-    return result;
+    try {
+        const [result] = await db.query(
+            `UPDATE orders SET status = 'delivering' WHERE id = ?`,
+            [orderId]
+        );
+        await db.query(
+            `INSERT INTO order_assignments (order_id, assigned_by, shipper_id, assigned_at, completion_date)
+             VALUES (?, ?, ?, NOW(), NULL)`,
+            [orderId, assignedBy, shipperId]
+        );
+        return result;
+    } catch (error) {
+        console.error('Error in assignOrderToShipper (OrderModel):', error);
+        throw error;
+    }
 };
 
+
+
 module.exports = {
-    getOrdersByUserID,
-    getOrdersByStatus,
-    getOrdersByStatusAndUser,
     getAllOrdersByStatus,
+    getOrdersByUserID,
+    getOrdersByStatusAndUser,
     getOrdersByShipperID,
     createOrder,
-    updateOrderStatus,
-    updateCompletionDate,
+    confirmOrder,
+    completeOrder,
     assignOrderToShipper
 };

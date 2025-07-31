@@ -2,17 +2,19 @@ import React, { useEffect, useState } from "react";
 import "./OrderTable.css";
 import {
   getAllProcessingOrders,
-  getConfirmedOrders,
+  getAllConfirmedOrders,
   getAllDeliveredOrders,
   getAllDeliveringOrders,
   confirmOrder,
-  getDeliveringOrdersByUserID
+  assignOrderToShipper,
 } from "../../services/OrderService";
-import { assignOrderToShipper } from '../../services/OrderService';
 import MyOrderDetailsModal from "../modals/MyOrderDetailsModal";
 import ConfirmationModal from "../modals/ConfirmationModal";
 import AssignShipperModal from "../modals/AssignShipperModal";
 import { getAllShippers } from "../../services/UserService";
+
+// Constants
+const DEFAULT_PAGE_SIZE = 10;
 
 const STATUS_BADGE = {
   pending: { class: "status-badge status-upcoming", text: "Chờ xác nhận" },
@@ -21,146 +23,132 @@ const STATUS_BADGE = {
   cancelled: { class: "status-badge status-inactive", text: "Đã hủy" },
 };
 
-const RECORDS_PER_PAGE = 10;
-
 const OrderTable = ({ type = "processing", isShipper = false }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [showModal, setShowModal] = useState(false);
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [total, setTotal] = useState(0);
   const [expandedRowId, setExpandedRowId] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [shippers, setShippers] = useState([]);
   const [assignOrderId, setAssignOrderId] = useState(null);
-  const [assignLoading, setAssignLoading] = useState(false);
+
+  // Auto close notification after 5s
+  useEffect(() => {
+    if (notification.message) {
+      const timer = setTimeout(() => {
+        setNotification({ message: "", type: "" });
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification.message]);
 
   useEffect(() => {
     fetchOrders();
-  }, [type, isShipper]);
+  }, [type, isShipper, currentPage, pageSize]);
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      let response;
-      if (type === "delivering") {
-        response = await getAllDeliveringOrders();
-      } else if (type === "delivered") {
-        response = await getAllDeliveredOrders();
-      } else if (type === "processing") {
-        response = await getAllProcessingOrders();
+      let response = { orders: [], total: 0 };
+      // Dùng API /all cho OrderManagementPage (admin/manager)
+      if (type === "processing") {
+        response = await getAllProcessingOrders(currentPage, pageSize);
       } else if (type === "confirmed") {
-        response = await getConfirmedOrders();
-      } else if (type === "cancelled") {
-        response = await getCancelledOrders();
-      } else {
-        response = await getAllProcessingOrders();
+        response = await getAllConfirmedOrders(currentPage, pageSize);
+      } else if (type === "delivering") {
+        response = await getAllDeliveringOrders(currentPage, pageSize);
+      } else if (type === "delivered") {
+        response = await getAllDeliveredOrders(currentPage, pageSize);
       }
-      const mappedOrders = (response.data || response).map(order => ({
-        id: order.id,
-        orderNumber: String(order.id),
-        customer: order.full_name || order.user_name || order.customer_name || "",
-        phone: order.phone,
-        orderDate: order.order_date,
-        status: order.status,
-        totalAmount: order.final_amount,
-        items: order.orderDetails || [],
-        shippingAddress: order.shipping_address,
-        shippingMethod: order.shipping_method_name,
-        paymentMethod: order.payment_method === 'online' ? 'ZaloPay' : 'Thanh toán khi nhận hàng',
-        discountAmount: order.discount_amount,
-        shippingFee: order.shipping_fee,
-        finalAmount: order.final_amount,
-        shipper_name: order.shipper_name || '',
-      }));
-      setOrders(mappedOrders);
+      console.log('OrderTable fetchOrders response:', response);
+      setOrders(response.orders || []);
+      setTotal(response.total || 0);
+      console.log('orders after fetch:', response.orders);
     } catch (error) {
-      console.error('Error fetching orders:', error);
-      setOrders([]);
+      setNotification({ message: "Lỗi khi tải đơn hàng.", type: "error" });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
+
+
   const handleConfirm = () => {
-    if (!selectedRows.length) return;
-    const pendingOrders = orders.filter(o => selectedRows.includes(o.id) && o.status === 'pending');
-    if (!pendingOrders.length) return;
     setShowConfirmModal(true);
   };
 
   const handleConfirmModal = async () => {
-    const pendingOrders = orders.filter(o => selectedRows.includes(o.id) && o.status === 'pending');
-    setShowConfirmModal(false);
-    if (!pendingOrders.length) return;
     try {
-      await Promise.all(pendingOrders.map(order => confirmOrder(order.id)));
-      setNotification({ message: `Xác nhận ${pendingOrders.length} đơn hàng thành công!`, type: "success" });
+      // Gọi API xác nhận
+      const pendingOrderIds = selectedRows.filter(id =>
+        orders.find(o => o.id === id && o.status === "pending")
+      );
+      console.log('pendingOrderIds gửi lên xác nhận:', pendingOrderIds);
+      const res = await confirmOrder(pendingOrderIds);
+      console.log('Kết quả confirmOrder:', res);
+      setNotification({ message: "Xác nhận đơn hàng thành công", type: "success" });
       fetchOrders();
       setSelectedRows([]);
-    } catch (e) {
-      setNotification({ message: "Lỗi xác nhận đơn hàng!", type: "error" });
+    } catch (error) {
+      setNotification({ message: `Xác nhận đơn hàng thất bại: ${error?.message || error}`, type: "error" });
+      console.error('Lỗi xác nhận đơn hàng:', error);
     } finally {
-      setTimeout(() => setNotification({ message: "", type: "" }), 3000);
+      setShowConfirmModal(false);
     }
   };
 
-  // Phân công shipper
-  const handleAssignShipperClick = () => {
-    if (!selectedRows.length) return;
-    // Chỉ cho phép phân công 1 đơn/lần để đơn giản UI
-    setAssignOrderId(selectedRows[0]);
-    setShowAssignModal(true);
-    setAssignLoading(true);
-    getAllShippers().then(data => {
-      setShippers(data);
-      setAssignLoading(false);
-    }).catch(() => {
-      setShippers([]);
-      setAssignLoading(false);
-    });
-  };
-  const handleAssignShipper = async (shipperId) => {
-    setAssignLoading(true);
-    console.log('[DEBUG] handleAssignShipper:', { assignOrderId, shipperId });
+  const handleAssignShipperClick = async () => {
     try {
-      const res = await assignOrderToShipper(assignOrderId, shipperId);
-      console.log('[DEBUG] assignOrderToShipper result:', res);
-      setNotification({ message: "Phân công shipper thành công!", type: "success" });
-      setShowAssignModal(false);
-      setSelectedRows([]);
-      fetchOrders();
-    } catch (e) {
-      console.error('[DEBUG] assignOrderToShipper error:', e);
-      setNotification({ message: "Lỗi phân công shipper!", type: "error" });
-    } finally {
-      setAssignLoading(false);
-      setTimeout(() => setNotification({ message: "", type: "" }), 3000);
+      const shippers = await getAllShippers();
+      setShippers(shippers || []);
+      setAssignOrderId(selectedRows[0]);
+      setShowAssignModal(true);
+    } catch (error) {
+      setNotification({ message: "Không tải được danh sách shipper", type: "error" });
     }
+  };
+
+  const handleAssignShipper = async (shipperId) => {
+    try {
+      await assignOrderToShipper(assignOrderId, shipperId);
+      setNotification({ message: "Phân công thành công", type: "success" });
+      fetchOrders();
+    } catch (error) {
+      setNotification({ message: "Phân công thất bại", type: "error" });
+    } finally {
+      setShowAssignModal(false);
+    }
+  };
+
+  const formatDate = (dateStr) => {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("vi-VN");
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(amount);
-  };
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('vi-VN');
+    return amount?.toLocaleString("vi-VN", { style: "currency", currency: "VND" }) || "0₫";
   };
 
-  // Pagination logic
-  const indexOfLastRecord = currentPage * RECORDS_PER_PAGE;
-  const indexOfFirstRecord = indexOfLastRecord - RECORDS_PER_PAGE;
+
+  const totalPages = Math.ceil(total / pageSize);
+
+  // Pagination helpers
+  const indexOfLastRecord = currentPage * pageSize;
+  const indexOfFirstRecord = indexOfLastRecord - pageSize;
   const currentRecords = orders.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(orders.length / RECORDS_PER_PAGE);
 
-  if (loading) return <div className="order-table-loading">Đang tải đơn hàng...</div>;
+  // Tính toán lại canConfirm dựa trên selectedRows và orders
+  const canConfirm = selectedRows.some(id => {
+    const order = orders.find(o => o.id === id);
+    return order && order.status === 'pending';
+  });
 
-  // Determine if any selected order is pending
-  const canConfirm = orders.some(o => selectedRows.includes(o.id) && o.status === 'pending');
-
+  // Đảm bảo canConfirm luôn được khai báo trước return
   return (
     <>
       <div className="order-table-container">
@@ -242,13 +230,13 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
                       aria-label={`Chọn đơn hàng #${order.orderNumber}`}
                     />
                   </td>
-                  <td>#{order.orderNumber}</td>
-                  <td>{order.customer}</td>
+                  <td>#{order.id || ''}</td>
+                  <td>{order.full_name || ''}</td>
                   <td>{order.phone || ''}</td>
-                  <td>{Array.isArray(order.items) ? order.items.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0}</td>
-                  <td>{formatDate(order.orderDate)}</td>
-                  {type === 'delivering' && <td>{order.shipper_name || 'Chưa có'}</td>}
-                  <td><strong>{formatCurrency(order.totalAmount)}</strong></td>
+                  <td>{Array.isArray(order.orderDetails) ? order.orderDetails.reduce((sum, item) => sum + 1, 0) : 0}</td>
+                  <td>{formatDate(order.order_date)}</td>
+                  {type === 'delivering' && <td>{order.shipper_name || order.shipperName || 'Chưa có'}</td>}
+                  <td><strong>{formatCurrency(Number(order.total_amount) || 0)}</strong></td>
                 </tr>,
                 expandedRowId === order.id && (
                   <tr key={order.id + '-details'}>
@@ -256,15 +244,15 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
                       <div className="order-details-inline">
                         <div className="order-details-row">
                           <div className="order-details-col order-details-col-1">
-                            <div className="order-details-item"><b>Mã đơn:</b> #{order.orderNumber}</div>
-                            <div className="order-details-item"><b>Ngày đặt:</b> {formatDate(order.orderDate)}</div>
-                            <div className="order-details-item"><b>Khách hàng:</b> {order.customer}</div>
+                            <div className="order-details-item"><b>Mã đơn:</b> #{order.id || ''}</div>
+                            <div className="order-details-item"><b>Ngày đặt:</b> {formatDate(order.order_date)}</div>
+                            <div className="order-details-item"><b>Khách hàng:</b> {order.full_name || ''}</div>
                             <div className="order-details-item"><b>SĐT:</b> {order.phone || ''}</div>
                           </div>
                           <div className="order-details-col order-details-col-2">
-                            <div className="order-details-item"><b>Địa chỉ giao hàng:</b> {order.shippingAddress}</div>
-                            <div className="order-details-item"><b>Phương thức thanh toán:</b> {order.paymentMethod}</div>
-                            <div className="order-details-item"><b>Phương thức vận chuyển:</b> {order.shippingMethod || order.shipping_method_name || 'Không rõ'}</div>
+                            <div className="order-details-item"><b>Địa chỉ giao hàng:</b> {order.shipping_address}</div>
+                            <div className="order-details-item"><b>Phương thức thanh toán:</b> {order.payment_method}</div>
+                            <div className="order-details-item"><b>Phương thức vận chuyển:</b> {order.shipping_method_name || 'Không rõ'}</div>
                           </div>
                         </div>
                         <div className="order-items-table-wrapper">
@@ -278,15 +266,20 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
                               </tr>
                             </thead>
                             <tbody>
-                              {order.items && order.items.length > 0 ? (
-                                order.items.map((item, idx) => (
-                                  <tr key={item.id || idx}>
-                                    <td>{item.name || item.title}</td>
-                                    <td>{item.quantity}</td>
-                                    <td>{formatCurrency(item.unit_price || item.price)}</td>
-                                    <td>{formatCurrency((item.unit_price || item.price) * item.quantity)}</td>
-                                  </tr>
-                                ))
+                              {order.orderDetails && order.orderDetails.length > 0 ? (
+                                order.orderDetails.map((item, idx) => {
+                                  const quantity = Number(item.quantity) || 1;
+                                  const unitPrice = Number(item.price || item.unit_price) || 0;
+                                  const totalPrice = unitPrice * quantity;
+                                  return (
+                                    <tr key={item.id || idx}>
+                                      <td>{item.title}</td>
+                                      <td>{quantity}</td>
+                                      <td>{unitPrice ? formatCurrency(unitPrice) : '-'}</td>
+                                      <td>{unitPrice ? formatCurrency(totalPrice) : '-'}</td>
+                                    </tr>
+                                  );
+                                })
                               ) : (
                                 <tr><td colSpan={4} className="order-items-empty">Không có sản phẩm</td></tr>
                               )}
@@ -294,15 +287,13 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
                           </table>
                         </div>
                         {(() => {
-                          const totalProductAmount = order.items && order.items.length > 0
-                            ? order.items.reduce((sum, item) => sum + ((item.unit_price || item.price) * item.quantity), 0)
-                            : 0;
+                          // Không có giá trị đơn giá/SL trong orderDetails, chỉ hiển thị tổng tiền, phí, khuyến mãi
                           return (
                             <div className="order-details-summary">
-                              <div className="order-details-summary-row"><span>Tổng tiền hàng:</span> <strong>{formatCurrency(totalProductAmount)}</strong></div>
-                              <div className="order-details-summary-row"><span>Phí vận chuyển:</span> <strong>{formatCurrency(order.shippingFee)}</strong></div>
-                              <div className="order-details-summary-row"><span>Khuyến mãi:</span> <strong className="order-details-discount">-{formatCurrency(order.discountAmount)}</strong></div>
-                              <div className="order-details-summary-row order-details-final"><span>Thành tiền:</span> <span>{formatCurrency(order.finalAmount)}</span></div>
+                              <div className="order-details-summary-row"><span>Tổng tiền hàng:</span> <strong>{formatCurrency(Number(order.total_amount) || 0)}</strong></div>
+                              <div className="order-details-summary-row"><span>Phí vận chuyển:</span> <strong>{formatCurrency(Number(order.shipping_fee) || 0)}</strong></div>
+                              <div className="order-details-summary-row"><span>Khuyến mãi:</span> <strong className="order-details-discount">-{formatCurrency(Number(order.discount_amount) || 0)}</strong></div>
+                              <div className="order-details-summary-row order-details-final"><span>Thành tiền:</span> <span>{formatCurrency(Number(order.final_amount) || 0)}</span></div>
                             </div>
                           );
                         })()}
@@ -374,4 +365,4 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
   );
 };
 
-export default OrderTable; 
+export default OrderTable;

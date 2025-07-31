@@ -1,3 +1,7 @@
+/* Giảm size chữ label chọn khuyến mãi */
+.coupon-section label {
+  font-size: 15px;
+}
 .cart-page {
   font-family: 'Segoe UI', Arial, sans-serif;
   background: #f0f9f9;

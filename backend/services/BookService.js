@@ -5,10 +5,6 @@ const getAllBooks = async () => {
 };
 
 const createBook = async (bookData) => {
-    // Kiểm tra dữ liệu đầu vào
-    if (!bookData.title || !bookData.author || !bookData.category_id || !bookData.publisher_id) {
-        throw new Error("Thiếu thông tin bắt buộc");
-    }
     
     const existingBooks = await bookModel.getAllBooks();
     const existed = existingBooks.some(book => book.title === bookData.title);

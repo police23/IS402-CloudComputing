@@ -21,6 +21,9 @@ const MyOrdersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
 
   // Fetch user orders from API
   useEffect(() => {
@@ -29,23 +32,23 @@ const MyOrdersPage = () => {
         setLoading(true);
         let response;
         if (filter === 'all') {
-          response = await getUserOrders();
+          response = await getUserOrders(page, pageSize);
         } else if (filter === 'pending') {
-          response = await getProcessingOrdersByUserID();
+          response = await getProcessingOrdersByUserID(page, pageSize);
         } else if (filter === 'confirmed') {
-          response = await getConfirmedOrdersByUserID();
+          response = await getConfirmedOrdersByUserID(page, pageSize);
         } else if (filter === 'delivering') {
-          response = await getDeliveringOrdersByUserID();
+          response = await getDeliveringOrdersByUserID(page, pageSize);
         } else if (filter === 'delivered') {
-          response = await getDeliveredOrdersByUserID();
+          response = await getDeliveredOrdersByUserID(page, pageSize);
         } else if (filter === 'cancelled') {
-          response = await getCancelledOrdersByUserID();
+          response = await getCancelledOrdersByUserID(page, pageSize);
         } else {
-          response = await getUserOrders();
+          response = await getUserOrders(page, pageSize);
         }
-        console.log('Filter:', filter, 'API response:', response); // Thêm log debug
-        // Map dữ liệu từ backend về format frontend cần
-        const mappedOrders = (response.data || response).map(order => ({
+        // API trả về { orders, total }
+        const ordersData = response.orders || response.data || [];
+        const mappedOrders = ordersData.map(order => ({
           id: order.id,
           orderNumber: String(order.id),
           orderDate: order.order_date,
@@ -65,15 +68,17 @@ const MyOrdersPage = () => {
           paymentMethod: order.payment_method === 'online' ? 'ZaloPay' : 'Thanh toán khi nhận hàng'
         }));
         setOrders(mappedOrders);
+        setTotal(response.total || 0);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching orders:', error);
         setLoading(false);
         setOrders([]);
+        setTotal(0);
       }
     };
     fetchOrders();
-  }, [filter]);
+  }, [filter, page, pageSize]);
 
   const getStatusText = (status) => {
     switch (status) {
@@ -97,9 +102,7 @@ const MyOrdersPage = () => {
     }
   };
 
-  const filteredOrders = orders.filter(order => {
-    return filter === 'all' || order.status === filter;
-  });
+
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -175,6 +178,10 @@ const MyOrdersPage = () => {
       }
     }
   };
+
+
+  // Pagination controls
+  const totalPages = Math.ceil(total / pageSize);
 
   if (loading) {
     return (
@@ -287,6 +294,47 @@ const MyOrdersPage = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+            {/* Pagination controls */}
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button
+                  className="pagination-button"
+                  disabled={page === 1}
+                  onClick={() => setPage(page - 1)}
+                >
+                  &lt;
+                </button>
+                {[...Array(totalPages)].map((_, idx) => (
+                  <button
+                    key={idx}
+                    className={`pagination-button${page === idx + 1 ? ' active' : ''}`}
+                    onClick={() => setPage(idx + 1)}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+                <button
+                  className="pagination-button"
+                  disabled={page === totalPages}
+                  onClick={() => setPage(page + 1)}
+                >
+                  &gt;
+                </button>
+                {/* Optional: page size selector */}
+                <select
+                  value={pageSize}
+                  onChange={e => {
+                    setPageSize(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  style={{ marginLeft: 8 }}
+                >
+                  {[10, 20, 50].map(size => (
+                    <option key={size} value={size}>{size} / trang</option>
+                  ))}
+                </select>
               </div>
             )}
           </div>

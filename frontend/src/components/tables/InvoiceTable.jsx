@@ -353,14 +353,6 @@ const InvoiceTable = ({ onEdit, onDelete, onView, onPrint }) => {
     });
   };
 
-  // Advanced search panel toggle: giữ lại bộ lọc khi đóng panel
-  const handleAdvancedSearchToggle = () => {
-    const newState = !isAdvancedSearchOpen;
-    setIsAdvancedSearchOpen(newState);
-    if (newState) setSimpleSearch({ field: 'id', value: '' });
-    setCurrentPage(1);
-  };
-
   return (
     <>
       <div className="table-actions">
@@ -395,7 +387,7 @@ const InvoiceTable = ({ onEdit, onDelete, onView, onPrint }) => {
             
             <button 
               className={`filter-button ${isAdvancedSearchOpen ? 'active' : ''}`}
-              onClick={handleAdvancedSearchToggle}
+              onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
               title="Tìm kiếm nâng cao"
             >
               <FontAwesomeIcon icon={faFilter} />

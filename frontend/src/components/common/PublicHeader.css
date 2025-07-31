@@ -1,3 +1,7 @@
+/* Giảm size chữ dropdown user menu */
+.header-user-dropdown > div {
+  font-size: 1.58rem;
+}
 /* Public Header Styles với màu xanh #6ec6c6 */
 .homepage-header {
   width: 100%;

@@ -19,7 +19,6 @@ const getCartByUserID = async (UserID) => {
 }
 
 const addToCart = async (userID, bookID, quantity) => {
-    // Kiểm tra xem user đã có cart chưa
     const [existingCart] = await db.query(
         'SELECT id FROM carts WHERE user_id = ?',
         [userID]
@@ -27,7 +26,6 @@ const addToCart = async (userID, bookID, quantity) => {
 
     let cartID;
     if (existingCart.length === 0) {
-        // Tạo cart mới nếu chưa có
         const [result] = await db.query(
             'INSERT INTO carts (user_id) VALUES (?)',
             [userID]
@@ -36,8 +34,7 @@ const addToCart = async (userID, bookID, quantity) => {
     } else {
         cartID = existingCart[0].id;
     }
-
-    // Kiểm tra xem sản phẩm đã có trong cart chưa
+    
     const [existingItem] = await db.query(
         'SELECT quantity FROM cart_details WHERE cart_id = ? AND book_id = ?',
         [cartID, bookID]
@@ -51,7 +48,7 @@ const addToCart = async (userID, bookID, quantity) => {
             [newQuantity, cartID, bookID]
         );
     } else {
-        // Thêm mới vào cart
+        
         await db.query(
             'INSERT INTO cart_details (cart_id, book_id, quantity) VALUES (?, ?, ?)',
             [cartID, bookID, quantity]

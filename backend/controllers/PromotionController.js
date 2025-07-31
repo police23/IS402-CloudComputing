@@ -1,4 +1,4 @@
-const promotionService = require("../services/promotionService");
+const promotionService = require("../services/PromotionService");
 
 const getPromotions = async (req, res) => {
     try {

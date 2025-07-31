@@ -6,7 +6,7 @@ import {
 import axios from "axios";
 import './PasswordChange.css';
 
-const PasswordChange = ({ user, onNotification }) => {
+const PasswordChange = ({ user, onNotification, onCancel }) => {
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -225,6 +225,7 @@ const PasswordChange = ({ user, onNotification }) => {
       confirmNewPassword: ""
     });
     setPasswordStrength({ score: 0, message: "" });
+    if (onCancel) onCancel();
   };
 
   return (
