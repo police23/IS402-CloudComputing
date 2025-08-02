@@ -11,6 +11,61 @@
   color: #333;
 }
 
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.chart-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.export-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Cập nhật nút export để phù hợp với thiết kế chung */
+.export-pdf-btn, .export-excel-btn {
+  background-color: #398b4e !important; /* Sử dụng màu xanh giống với các nút thêm */
+  color: white !important;
+  border: none;
+  padding: 9px 16px !important;
+  border-radius: 12px !important;
+  cursor: pointer;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  transition: background-color 0.3s ease !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-excel-btn {
+  background-color: #1976d2 !important; /* Màu xanh dương cho nút Excel */
+}
+
+.export-pdf-btn:hover {
+  background-color: #275c34 !important; /* Giống với màu hover của nút thêm */
+}
+
+.export-excel-btn:hover {
+  background-color: #1565c0 !important; /* Màu hover cho nút Excel */
+}
+
+.export-pdf-btn:active {
+  background-color: #1e4728 !important;
+}
+
+.export-excel-btn:active {
+  background-color: #0d47a1 !important;
+}
+
 .loading-message {
   margin-top: 24px;
   color: #888;

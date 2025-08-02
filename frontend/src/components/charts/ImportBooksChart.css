@@ -155,8 +155,13 @@
   color: #333;
 }
 
+.export-buttons {
+  display: flex;
+  gap: 10px;
+}
+
 /* Cập nhật nút export để phù hợp với thiết kế chung */
-.export-pdf-btn {
+.export-pdf-btn, .export-excel-btn {
   background-color: #398b4e !important; /* Sử dụng màu xanh giống với các nút thêm */
   color: white !important;
   border: none;
@@ -171,12 +176,24 @@
   gap: 8px;
 }
 
+.export-excel-btn {
+  background-color: #1976d2 !important; /* Màu xanh dương cho nút Excel */
+}
+
 .export-pdf-btn:hover {
   background-color: #275c34 !important; /* Giống với màu hover của nút thêm */
 }
 
+.export-excel-btn:hover {
+  background-color: #1565c0 !important; /* Màu hover cho nút Excel */
+}
+
 .export-pdf-btn:active {
   background-color: #1e4728 !important;
+}
+
+.export-excel-btn:active {
+  background-color: #0d47a1 !important;
 }
 
 .revenue-summary {

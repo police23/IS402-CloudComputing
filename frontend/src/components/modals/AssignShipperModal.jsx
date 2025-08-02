@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../modals/Modals.css";
+import "./AssignShipperModal.css";
 
 const AssignShipperModal = ({ isOpen, onClose, onAssign, shippers, orderId }) => {
   const [selectedShipper, setSelectedShipper] = useState(null);
@@ -7,16 +7,14 @@ const AssignShipperModal = ({ isOpen, onClose, onAssign, shippers, orderId }) =>
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content" style={{ maxWidth: 400, padding: '28px 24px' }}>
+    <div className="modal-overlay assign-shipper-modal">
+      <div className="modal-content">
         <div className="modal-header">
           <h2>Phân công shipper</h2>
         </div>
         <div className="modal-body">
-          <div style={{ marginBottom: 16 }}>
-            <b>Chọn shipper giao đơn #{orderId}:</b>
-          </div>
-          <div className="shipper-list-modern" style={{ marginTop: 8 }}>
+          <div><b>Chọn shipper giao đơn #{orderId}:</b></div>
+          <div className="shipper-list">
             {shippers && shippers.length > 0 ? (
               shippers.map(shipper => (
                 <div
@@ -24,27 +22,18 @@ const AssignShipperModal = ({ isOpen, onClose, onAssign, shippers, orderId }) =>
                   className={`shipper-card${selectedShipper === shipper.id ? " selected" : ""}`}
                   onClick={() => setSelectedShipper(shipper.id)}
                   tabIndex={0}
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 14, borderRadius: 12, border: selectedShipper === shipper.id ? '2px solid #1e90ff' : '1px solid #e0e0e0', background: selectedShipper === shipper.id ? '#f0f8ff' : '#fff', cursor: 'pointer', marginBottom: 12, transition: 'border 0.2s, background 0.2s', width: '100%' }}
                 >
                   {/* Avatar icon */}
-                  <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#e3eefd', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: '#1e90ff', fontWeight: 600 }}>
+                  <div className="shipper-avatar">
                     <span role="img" aria-label="Shipper">🚚</span>
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>{shipper.full_name}</div>
-                    <div style={{ color: '#555', fontSize: 14 }}>{shipper.phone}</div>
+                  <div className="shipper-info">
+                    <div className="name">{shipper.full_name}</div>
+                    <div className="phone">{shipper.phone}</div>
                   </div>
                   {/* Custom radio indicator */}
-                  <div style={{ marginLeft: 8 }}>
-                    <span style={{
-                      display: 'inline-block',
-                      width: 18,
-                      height: 18,
-                      borderRadius: '50%',
-                      border: selectedShipper === shipper.id ? '6px solid #1e90ff' : '2px solid #bbb',
-                      background: selectedShipper === shipper.id ? '#fff' : '#f5f5f5',
-                      transition: 'border 0.2s, background 0.2s'
-                    }}></span>
+                  <div className="shipper-radio">
+                    <span></span>
                   </div>
                   {/* Hidden radio for accessibility */}
                   <input
@@ -62,7 +51,7 @@ const AssignShipperModal = ({ isOpen, onClose, onAssign, shippers, orderId }) =>
             )}
           </div>
         </div>
-        <div className="modal-actions" style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
+        <div className="modal-actions">
           <button className="btn" onClick={onClose}>Hủy</button>
           <button
           className="btn btn-confirm"

@@ -25,7 +25,7 @@ router.get("/", verifyToken, OrderController.getOrdersByUserID);
 router.post("/", verifyToken, OrderController.createOrder);
 router.patch("/:orderId/confirm", verifyToken, OrderController.confirmOrder);
 router.patch("/:orderId/complete", verifyToken, OrderController.completeOrder);
-// router.patch("/:orderId/cancel", verifyToken, OrderController.updateOrderStatus); // Removed: updateOrderStatus does not exist
+router.patch("/:orderId/cancel", verifyToken, OrderController.cancelOrder);
 router.post('/:orderId/assign-shipper', verifyToken, OrderController.assignOrderToShipper);
 
 module.exports = router;

@@ -8,7 +8,7 @@ import "./ImportForm.css";
 const ImportForm = ({ importData, onSubmit, onClose }) => {
   const [formData, setFormData] = useState({
     supplierId: "",
-    bookDetails: [],
+    bookDetails: [{ bookId: "", quantity: 1, price: "" }],  // Bắt đầu với một dòng trống
     total: "",
   });
 
@@ -45,18 +45,49 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
 
   // Load books from database
   useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/books");
-        if (response.ok) {
-          const data = await response.json();
+    // Tải dữ liệu sách với cách đơn giản nhất
+    fetch("http://localhost:5000/api/books")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Fetched books data:", data);
+        
+        // Kiểm tra xem data có phải là đối tượng có thuộc tính data là mảng không
+        if (data && data.data && Array.isArray(data.data)) {
+          console.log("Sử dụng data.data từ API");
+          setBooks(data.data);
+        } 
+        // Kiểm tra xem data có phải là đối tượng có thuộc tính results là mảng không
+        else if (data && data.results && Array.isArray(data.results)) {
+          console.log("Sử dụng data.results từ API");
+          setBooks(data.results);
+        }
+        // Kiểm tra xem data có phải là mảng không
+        else if (Array.isArray(data)) {
+          console.log("Sử dụng data trực tiếp từ API");
           setBooks(data);
         }
-      } catch (error) {
+        // Nếu không khớp với bất kỳ cấu trúc nào, sử dụng mảng cứng
+        else {
+          console.error("Không thể xác định cấu trúc dữ liệu books:", data);
+          // Sử dụng mảng cứng để có thể tiếp tục
+          const hardcodedBooks = [
+            { id: 1, title: "Dế Mèn Phiêu Lưu Ký" },
+            { id: 2, title: "Tuổi Trẻ Đáng Giá Bao Nhiêu" },
+            { id: 3, title: "Bố Già" },
+            { id: 4, title: "Đắc Nhân Tâm" },
+            { id: 5, title: "Lược Sử Thời Gian" }
+          ];
+          setBooks(hardcodedBooks);
+        }
+      })
+      .catch(error => {
         console.error("Error fetching books:", error);
-      }
-    };
-    fetchBooks();
+      });
   }, []);
 
   // Load rules from database
@@ -65,6 +96,11 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
       .then(res => res.json())
       .then(data => setRules(data));
   }, []);
+  
+  // Debug effect to monitor the books state
+  useEffect(() => {
+    console.log("Books state updated:", books);
+  }, [books]);
 
   const computedTotal = formData.bookDetails.reduce((sum, detail) => {
     const quantity = parseInt(detail.quantity) || 0;
@@ -178,6 +214,10 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
       ...prev,
       bookDetails: prev.bookDetails.map((detail, i) => {
         if (i === index) {
+          // Nếu trường là bookId, đảm bảo nó là số nguyên
+          if (field === 'bookId') {
+            return { ...detail, [field]: value ? parseInt(value) : "" };
+          }
           return { ...detail, [field]: value };
         }
         return detail;
@@ -225,48 +265,59 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
         </div>
 
         <div className="importform-body">
-          <form onSubmit={handleSubmit} className="account-form">            {/* Người nhập */}
-            <div className="form-group">
-              <label>
-                <FontAwesomeIcon icon={faUser} className="importform-icon" />
-                Người nhập
-              </label>
-              <input
-                type="text"
-                value={
-                  currentUser?.full_name ||
-                  currentUser?.fullName ||
-                  currentUser?.displayName ||
-                  currentUser?.username ||
-                  ""
-                }                readOnly
-                className="importform-readonly-input"
-              />
-            </div>            <div className="form-group">
-              <label htmlFor="supplierId">
-                <FontAwesomeIcon icon={faBuilding} className="importform-icon" />
-                Nhà cung cấp
-              </label>
-              <select
-                id="supplierId"
-                name="supplierId"
-                value={formData.supplierId}
-                onChange={handleChange}
-                className={errors.supplierId ? "error importform-select" : "importform-select"}
-              >
-                <option value="">Chọn nhà cung cấp</option>
-                {suppliers && suppliers.length > 0 ? (
-                  suppliers.map((supplier) => (
-                    <option key={supplier.id} value={supplier.id}>
+          <form onSubmit={handleSubmit} className="account-form">            
+            {/* Layout 2 cột cho Người nhập và Nhà cung cấp */}
+            <div className="importform-row-2col">
+              <div className="importform-col-half">
+                <div className="form-group">
+                  <label>
+                    <FontAwesomeIcon icon={faUser} className="importform-icon" />
+                    Người nhập
+                  </label>
+                  <input
+                    type="text"
+                    value={
+                      currentUser?.full_name ||
+                      currentUser?.fullName ||
+                      currentUser?.displayName ||
+                      currentUser?.username ||
+                      ""
+                    }                    readOnly
+                    className="importform-readonly-input"
+                  />
+                </div>
+              </div>
+              
+              <div className="importform-col-half">
+                <div className="form-group">
+                  <label htmlFor="supplierId">
+                    <FontAwesomeIcon icon={faBuilding} className="importform-icon" />
+                    Nhà cung cấp
+                  </label>
+                  <select
+                    id="supplierId"
+                    name="supplierId"
+                    value={formData.supplierId}
+                    onChange={handleChange}
+                    className={errors.supplierId ? "error importform-select" : "importform-select"}
+                  >
+                    <option value="">Chọn nhà cung cấp</option>
+                    {suppliers && suppliers.length > 0 ? (
+                      suppliers.map((supplier) => (
+                        <option key={supplier.id} value={supplier.id}>
                       {supplier.name}
                     </option>
                   ))
                 ) : (
                   <option value="" disabled>Không có nhà cung cấp nào</option>
                 )}
-              </select>
-              {errors.supplierId && <div className="error-message">{errors.supplierId}</div>}
-            </div><div className="form-group importform-group-margin-top">
+                  </select>
+                  {errors.supplierId && <div className="error-message">{errors.supplierId}</div>}
+                </div>
+              </div>
+            </div>
+
+            <div className="form-group importform-group-margin-top">
               <div className="importform-label-row">
                 <label className="importform-section-label">
                   <FontAwesomeIcon icon={faBook} className="importform-icon" />
@@ -292,33 +343,28 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
                     </tr>
                   </thead>
                   <tbody>
+                    {console.log("formData.bookDetails:", formData.bookDetails)}
                     {formData.bookDetails.map((detail, index) => {
                       const quantity = parseInt(detail.quantity) || 0;
                       const price = parseInt(detail.price) || 0;
-                      const total = quantity * price;                      return (
+                      const total = quantity * price;
+                      // Định dạng giá nhập
+                      const formattedPrice = detail.price ? Number(detail.price).toLocaleString('vi-VN') : "";
+                      return (
                         <tr key={index}>
                           <td className="importform-td-book">
                             <select
-                              value={detail.bookId}
+                              value={detail.bookId || ""}
                               onChange={(e) => handleBookDetailChange(index, 'bookId', e.target.value)}
                               className={errors.bookDetails ? "error importform-book-select" : "importform-book-select"}
-                            >                              <option value="">Chọn sách</option>
+                            >
+                              <option value="">Chọn sách</option>
                               {books && books.length > 0 ? (
-                                books
-                                  .filter(book => {
-                                    // Hiển thị sách nếu chưa được chọn ở các dòng khác
-                                    // hoặc là sách đã chọn trước đó ở dòng hiện tại
-                                    const alreadySelectedElsewhere = formData.bookDetails.some(
-                                      (otherDetail, otherIndex) => 
-                                        otherIndex !== index && 
-                                        otherDetail.bookId && 
-                                        otherDetail.bookId === book.id.toString()
-                                    );
-                                    return !alreadySelectedElsewhere || book.id.toString() === detail.bookId;
-                                  })
-                                  .map(book => (
-                                    <option key={book.id} value={book.id}>{book.title}</option>
-                                  ))
+                                books.map(book => (
+                                  <option key={book.id} value={book.id}>
+                                    {book.title}
+                                  </option>
+                                ))
                               ) : (
                                 <option value="" disabled>Không có sách nào</option>
                               )}
@@ -336,18 +382,23 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
                           </td>
                           <td className="importform-td-price">
                             <input
-                              type="number"
-                              value={detail.price}
-                              onChange={(e) => handleBookDetailChange(index, 'price', e.target.value)}
+                              type="text"
+                              value={formattedPrice}
+                              onChange={(e) => {
+                                // Chỉ nhận số, loại bỏ ký tự không phải số
+                                const raw = e.target.value.replace(/\D/g, "");
+                                handleBookDetailChange(index, 'price', raw);
+                              }}
                               placeholder="Giá nhập"
                               min="0"
                               className="importform-price-input"
+                              inputMode="numeric"
                             />
                           </td>
                           <td className="importform-td-total">
                             <input
                               type="text"
-                              value={total > 0 ? total.toLocaleString() : ""}
+                              value={total > 0 ? total.toLocaleString('vi-VN') : ""}
                               readOnly
                               tabIndex={-1}
                               className="importform-total-input"

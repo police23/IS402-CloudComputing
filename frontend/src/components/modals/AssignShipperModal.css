@@ -1,0 +1,178 @@
+.modal-overlay.assign-shipper-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.assign-shipper-modal .modal-content {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  width: 380px;
+  max-width: 95vw;
+  padding: 0;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  font-family: system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* Header */
+.assign-shipper-modal .modal-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid #eee;
+  border-radius: 8px 8px 0 0;
+  background-color: #f9f9f9;
+}
+
+.assign-shipper-modal .modal-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Body */
+.assign-shipper-modal .modal-body {
+  padding: 12px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.assign-shipper-modal .shipper-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.assign-shipper-modal .shipper-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.assign-shipper-modal .shipper-card:hover {
+  background-color: #f5faff;
+}
+
+.assign-shipper-modal .shipper-card.selected {
+  border: 2px solid #1e90ff;
+  background: #f0f8ff;
+}
+
+.assign-shipper-modal .shipper-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e3eefd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #1e90ff;
+  font-weight: bold;
+}
+
+.assign-shipper-modal .shipper-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.assign-shipper-modal .shipper-info .name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.assign-shipper-modal .shipper-info .phone {
+  font-size: 12px;
+  color: #555;
+}
+
+/* Custom radio */
+.assign-shipper-modal .shipper-radio {
+  margin-left: auto;
+}
+
+.assign-shipper-modal .shipper-radio span {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.assign-shipper-modal .shipper-card.selected .shipper-radio span {
+  border: 5px solid #1e90ff;
+  background: #fff;
+}
+
+.assign-shipper-modal .shipper-card:not(.selected) .shipper-radio span {
+  border: 2px solid #bbb;
+  background: #f5f5f5;
+}
+
+/* Actions */
+.assign-shipper-modal .modal-actions {
+  padding: 10px 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-radius: 0 0 8px 8px;
+  background-color: #f9f9f9;
+}
+
+.assign-shipper-modal .modal-actions .btn {
+  min-width: 80px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.assign-shipper-modal .modal-actions .btn:first-child {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+.assign-shipper-modal .modal-actions .btn:first-child:hover {
+  background-color: #e0e0e0;
+}
+
+.assign-shipper-modal .modal-actions .btn.btn-confirm {
+  background-color: #0c615c;
+  color: white;
+}
+
+.assign-shipper-modal .modal-actions .btn.btn-confirm:hover {
+  background-color: #07504d;
+}
+
+.assign-shipper-modal .modal-actions .btn.btn-confirm:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

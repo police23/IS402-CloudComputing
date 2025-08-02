@@ -28,6 +28,10 @@ const completeOrder = async (orderId) => {
     return await OrderModel.completeOrder(orderId);
 };
 
+const cancelOrder = async (orderId) => {
+    return await OrderModel.cancelOrder(orderId);
+};
+
 const assignOrderToShipper = async (orderId, shipperId, assignedBy) => {
     try {
         const result = await OrderModel.assignOrderToShipper(orderId, shipperId, assignedBy);
@@ -45,5 +49,6 @@ module.exports = {
     createOrder,
     confirmOrder,
     completeOrder,
+    cancelOrder,
     assignOrderToShipper
 };

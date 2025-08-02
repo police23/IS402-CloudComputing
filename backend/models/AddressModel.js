@@ -44,7 +44,6 @@ const updateAddress = async (addressId, addressData) => {
 };
 
 const deleteAddress = async (addressId, userId) => {
-    // Xóa địa chỉ
     const [result] = await db.query(
         "DELETE FROM addresses WHERE id = ?",
         [addressId]
@@ -58,12 +57,9 @@ const deleteAddress = async (addressId, userId) => {
 };
 
 const setDefaultAddress = async (addressId, userId) => {
-    // Đặt tất cả địa chỉ thành không mặc định
     await db.query(
         "UPDATE addresses SET is_default = 0"
     );
-    
-    // Đặt địa chỉ được chọn làm mặc định
     const [result] = await db.query(
         "UPDATE addresses SET is_default = 1 WHERE id = ?",
         [addressId]

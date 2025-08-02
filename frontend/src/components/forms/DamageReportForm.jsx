@@ -90,7 +90,7 @@ const DamageReportForm = ({ onSubmit, onClose, books = [], users = [] }) => {
         <div className="damagereportform-header">
           <h3 className="importform-header-title">
             <FontAwesomeIcon icon={faBoxOpen} className="importform-header-icon" />
-            Thêm phiếu hư hỏng mới
+            Thêm phiếu sách hỏng mới
           </h3>
           <button className="close-button" onClick={onClose} aria-label="Đóng">
             <FontAwesomeIcon icon={faTimes} />
@@ -161,10 +161,23 @@ const DamageReportForm = ({ onSubmit, onClose, books = [], users = [] }) => {
                             type="number"
                             value={item.quantity}
                             min="1"
-                            onChange={e => handleBookChange(idx, "quantity", e.target.value)}
+                            max={(() => {
+                              const book = books.find(b => String(b.id) === String(item.bookId));
+                              return book ? book.stock : undefined;
+                            })()}
+                            onChange={e => {
+                              const book = books.find(b => String(b.id) === String(item.bookId));
+                              const maxQty = book ? book.stock : undefined;
+                              let val = e.target.value;
+                              if (maxQty !== undefined && Number(val) > maxQty) {
+                                val = maxQty;
+                              }
+                              handleBookChange(idx, "quantity", val);
+                            }}
                             className={errors[`damagedBooks_${idx}_quantity`] ? "error importform-quantity-input" : "importform-quantity-input"}
                           />
                           {errors[`damagedBooks_${idx}_quantity`] && <div className="error-message">{errors[`damagedBooks_${idx}_quantity`]}</div>}
+                          
                         </td>
                         <td className="importform-td-book">
                           <input

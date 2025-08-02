@@ -6,6 +6,8 @@ const getStatusText = (status) => {
     case 'pending': return 'Chờ xử lý';
     case 'processing': return 'Đang xử lý';
     case 'shipped': return 'Đã gửi hàng';
+    case 'delivering': return 'Đang giao';
+    case 'delivered': return 'Đã giao';
     case 'completed': return 'Hoàn thành';
     case 'cancelled': return 'Đã hủy';
     default: return status;
@@ -23,6 +25,20 @@ const formatDate = (dateString) => {
 };
 const toNumber = (val) => Number(val) || 0;
 
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'pending': return '#ff9800'; // Màu cam - chờ xử lý
+    case 'processing': return '#2196f3'; // Màu xanh dương - đang xử lý
+    case 'confirmed': return '#2196f3'; // Màu xanh dương - đã duyệt
+    case 'shipping': return '#9c27b0'; // Màu tím - đang gửi hàng
+    case 'delivering': return '#9c27b0'; // Màu tím - đang giao
+    case 'delivered': return '#4caf50'; // Màu xanh lá - đã giao
+    case 'completed': return '#4caf50'; // Màu xanh lá - hoàn thành
+    case 'cancelled': return '#f44336'; // Màu đỏ - đã hủy
+    default: return '#757575'; // Màu xám - mặc định
+  }
+};
+
 const MyOrderDetailsModal = ({ order, open, onClose, onCancelOrder }) => {
   if (!open || !order) return null;
   console.log('Order detail:', order); // debug
@@ -39,7 +55,7 @@ const MyOrderDetailsModal = ({ order, open, onClose, onCancelOrder }) => {
             <div className="order-info-col">
               <div className="order-info-row"><span>Mã đơn:</span> <span>#{order.orderNumber}</span></div>
               <div className="order-info-row"><span>Ngày đặt:</span> <span>{formatDate(order.orderDate)}</span></div>
-              <div className="order-info-row"><span>Trạng thái:</span> <span className="status-badge" style={{ backgroundColor: '#2196f3' }}>{getStatusText(order.status)}</span></div>
+              <div className="order-info-row"><span>Trạng thái:</span> <span className="status-badge" style={{ backgroundColor: getStatusColor(order.status) }}>{getStatusText(order.status)}</span></div>
             </div>
             <div className="order-info-col">
               <div className="order-info-row"><span>Địa chỉ giao hàng:</span> <span>{order.shippingAddress}</span></div>

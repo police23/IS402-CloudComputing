@@ -1,4 +1,12 @@
 /* CSS cho ImportForm */
+/* Layout 2 cột cho phần người nhập và nhà cung cấp */
+.importform-row-2col {
+  display: flex;
+  gap: 16px;
+}
+.importform-col-half {
+  flex: 1;
+}
 
 /* Định dạng cho label giống BookForm */
 .account-form label {
@@ -16,7 +24,7 @@
 .importform-flex-col {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 .importform-flex-column {
@@ -27,8 +35,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
-  gap: 12px;
+  margin-bottom: 4px;
+  gap: 6px;
 }
 
 .importform-table {
@@ -87,8 +95,8 @@
 .importform-summary {
   display: flex;
   justify-content: flex-end;
-  gap: 32px;
-  margin-top: 18px;
+  gap: 16px;
+  margin-top: 0px;
 }
 
 .importform-summary-box {
@@ -174,7 +182,7 @@
 }
 
 .importform-body {
-  padding: 24px;
+  padding: 12px;
   flex: 1 1 auto;
   overflow-y: auto;
   max-height: 70vh;
@@ -205,11 +213,11 @@
 }
 
 .importform-group-margin-top {
-  margin-top: 18px;
+  margin-top: 0;
 }
 
 .importform-actions-margin-top {
-  margin-top: 24px;
+  margin-top: 0px;
 }
 
 .importform-table-header-row {
@@ -236,6 +244,15 @@
   border-radius: 4px;
   border: 1px solid #ccc;
   display: block;
+  z-index: 100;
+  background-color: white;
+}
+
+.importform-book-select option {
+  padding: 8px;
+  background-color: white;
+  color: #333;
+  z-index: 100;
 }
 
 .importform-quantity-input {
@@ -260,6 +277,8 @@
   border: 1px solid #ccc;
   text-align: right;
   display: block;
+  font-size: 15px !important;
+  font-weight: 500;
 }
 
 .importform-total-input {
@@ -271,9 +290,11 @@
   border-radius: 4px;
   border: 1px solid #eee;
   background: #f8f9fa;
-  color: #333;
+  color: #095e5a;
   text-align: right;
   display: block;
+  font-size: 15px !important;
+  font-weight: 500;
 }
 
 .importform-readonly-input {

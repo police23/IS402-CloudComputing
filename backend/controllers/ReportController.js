@@ -1,5 +1,4 @@
 const reportService = require("../services/ReportService");
-// Doanh thu & số lượng bán theo 12 tháng của năm (offline)
 const getRevenueByYearOffline = async (req, res) => {
     try {
         const year = req.query.year || req.params.year;
@@ -228,6 +227,47 @@ const getTop10MostSoldBooksAll = async (req, res) => {
     }
 };
 
+// API lấy chi tiết doanh thu theo từng sách theo tháng trong năm
+const getBookRevenueDetailsByYear = async (req, res) => {
+    try {
+        const year = req.query.year || req.params.year;
+        const type = req.query.type || 'all'; // mặc định lấy tất cả
+        
+        if (!year) {
+            return res.status(400).json({ message: "Thiếu tham số năm" });
+        }
+        
+        const detailData = await reportService.getBookRevenueDetailsByYear(year, type);
+        res.json(detailData);
+    } catch (error) {
+        if (error.message === "Thiếu tham số năm") {
+            return res.status(400).json({ message: error.message });
+        }
+        res.status(500).json({ message: "Lỗi server khi lấy chi tiết doanh thu theo sách theo tháng" });
+    }
+};
+
+// API lấy chi tiết doanh thu theo từng sách theo ngày trong tháng
+const getBookRevenueDetailsByMonth = async (req, res) => {
+    try {
+        const month = req.query.month || req.params.month;
+        const year = req.query.year || req.params.year;
+        const type = req.query.type || 'all'; // mặc định lấy tất cả
+        
+        if (!month || !year) {
+            return res.status(400).json({ message: "Thiếu tham số tháng hoặc năm" });
+        }
+        
+        const detailData = await reportService.getBookRevenueDetailsByMonth(month, year, type);
+        res.json(detailData);
+    } catch (error) {
+        if (error.message === "Thiếu tham số tháng hoặc năm") {
+            return res.status(400).json({ message: error.message });
+        }
+        res.status(500).json({ message: "Lỗi server khi lấy chi tiết doanh thu theo sách theo ngày" });
+    }
+};
+
 module.exports = {
     getTop10MostSoldBooksOffline,
     getTop10MostSoldBooksOnline,
@@ -236,8 +276,10 @@ module.exports = {
     getDailyRevenueByMonth,
     getDailyRevenueByMonthOffline,
     getDailyRevenueByMonthOnline,
-    getDailyRevenueByMonthAll
-    ,getRevenueByYearOffline
-    ,getRevenueByYearOnline
-    ,getRevenueByYearAll
+    getDailyRevenueByMonthAll,
+    getRevenueByYearOffline,
+    getRevenueByYearOnline,
+    getRevenueByYearAll,
+    getBookRevenueDetailsByYear,
+    getBookRevenueDetailsByMonth
 };

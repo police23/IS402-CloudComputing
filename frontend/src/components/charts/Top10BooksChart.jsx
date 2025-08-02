@@ -10,6 +10,7 @@ import {
 } from "chart.js";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import * as XLSX from "xlsx";
 import "./Top10BooksChart.css";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
@@ -79,6 +80,50 @@ const Top10BooksTable = ({ books, month, year }) => {
     } catch (error) {
       console.error("Lỗi khi xuất PDF:", error);
       alert("Có lỗi xảy ra khi xuất báo cáo PDF");
+    }
+  };
+
+  const exportToExcel = () => {
+    try {
+      const displayMonth = month !== undefined && month !== null ? month : new Date().getMonth() + 1;
+      const displayYear = year !== undefined && year !== null ? year : new Date().getFullYear();
+      
+      // Chuẩn bị dữ liệu cho Excel
+      const excelData = books.map((book, index) => ({
+        'STT': index + 1,
+        'Tên sách': book.title,
+        'Số lượng bán': Number(book.total_sold).toLocaleString('vi-VN'),
+        'Giá bán (VNĐ)': Number(book.price).toLocaleString('vi-VN')
+      }));
+
+      // Tạo workbook và worksheet
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      
+      // Tiêu đề cho file Excel
+      XLSX.utils.sheet_add_aoa(worksheet, [
+        [`BÁO CÁO TOP 10 SÁCH BÁN CHẠY NHẤT - THÁNG ${displayMonth}/${displayYear}`],
+        [`Xuất lúc: ${new Date().toLocaleString('vi-VN')}`],
+        [''] // Dòng trống trước dữ liệu
+      ], { origin: 'A1' });
+
+      // Thiết lập độ rộng cột
+      const columnWidths = [
+        { wch: 5 },   // STT
+        { wch: 40 },  // Tên sách
+        { wch: 15 },  // Số lượng bán
+        { wch: 18 },  // Giá bán (VNĐ)
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // Thêm worksheet vào workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, `Top10 T${displayMonth}-${displayYear}`);
+      
+      // Xuất file Excel
+      XLSX.writeFile(workbook, `bao-cao-top-10-sach-ban-chay-thang-${displayMonth}-${displayYear}.xlsx`);
+    } catch (error) {
+      console.error("Lỗi khi xuất Excel:", error);
+      alert("Có lỗi xảy ra khi xuất báo cáo Excel");
     }
   };
 
@@ -169,9 +214,11 @@ const Top10BooksTable = ({ books, month, year }) => {
         <h3 className="chart-section-title">
           Top 10 sách bán chạy nhất - Tháng {displayMonth}/{displayYear}
         </h3>
-        <button className="export-pdf-btn btn" onClick={exportToPDF}>
-          <i className="fas fa-file-export"></i> Xuất PDF
-        </button>
+        <div className="export-buttons">
+          <button className="export-excel-btn btn" onClick={exportToExcel}>
+            <i className="fas fa-file-excel"></i> Xuất Excel
+          </button>
+        </div>
       </div>
       <div id="top10-books-chart">
         <Bar

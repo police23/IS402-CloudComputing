@@ -43,14 +43,14 @@ function OrderSuccessPage() {
           {orderInfo && (
             <div className="order-info-box">
               <h3 className="order-info-title">Thông tin đơn hàng</h3>
-              <div className="order-info-row"><b>Mã đơn hàng:</b> <span className="order-info-code">{orderInfo.orderCode || orderInfo.id}</span></div>
+              <div className="order-info-row"><b>Mã đơn hàng:</b> <span className="order-info-code">{orderInfo.orderCode || orderInfo.id || '-'}</span></div>
               <div className="order-info-row"><b>Phương thức thanh toán:</b> <span className="order-info-method">{orderInfo.paymentMethod === 'online' ? 'ZaloPay' : 'Thanh toán khi nhận hàng (COD)'}</span></div>
               <div className="order-info-row"><b>Tổng tiền:</b> <span className="order-info-total">{orderInfo.total && orderInfo.total.toLocaleString('vi-VN')}đ</span></div>
             </div>
           )}
           <div className="order-success-actions">
             <button className="btn-back-home" onClick={() => navigate('/')}>Về trang chủ</button>
-            <button className="btn-view-orders" onClick={() => navigate('/account/orders')}>Xem đơn hàng của tôi</button>
+            <button className="btn-view-orders" onClick={() => navigate('/my-orders')}>Xem đơn hàng của tôi</button>
           </div>
         </div>
       </div>

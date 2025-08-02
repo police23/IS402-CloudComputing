@@ -12,6 +12,7 @@ import {
 } from "chart.js";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import * as XLSX from "xlsx";
 import "./ImportBooksChart.css"; // CSS riêng cho ImportBooksTable
 import { getImportDataByMonth, getImportDataByYear } from "../../services/ImportService";
 
@@ -178,15 +179,69 @@ function renderDailyView(dailyData, month, year) {
     }
   };
 
+  const exportToExcel = () => {
+    try {
+      // Chuẩn bị dữ liệu cho Excel
+      const excelData = dailyData.map((item, index) => ({
+        'STT': index + 1,
+        'Ngày': `${item.day}/${month}/${year}`,
+        'Số lượng sách nhập': Number(item.totalBooks).toLocaleString('vi-VN'),
+        'Giá trị nhập (VNĐ)': Number(item.totalCost).toLocaleString('vi-VN')
+      }));
+
+      // Thêm dòng tổng kết
+      const totalBooks = dailyData.reduce((sum, item) => sum + Number(item.totalBooks), 0);
+      const totalCost = dailyData.reduce((sum, item) => sum + Number(item.totalCost), 0);
+      
+      excelData.push({
+        'STT': '',
+        'Ngày': 'TỔNG CỘNG',
+        'Số lượng sách nhập': totalBooks.toLocaleString('vi-VN'),
+        'Giá trị nhập (VNĐ)': totalCost.toLocaleString('vi-VN')
+      });
+
+      // Tạo workbook và worksheet
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      
+      // Tiêu đề cho file Excel
+      XLSX.utils.sheet_add_aoa(worksheet, [
+        [`BÁO CÁO NHẬP KHO - THÁNG ${month}/${year}`],
+        [`Xuất lúc: ${new Date().toLocaleString('vi-VN')}`],
+        [''] // Dòng trống trước dữ liệu
+      ], { origin: 'A1' });
+
+      // Thiết lập độ rộng cột
+      const columnWidths = [
+        { wch: 5 },  // STT
+        { wch: 15 }, // Ngày
+        { wch: 20 }, // Số lượng sách nhập
+        { wch: 25 }, // Giá trị nhập (VNĐ)
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // Thêm worksheet vào workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, `Nhập kho T${month}-${year}`);
+      
+      // Xuất file Excel
+      XLSX.writeFile(workbook, `bao-cao-nhap-kho-thang-${month}-${year}.xlsx`);
+    } catch (error) {
+      console.error("Lỗi khi xuất Excel:", error);
+      alert("Có lỗi xảy ra khi xuất báo cáo Excel");
+    }
+  };
+
   return (
     <div className="chart-section">
       <div className="chart-header">
         <h3 className="chart-section-title">
           Biểu đồ số lượng và giá trị nhập kho ({month}/{year})
         </h3>
-        <button className="export-pdf-btn btn" onClick={exportToPDF}>
-          <i className="fas fa-file-export"></i> Xuất PDF
-        </button>
+        <div className="export-buttons">
+          <button className="export-excel-btn btn" onClick={exportToExcel}>
+            <i className="fas fa-file-excel"></i> Xuất Excel
+          </button>
+        </div>
       </div>
       <div id="import-chart-daily">
         <Chart type='bar' data={chartData} options={options} height={130} />
@@ -300,6 +355,93 @@ const ImportBooksTable = ({ data, year, month, viewType = "monthly" }) => {
     } catch (error) {
       console.error("Lỗi khi xuất PDF:", error);
       alert("Có lỗi xảy ra khi xuất báo cáo PDF");
+    }
+  };
+
+  const exportToExcel = () => {
+    try {
+      let excelData = [];
+      let sheetName = '';
+      let fileName = '';
+
+      if (viewType === "daily" && data?.daily) {
+        // Dữ liệu theo ngày
+        excelData = data.daily.map((item, index) => ({
+          'STT': index + 1,
+          'Ngày': `${item.day}/${month}/${year}`,
+          'Số lượng sách nhập': Number(item.totalBooks).toLocaleString('vi-VN'),
+          'Giá trị nhập (VNĐ)': Number(item.totalCost).toLocaleString('vi-VN')
+        }));
+
+        // Thêm dòng tổng kết
+        const totalBooks = data.daily.reduce((sum, item) => sum + Number(item.totalBooks), 0);
+        const totalCost = data.daily.reduce((sum, item) => sum + Number(item.totalCost), 0);
+        
+        excelData.push({
+          'STT': '',
+          'Ngày': 'TỔNG CỘNG',
+          'Số lượng sách nhập': totalBooks.toLocaleString('vi-VN'),
+          'Giá trị nhập (VNĐ)': totalCost.toLocaleString('vi-VN')
+        });
+
+        sheetName = `Nhập kho T${month}-${year}`;
+        fileName = `bao-cao-nhap-kho-thang-${month}-${year}.xlsx`;
+      } else {
+        // Dữ liệu theo tháng
+        excelData = importsByMonth.map((item, index) => ({
+          'STT': index + 1,
+          'Tháng': `Tháng ${index + 1}/${year}`,
+          'Số lượng sách nhập': Number(item.totalBooks).toLocaleString('vi-VN'),
+          'Giá trị nhập (VNĐ)': Number(item.totalCost).toLocaleString('vi-VN')
+        }));
+
+        // Thêm dòng tổng kết
+        const totalBooks = importsByMonth.reduce((sum, item) => sum + Number(item.totalBooks), 0);
+        const totalCost = importsByMonth.reduce((sum, item) => sum + Number(item.totalCost), 0);
+        
+        excelData.push({
+          'STT': '',
+          'Tháng': 'TỔNG CỘNG',
+          'Số lượng sách nhập': totalBooks.toLocaleString('vi-VN'),
+          'Giá trị nhập (VNĐ)': totalCost.toLocaleString('vi-VN')
+        });
+
+        sheetName = `Nhập kho ${year}`;
+        fileName = `bao-cao-nhap-kho-nam-${year}.xlsx`;
+      }
+
+      // Tạo workbook và worksheet
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      
+      // Tiêu đề cho file Excel
+      const title = viewType === "daily" 
+        ? `BÁO CÁO NHẬP KHO - THÁNG ${month}/${year}`
+        : `BÁO CÁO NHẬP KHO - NĂM ${year}`;
+        
+      XLSX.utils.sheet_add_aoa(worksheet, [
+        [title],
+        [`Xuất lúc: ${new Date().toLocaleString('vi-VN')}`],
+        [''] // Dòng trống trước dữ liệu
+      ], { origin: 'A1' });
+
+      // Thiết lập độ rộng cột
+      const columnWidths = [
+        { wch: 5 },  // STT
+        { wch: 15 }, // Ngày/Tháng
+        { wch: 20 }, // Số lượng sách nhập
+        { wch: 25 }, // Giá trị nhập (VNĐ)
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // Thêm worksheet vào workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+      
+      // Xuất file Excel
+      XLSX.writeFile(workbook, fileName);
+    } catch (error) {
+      console.error("Lỗi khi xuất Excel:", error);
+      alert("Có lỗi xảy ra khi xuất báo cáo Excel");
     }
   };
 
@@ -424,9 +566,11 @@ const ImportBooksTable = ({ data, year, month, viewType = "monthly" }) => {
         <h3 className="chart-section-title">
           Biểu đồ số lượng và giá trị nhập kho năm {year}
         </h3>
-        <button className="export-pdf-btn btn" onClick={exportToPDF}>
-          <i className="fas fa-file-export"></i> Xuất PDF
-        </button>
+        <div className="export-buttons">
+          <button className="export-excel-btn btn" onClick={exportToExcel}>
+            <i className="fas fa-file-excel"></i> Xuất Excel
+          </button>
+        </div>
       </div>
       <div id="import-chart">
         <Chart type='bar' data={chartData} options={options} height={130} />

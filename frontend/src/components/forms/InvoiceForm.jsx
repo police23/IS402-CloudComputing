@@ -11,6 +11,7 @@ import "./InvoiceForm.css";
 import { openModal, closeModal } from "../../utils/modalUtils";
 import { getAllBooks } from "../../services/BookService";
 import { checkPromotion, getAvailablePromotions } from "../../services/PromotionService";
+import { exportInvoicePDF } from "../../services/invoiceService";
 
 const InvoiceForm = ({ invoice, onSubmit, onClose, setShowForm }) => {
   const [formData, setFormData] = useState({
@@ -28,7 +29,6 @@ const InvoiceForm = ({ invoice, onSubmit, onClose, setShowForm }) => {
   const [errors, setErrors] = useState({});
   const [userInfo, setUserInfo] = useState({ id: "", full_name: "" }); // Thêm state này
   const [promoError, setPromoError] = useState("");
-  const [promoSuccess, setPromoSuccess] = useState("");
   const [stockErrors, setStockErrors] = useState({}); // Thêm state lưu lỗi tồn kho từng sách
   const [availablePromotions, setAvailablePromotions] = useState([]);
 
@@ -226,12 +226,31 @@ const InvoiceForm = ({ invoice, onSubmit, onClose, setShowForm }) => {
     setStockErrors({}); // Reset lỗi tồn kho trước khi submit
     if (validateForm()) {
       try {
+        console.log("Đang gửi dữ liệu hóa đơn:", formData);
         const result = await onSubmit(formData);
+        console.log("Kết quả từ backend sau khi submit:", result);
+        
         // Sau khi tạo hóa đơn thành công, tải file PDF
         if (result && result.id) {
-          window.open(`http://localhost:5000/api/invoices/${result.id}/pdf`, "_blank");
+          console.log("Bắt đầu xuất PDF cho hóa đơn ID:", result.id);
+          try {
+            await exportInvoicePDF(result.id);
+            console.log("Đã xuất PDF thành công");
+          } catch (pdfError) {
+            console.error("Lỗi khi xuất PDF:", pdfError);
+            alert("Đã tạo hóa đơn thành công nhưng không thể xuất PDF tự động.");
+          }
+        } else {
+          console.error("Không nhận được ID hóa đơn hợp lệ:", result);
+          alert("Đã tạo hóa đơn thành công nhưng không thể xuất PDF do backend không trả về ID hóa đơn.");
         }
-        setShowForm && setShowForm(false); // Nếu có prop setShowForm thì đóng, còn không thì không làm gì
+        
+        // Luôn đóng form khi đã submit thành công, bất kể có xuất PDF thành công hay không
+        if (onClose) {
+          onClose();
+        } else if (setShowForm) {
+          setShowForm(false);
+        }
       } catch (err) {
         // Nếu backend trả về lỗi tồn kho hoặc lỗi khác, hiển thị alert hoặc lỗi dưới từng sách
         if (
@@ -263,8 +282,7 @@ const InvoiceForm = ({ invoice, onSubmit, onClose, setShowForm }) => {
         // Không đóng form nếu có lỗi
         return;
       }
-      // Nếu thành công mới đóng form
-      setShowForm && setShowForm(false);
+      // Chỗ này không cần thiết nữa vì đã xử lý trong block try
     }
   };
 
@@ -293,12 +311,10 @@ const InvoiceForm = ({ invoice, onSubmit, onClose, setShowForm }) => {
   const handleApplyPromotion = () => {
     if (!formData.promotion_code) {
       setPromoError("Vui lòng chọn mã khuyến mãi");
-      setPromoSuccess("");
       return;
     }
     if (!formData.total_amount || formData.total_amount <= 0) {
       setPromoError("Vui lòng thêm sách vào hóa đơn trước khi áp dụng mã khuyến mãi");
-      setPromoSuccess("");
       return;
     }
     const { discount, final } = calculateDiscount(formData.promotion_code, formData.total_amount);
@@ -308,7 +324,6 @@ const InvoiceForm = ({ invoice, onSubmit, onClose, setShowForm }) => {
       final_amount: final
     }));
     setPromoError("");
-    setPromoSuccess("Đã áp dụng khuyến mãi!");
   };
 
   // Thêm hàm kiểm tra có lỗi tồn kho không
@@ -535,9 +550,6 @@ const InvoiceForm = ({ invoice, onSubmit, onClose, setShowForm }) => {
                   </div>
                   {promoError && (
                     <div style={{ color: "#d32f2f", fontSize: "12px" }}>{promoError}</div>
-                  )}
-                  {promoSuccess && (
-                    <div style={{ color: "#2e7d32", fontSize: "12px" }}>{promoSuccess}</div>
                   )}
                 </div>
                 <div className="invoiceform-summary-row">

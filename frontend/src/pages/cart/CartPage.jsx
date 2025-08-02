@@ -18,7 +18,11 @@ function CartPage() {
   const [error, setError] = useState(null);
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const discount = appliedCoupon ? Math.round(subtotal * (appliedCoupon.discount / 100)) : 0;
+  const discount = appliedCoupon 
+    ? (appliedCoupon.type === 'percent' || appliedCoupon.discountType === 'percent')
+      ? Math.round(subtotal * (appliedCoupon.discount / 100))
+      : Number(appliedCoupon.discount)
+    : 0;
   const total = subtotal - discount;
 
   // Load cart data khi component mount
@@ -315,9 +319,9 @@ function CartPage() {
                   {availablePromotions.map(promo => (
                     <option key={promo.id} value={promo.id}>
                       {promo.promotion_code} (
-                        {promo.discountType === 'percent' || promo.type === 'percent' || promo.isPercent ?
+                        {promo.type === 'percent' || promo.discountType === 'percent' ?
                           `Giảm ${promo.discount}%`
-                          : `Giảm ${promo.discount?.toLocaleString('vi-VN')}đ`
+                          : `Giảm ${Number(promo.discount).toLocaleString('vi-VN')}đ`
                         }
                       )
                     </option>
@@ -326,7 +330,11 @@ function CartPage() {
               </div>
               {appliedCoupon && (
                 <div className="applied-coupon" style={{ marginTop: '12px' }}>
-                  <span>Đã chọn: {appliedCoupon.name} - Giảm {appliedCoupon.discount}%</span>
+                  <span>Đã chọn: {appliedCoupon.name} - {
+                    (appliedCoupon.type === 'percent' || appliedCoupon.discountType === 'percent')
+                      ? `Giảm ${appliedCoupon.discount}%`
+                      : `Giảm ${Number(appliedCoupon.discount).toLocaleString('vi-VN')}đ`
+                  }</span>
                   <button onClick={() => setAppliedCoupon(null)}>Bỏ chọn</button>
                 </div>
               )}

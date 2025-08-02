@@ -9,21 +9,15 @@ import { getAllPromotions } from '../../services/PromotionService';
 const banners = [
   {
     id: 1,
-    image: '/assets/banner1.jpg',
-    title: 'Mua 2 tặng 1 - Sách thiếu nhi',
-    desc: 'Ưu đãi tháng 7 cho mọi đơn hàng sách thiếu nhi.'
+    image: '/src/assets/img/banner1.png',
   },
   {
     id: 2,
-    image: '/assets/banner2.jpg',
-    title: 'Sách mới về liên tục',
-    desc: 'Khám phá những đầu sách hot nhất vừa cập bến.'
+    image: '/src/assets/img/banner2.png',
   },
   {
     id: 3,
-    image: '/assets/banner3.jpg',
-    title: 'Giảm giá 30% sách kỹ năng',
-    desc: 'Nâng cấp bản thân với sách kỹ năng sống.'
+    image: '/src/assets/img/banner3.jpg',
   }
 ];
 
@@ -60,10 +54,6 @@ function BannerSlider() {
           key={banner.id}
           style={{ backgroundImage: `url(${banner.image})` }}
         >
-          <div className="banner-content">
-            <h2>{banner.title}</h2>
-            <p>{banner.desc}</p>
-          </div>
         </div>
       ))}
       <div className="banner-controls">
@@ -134,7 +124,7 @@ function PromoSection({ promotions }) {
             <div className="promo-header">
               <span className="promo-code">{promo.promotion_code || promo.code}</span>
               <span className="promo-discount">
-                {promo.type === 'percent'
+                {(promo.type === 'percent' || promo.discountType === 'percent')
                   ? `-${promo.discount}%`
                   : `-${promo.discount ? Number(promo.discount).toLocaleString('vi-VN') : ''}đ`}
               </span>

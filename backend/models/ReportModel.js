@@ -198,17 +198,210 @@ const getTop10MostSoldBooksAll = async (month, year) => {
     return rows;
 };
 
+const getBookRevenueDetailsByYear = async (year, type = 'all') => {
+    try {
+        year = Number(year);
+        let query = '';
+        let params = [];
+
+        if (type === 'offline') {
+            query = `
+                SELECT 
+                    b.id, 
+                    b.title, 
+                    b.price,
+                    MONTH(i.created_at) AS month,
+                    SUM(d.quantity) AS quantity_sold,
+                    SUM(d.quantity * d.unit_price) AS revenue
+                FROM books b
+                JOIN invoice_details d ON b.id = d.book_id
+                JOIN invoices i ON d.invoice_id = i.id
+                WHERE YEAR(i.created_at) = ?
+                GROUP BY b.id, b.title, b.price, MONTH(i.created_at)
+                ORDER BY MONTH(i.created_at), b.title
+            `;
+            params = [year];
+        } else if (type === 'online') {
+            query = `
+                SELECT 
+                    b.id, 
+                    b.title, 
+                    b.price,
+                    MONTH(o.order_date) AS month,
+                    SUM(od.quantity) AS quantity_sold,
+                    SUM(od.quantity * od.unit_price) AS revenue
+                FROM books b
+                JOIN order_details od ON b.id = od.book_id
+                JOIN orders o ON od.order_id = o.id
+                WHERE YEAR(o.order_date) = ?
+                GROUP BY b.id, b.title, b.price, MONTH(o.order_date)
+                ORDER BY MONTH(o.order_date), b.title
+            `;
+            params = [year];
+        } else {
+            // type = 'all' (mặc định)
+            query = `
+                SELECT 
+                    combined.id, 
+                    combined.title, 
+                    combined.price,
+                    combined.month,
+                    SUM(combined.quantity_sold) AS quantity_sold,
+                    SUM(combined.revenue) AS revenue
+                FROM (
+                    SELECT 
+                        b.id, 
+                        b.title, 
+                        b.price,
+                        MONTH(i.created_at) AS month,
+                        SUM(d.quantity) AS quantity_sold,
+                        SUM(d.quantity * d.unit_price) AS revenue
+                    FROM books b
+                    JOIN invoice_details d ON b.id = d.book_id
+                    JOIN invoices i ON d.invoice_id = i.id
+                    WHERE YEAR(i.created_at) = ?
+                    GROUP BY b.id, b.title, b.price, MONTH(i.created_at)
+                    
+                    UNION ALL
+                    
+                    SELECT 
+                        b.id, 
+                        b.title, 
+                        b.price,
+                        MONTH(o.order_date) AS month,
+                        SUM(od.quantity) AS quantity_sold,
+                        SUM(od.quantity * od.unit_price) AS revenue
+                    FROM books b
+                    JOIN order_details od ON b.id = od.book_id
+                    JOIN orders o ON od.order_id = o.id
+                    WHERE YEAR(o.order_date) = ?
+                    GROUP BY b.id, b.title, b.price, MONTH(o.order_date)
+                ) AS combined
+                GROUP BY combined.id, combined.title, combined.price, combined.month
+                ORDER BY combined.month, combined.title
+            `;
+            params = [year, year];
+        }
+        
+        console.log("Query getBookRevenueDetailsByYear:", query);
+        console.log("Params:", params);
+        
+        const [rows] = await db.query(query, params);
+        return rows;
+    } catch (error) {
+        console.error("Lỗi trong ReportModel.getBookRevenueDetailsByYear:", error);
+        throw error;
+    }
+};
+
+// Lấy chi tiết doanh thu theo từng sách theo ngày trong tháng
+const getBookRevenueDetailsByMonth = async (month, year, type = 'all') => {
+    try {
+        month = Number(month);
+        year = Number(year);
+        let query = '';
+        let params = [];
+
+        if (type === 'offline') {
+            query = `
+                SELECT 
+                    b.id, 
+                    b.title, 
+                    b.price,
+                    DAY(i.created_at) AS day,
+                    SUM(d.quantity) AS quantity_sold,
+                    SUM(d.quantity * d.unit_price) AS revenue
+                FROM books b
+                JOIN invoice_details d ON b.id = d.book_id
+                JOIN invoices i ON d.invoice_id = i.id
+                WHERE MONTH(i.created_at) = ? AND YEAR(i.created_at) = ?
+                GROUP BY b.id, b.title, b.price, DAY(i.created_at)
+                ORDER BY DAY(i.created_at), b.title
+            `;
+            params = [month, year];
+        } else if (type === 'online') {
+            query = `
+                SELECT 
+                    b.id, 
+                    b.title, 
+                    b.price,
+                    DAY(o.order_date) AS day,
+                    SUM(od.quantity) AS quantity_sold,
+                    SUM(od.quantity * od.unit_price) AS revenue
+                FROM books b
+                JOIN order_details od ON b.id = od.book_id
+                JOIN orders o ON od.order_id = o.id
+                WHERE MONTH(o.order_date) = ? AND YEAR(o.order_date) = ?
+                GROUP BY b.id, b.title, b.price, DAY(o.order_date)
+                ORDER BY DAY(o.order_date), b.title
+            `;
+            params = [month, year];
+        } else {
+            // type = 'all' (mặc định)
+            query = `
+                SELECT 
+                    combined.id, 
+                    combined.title, 
+                    combined.price,
+                    combined.day,
+                    SUM(combined.quantity_sold) AS quantity_sold,
+                    SUM(combined.revenue) AS revenue
+                FROM (
+                    SELECT 
+                        b.id, 
+                        b.title, 
+                        b.price,
+                        DAY(i.created_at) AS day,
+                        SUM(d.quantity) AS quantity_sold,
+                        SUM(d.quantity * d.unit_price) AS revenue
+                    FROM books b
+                    JOIN invoice_details d ON b.id = d.book_id
+                    JOIN invoices i ON d.invoice_id = i.id
+                    WHERE MONTH(i.created_at) = ? AND YEAR(i.created_at) = ?
+                    GROUP BY b.id, b.title, b.price, DAY(i.created_at)
+                    
+                    UNION ALL
+                    
+                    SELECT 
+                        b.id, 
+                        b.title, 
+                        b.price,
+                        DAY(o.order_date) AS day,
+                        SUM(od.quantity) AS quantity_sold,
+                        SUM(od.quantity * od.unit_price) AS revenue
+                    FROM books b
+                    JOIN order_details od ON b.id = od.book_id
+                    JOIN orders o ON od.order_id = o.id
+                    WHERE MONTH(o.order_date) = ? AND YEAR(o.order_date) = ?
+                    GROUP BY b.id, b.title, b.price, DAY(o.order_date)
+                ) AS combined
+                GROUP BY combined.id, combined.title, combined.price, combined.day
+                ORDER BY combined.day, combined.title
+            `;
+            params = [month, year, month, year];
+        }
+        
+        const [rows] = await db.query(query, params);
+        return rows;
+    } catch (error) {
+        console.error("Lỗi trong ReportModel.getBookRevenueDetailsByMonth:", error);
+        throw error;
+    }
+};
+
 
 module.exports = {
     getTop10MostSoldBooksOffline,
     getTop10MostSoldBooksOnline,
     getTop10MostSoldBooksAll,
     getTotalRevenueByMonth,
-    getDailyRevenueByMonth
-    ,getDailyRevenueByMonthOffline
-    ,getDailyRevenueByMonthOnline
-    ,getDailyRevenueByMonthAll
-    ,getRevenueByYearOffline
-    ,getRevenueByYearOnline
-    ,getRevenueByYearAll
+    getDailyRevenueByMonth,
+    getDailyRevenueByMonthOffline,
+    getDailyRevenueByMonthOnline,
+    getDailyRevenueByMonthAll,
+    getRevenueByYearOffline,
+    getRevenueByYearOnline,
+    getRevenueByYearAll,
+    getBookRevenueDetailsByYear,
+    getBookRevenueDetailsByMonth
 }; 

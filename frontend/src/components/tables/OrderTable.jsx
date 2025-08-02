@@ -233,7 +233,7 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
                   <td>#{order.id || ''}</td>
                   <td>{order.full_name || ''}</td>
                   <td>{order.phone || ''}</td>
-                  <td>{Array.isArray(order.orderDetails) ? order.orderDetails.reduce((sum, item) => sum + 1, 0) : 0}</td>
+                  <td>{Array.isArray(order.orderDetails) ? order.orderDetails.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) : 0}</td>
                   <td>{formatDate(order.order_date)}</td>
                   {type === 'delivering' && <td>{order.shipper_name || order.shipperName || 'Chưa có'}</td>}
                   <td><strong>{formatCurrency(Number(order.total_amount) || 0)}</strong></td>

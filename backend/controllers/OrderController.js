@@ -45,9 +45,7 @@ const getOrdersByShipperID = async (req, res) => {
         const status = getStatusFromRoute(req.path);
         const page = parseInt(req.query.page) || 1;
         const pageSize = parseInt(req.query.pageSize) || 10;
-        console.log('[getOrdersByShipperID] shipperID:', shipperID, 'status:', status, 'page:', page, 'pageSize:', pageSize);
         const result = await OrderService.getOrdersByShipperID(shipperID, status, page, pageSize);
-        console.log('[getOrdersByShipperID] result:', JSON.stringify(result));
         res.json(result);
     } catch (error) {
         console.error('Error in getOrdersByShipperID:', error);
@@ -93,6 +91,17 @@ const completeOrder = async (req, res) => {
     }
 };
 
+const cancelOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const result = await OrderService.cancelOrder(orderId);
+        res.json(result);
+    } catch (error) {
+        console.error('Error in cancelOrder:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 const assignOrderToShipper = async (req, res) => {
     try {
         
@@ -125,5 +134,6 @@ module.exports = {
     createOrder,
     confirmOrder,
     completeOrder,
+    cancelOrder,
     assignOrderToShipper
 };

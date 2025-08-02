@@ -117,135 +117,146 @@ const ShipperTable = ({ type = "delivering" }) => {
               onClick={handleComplete}
               disabled={!canComplete}
             >
+              <i className="fa fa-check"></i>
               Xác nhận đã giao
             </button>
           )}
         </div>
-        <table className="order-table">
-          <thead>
-            <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  checked={currentRecords.length > 0 && currentRecords.every(order => selectedRows.includes(order.id))}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      setSelectedRows(prev => ([...new Set([...prev, ...currentRecords.map(o => o.id)])]));
-                    } else {
-                      setSelectedRows(prev => prev.filter(id => !currentRecords.some(o => o.id === id)));
-                    }
-                  }}
-                  aria-label="Chọn tất cả"
-                />
-              </th>
-              <th>Mã đơn</th>
-              <th>Khách hàng</th>
-              <th>Số ĐT</th>
-              <th>SL sách</th>
-              <th>{type === "delivered" ? "Ngày giao" : "Ngày đặt"}</th>
-              <th>Thành tiền</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentRecords.length === 0 ? (
+        <div className="table-wrapper">
+          <table className="order-table">
+            <thead>
               <tr>
-                <td colSpan={7} className="order-table-empty">Không có dữ liệu</td>
+                <th>
+                  <input
+                    type="checkbox"
+                    checked={currentRecords.length > 0 && currentRecords.every(order => selectedRows.includes(order.id))}
+                    onChange={e => {
+                      if (e.target.checked) {
+                        setSelectedRows(prev => ([...new Set([...prev, ...currentRecords.map(o => o.id)])]));
+                      } else {
+                        setSelectedRows(prev => prev.filter(id => !currentRecords.some(o => o.id === id)));
+                      }
+                    }}
+                    aria-label="Chọn tất cả"
+                  />
+                </th>
+                <th>Mã đơn</th>
+                <th className="customer-col">Khách hàng</th>
+                <th className="hide-mobile">Số ĐT</th>
+                <th className="hide-tablet quantity-col">SL sách</th>
+                <th className="date-col">{type === "delivered" ? "Ngày giao" : "Ngày đặt"}</th>
+                <th>Thành tiền</th>
               </tr>
-            ) : (
-              currentRecords.flatMap(order => [
-                <tr
-                  key={order.id}
-                  className={selectedRows.includes(order.id) ? "selected" : ""}
-                  onClick={() => setExpandedRowId(expandedRowId === order.id ? null : order.id)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedRows.includes(order.id)}
-                      onChange={e => {
-                        e.stopPropagation();
-                        setSelectedRows(prev =>
-                          e.target.checked
-                            ? [...prev, order.id]
-                            : prev.filter(id => id !== order.id)
-                        );
-                      }}
-                      onClick={e => e.stopPropagation()}
-                      aria-label={`Chọn đơn hàng #${order.orderNumber}`}
-                    />
-                  </td>
-                  <td>#{order.orderNumber}</td>
-                  <td>{order.customer}</td>
-                  <td>{order.phone || ''}</td>
-                  <td>{Array.isArray(order.items) ? order.items.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0}</td>
-                  <td>{formatDate(order.orderDate)}</td>
-                  <td><strong>{formatCurrency(order.totalAmount)}</strong></td>
-                </tr>,
-                expandedRowId === order.id && (
-                  <tr key={order.id + '-details'}>
-                    <td colSpan={7} className="order-details-cell">
-                      <div className="order-details-inline">
-                        <div className="order-details-row">
-                          <div className="order-details-col order-details-col-1">
-                            <div className="order-details-item"><b>Mã đơn:</b> #{order.orderNumber}</div>
-                            <div className="order-details-item"><b>Ngày đặt:</b> {formatDate(order.orderDate)}</div>
-                            <div className="order-details-item"><b>Khách hàng:</b> {order.customer}</div>
-                            <div className="order-details-item"><b>SĐT:</b> {order.phone || ''}</div>
-                          </div>
-                          <div className="order-details-col order-details-col-2">
-                            <div className="order-details-item"><b>Địa chỉ giao hàng:</b> {order.shippingAddress}</div>
-                            <div className="order-details-item"><b>Phương thức thanh toán:</b> {order.paymentMethod}</div>
-                            <div className="order-details-item"><b>Phương thức vận chuyển:</b> {order.shippingMethod || 'Không rõ'}</div>
-                          </div>
-                        </div>
-                        <div className="order-items-table-wrapper">
-                          <table className="order-items-table">
-                            <thead>
-                              <tr>
-                                <th>Tên sản phẩm</th>
-                                <th>Số lượng</th>
-                                <th>Đơn giá</th>
-                                <th>Thành tiền</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {order.items && order.items.length > 0 ? (
-                                order.items.map((item, idx) => (
-                                  <tr key={item.id || idx}>
-                                    <td>{item.name || item.title}</td>
-                                    <td>{item.quantity}</td>
-                                    <td>{formatCurrency(item.unit_price || item.price)}</td>
-                                    <td>{formatCurrency((item.unit_price || item.price) * item.quantity)}</td>
-                                  </tr>
-                                ))
-                              ) : (
-                                <tr><td colSpan={4} className="order-items-empty">Không có sản phẩm</td></tr>
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                        {(() => {
-                          const totalProductAmount = order.items && order.items.length > 0
-                            ? order.items.reduce((sum, item) => sum + ((item.unit_price || item.price) * item.quantity), 0)
-                            : 0;
-                          return (
-                            <div className="order-details-summary">
-                              <div className="order-details-summary-row"><span>Tổng tiền hàng:</span> <strong>{formatCurrency(totalProductAmount)}</strong></div>
-                              <div className="order-details-summary-row"><span>Phí vận chuyển:</span> <strong>{formatCurrency(order.shippingFee)}</strong></div>
-                              <div className="order-details-summary-row"><span>Khuyến mãi:</span> <strong className="order-details-discount">-{formatCurrency(order.discountAmount)}</strong></div>
-                              <div className="order-details-summary-row order-details-final"><span>Thành tiền:</span> <span>{formatCurrency(order.finalAmount)}</span></div>
-                            </div>
+            </thead>
+            <tbody>
+              {currentRecords.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="order-table-empty">Không có dữ liệu</td>
+                </tr>
+              ) : (
+                currentRecords.flatMap(order => [
+                  <tr
+                    key={order.id}
+                    className={selectedRows.includes(order.id) ? "selected" : ""}
+                    onClick={() => setExpandedRowId(expandedRowId === order.id ? null : order.id)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedRows.includes(order.id)}
+                        onChange={e => {
+                          e.stopPropagation();
+                          setSelectedRows(prev =>
+                            e.target.checked
+                              ? [...prev, order.id]
+                              : prev.filter(id => id !== order.id)
                           );
-                        })()}
-                      </div>
+                        }}
+                        onClick={e => e.stopPropagation()}
+                        aria-label={`Chọn đơn hàng #${order.orderNumber}`}
+                      />
                     </td>
-                  </tr>
-                )
-              ]).filter(Boolean)
-            )}
-          </tbody>
-        </table>
+                    <td data-label="Mã đơn">
+                      <span className="order-number">#{order.orderNumber}</span>
+                    </td>
+                    <td data-label="Khách hàng" className="customer-col">
+                      {order.customer}
+                    </td>
+                    <td className="hide-mobile" data-label="Số ĐT">{order.phone || ''}</td>
+                    <td className="hide-tablet quantity-col" data-label="SL sách">{Array.isArray(order.items) ? order.items.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0}</td>
+                    <td data-label={type === "delivered" ? "Ngày giao" : "Ngày đặt"} className="date-col">
+                      {formatDate(order.orderDate)}
+                    </td>
+                    <td data-label="Thành tiền">
+                      <strong className="order-amount">{formatCurrency(order.totalAmount)}</strong>
+                    </td>
+                  </tr>,
+                  expandedRowId === order.id && (
+                    <tr key={order.id + '-details'}>
+                      <td colSpan={7} className="order-details-cell">
+                        <div className="order-details-inline">
+                          <div className="order-details-row">
+                            <div className="order-details-col order-details-col-1">
+                              <div className="order-details-item"><b>Mã đơn:</b> #{order.orderNumber}</div>
+                              <div className="order-details-item"><b>Ngày đặt:</b> {formatDate(order.orderDate)}</div>
+                              <div className="order-details-item"><b>Khách hàng:</b> {order.customer}</div>
+                              <div className="order-details-item"><b>SĐT:</b> {order.phone || ''}</div>
+                            </div>
+                            <div className="order-details-col order-details-col-2">
+                              <div className="order-details-item"><b>Địa chỉ giao hàng:</b> {order.shippingAddress}</div>
+                              <div className="order-details-item"><b>Phương thức thanh toán:</b> {order.paymentMethod}</div>
+                              <div className="order-details-item"><b>Phương thức vận chuyển:</b> {order.shippingMethod || 'Không rõ'}</div>
+                            </div>
+                          </div>
+                          <div className="order-items-table-wrapper">
+                            <table className="order-items-table">
+                              <thead>
+                                <tr>
+                                  <th>Tên sản phẩm</th>
+                                  <th>Số lượng</th>
+                                  <th>Đơn giá</th>
+                                  <th>Thành tiền</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {order.items && order.items.length > 0 ? (
+                                  order.items.map((item, idx) => (
+                                    <tr key={item.id || idx}>
+                                      <td>{item.name || item.title}</td>
+                                      <td>{item.quantity}</td>
+                                      <td>{formatCurrency(item.unit_price || item.price)}</td>
+                                      <td>{formatCurrency((item.unit_price || item.price) * item.quantity)}</td>
+                                    </tr>
+                                  ))
+                                ) : (
+                                  <tr><td colSpan={4} className="order-items-empty">Không có sản phẩm</td></tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                          {(() => {
+                            const totalProductAmount = order.items && order.items.length > 0
+                              ? order.items.reduce((sum, item) => sum + ((item.unit_price || item.price) * item.quantity), 0)
+                              : 0;
+                            return (
+                              <div className="order-details-summary">
+                                <div className="order-details-summary-row"><span>Tổng tiền hàng:</span> <strong>{formatCurrency(totalProductAmount)}</strong></div>
+                                <div className="order-details-summary-row"><span>Phí vận chuyển:</span> <strong>{formatCurrency(order.shippingFee)}</strong></div>
+                                <div className="order-details-summary-row"><span>Khuyến mãi:</span> <strong className="order-details-discount">-{formatCurrency(order.discountAmount)}</strong></div>
+                                <div className="order-details-summary-row order-details-final"><span>Thành tiền:</span> <span>{formatCurrency(order.finalAmount)}</span></div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                ]).filter(Boolean)
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
       {/* Pagination */}
       {orders.length > 0 && (

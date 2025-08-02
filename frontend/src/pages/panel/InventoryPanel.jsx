@@ -12,6 +12,7 @@ import Sidebar from "../../components/common/Sidebar.jsx";
 import Header from "../../components/common/Header.jsx";
 import BookTable from "../../components/tables/BookTable.jsx";
 import ImportTable from "../../components/tables/ImportTable.jsx";
+import DamageReportTable from "../../components/tables/DamageReportTable.jsx";
 import ProfilePage from "../profile/ProfilePage.jsx";
 import { useAuth } from "../../contexts/AuthContext.jsx";  // Make sure the extension is .jsx
 import "./Panel.css";
@@ -24,10 +25,17 @@ const inventoryMenuItems = [
     label: "Quản lý đầu sách",
     icon: <FontAwesomeIcon icon={faBook} />,
     showActions: true,
-  },  {
+  },
+  {
     path: "imports",
     label: "Quản lý nhập sách",
     icon: <FontAwesomeIcon icon={faFileImport} />,
+    showActions: true,
+  },
+  {
+    path: "damage-reports",
+    label: "Phiếu sách hỏng",
+    icon: <FontAwesomeIcon icon={faListUl} />,
     showActions: true,
   },
   {
@@ -98,6 +106,8 @@ const InventoryDashboard = () => {
         return <CategoryTable onEdit={handleEdit} onDelete={handleDelete} />;
       case "imports":
         return <ImportTable onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />;
+      case "damage-reports":
+        return <DamageReportTable onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />;
       case "profile":
         return <ProfilePage />;
       default:

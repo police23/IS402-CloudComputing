@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTrash, faPencilAlt, faInfo, faSearch, faEye, faFilter } from "@fortawesome/free-solid-svg-icons";
 import ConfirmationModal from "../modals/ConfirmationModal";
 import DamageReportForm from "../forms/DamageReportForm";
+import DamageReportDetailsModal from "../modals/DamageReportDetailsModal";
+import { getAllBooks } from "../../services/BookService";
 import { faCheckCircle, faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 
 const DamageReportTable = ({ onEdit, onDelete, onView }) => {
@@ -33,9 +35,8 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
 
   // Fetch books and users for the form
   useEffect(() => {
-    fetch("/api/books")
-      .then(res => res.json())
-      .then(data => setBooks(data))
+    getAllBooks()
+      .then(data => setBooks(Array.isArray(data) ? data : []))
       .catch(() => setBooks([]));
     fetch("/api/users")
       .then(res => res.json())
@@ -151,6 +152,10 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
 
   // Modal xác nhận xóa
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+  // Modal chi tiết phiếu sách hỏng
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
 
   // Hàm xác nhận xóa
   async function confirmDelete() {
@@ -355,13 +360,29 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
                   </td>
                   {/* <td style={{ width: '40%', minWidth: 120, maxWidth: 400 }}>{report.note}</td> */}
                   <td style={{ textAlign: 'center' }}>
-                    <button
-                      className="btn btn-view"
-                      title="Xem chi tiết"
-                      onClick={() => onView && onView(report)}
-                    >
-                      <FontAwesomeIcon icon={faEye} />
-                    </button>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                      <button
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          padding: 0,
+                          cursor: 'pointer',
+                          outline: 'none',
+                          boxShadow: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginLeft: '12px',
+                        }}
+                        title="Xem chi tiết"
+                        onClick={() => {
+                          setSelectedReport(report);
+                          setShowDetailsModal(true);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faEye} style={{ fontSize: 18, color: '#095e5a' }} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -369,6 +390,14 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
           </tbody>
         </table>
       </div>
+      {/* Modal chi tiết phiếu sách hỏng */}
+      {showDetailsModal && (
+        <DamageReportDetailsModal
+          isOpen={showDetailsModal}
+          onClose={() => setShowDetailsModal(false)}
+          damageReportData={selectedReport}
+        />
+      )}
       {/* Pagination */}
       <div className="pagination">
         <span className="pagination-info">

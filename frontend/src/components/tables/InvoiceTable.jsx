@@ -237,25 +237,44 @@ const InvoiceTable = ({ onEdit, onDelete, onView, onPrint }) => {
             : invoice
         )
       );
+      return null; // Không có ID trả về khi edit
     } else {
       // Add new invoice to backend
       try {
         const result = await addInvoice(formData);
+        console.log("Backend trả về khi tạo hóa đơn:", result);
+        
         // Reload invoices from backend
         const data = await getAllInvoices();
         setInvoices(data);
         setNotification({ message: "Tạo hóa đơn thành công!", type: "success" });
         setShowProgress(true);
-        // Xuất file PDF ngay sau khi tạo hóa đơn thành công
-        if (result && result.id) {
-          window.open(`http://localhost:5000/api/invoices/${result.id}/pdf`, "_blank");
+        
+        // Nếu backend không trả về ID, thử tìm ID từ danh sách hóa đơn vừa reload
+        if (!result || !result.id) {
+          console.log("Không nhận được ID từ API trực tiếp, tìm kiếm trong danh sách mới nhất");
+          // Tìm hóa đơn mới nhất dựa vào thông tin khách hàng và ngày tạo
+          const latestInvoice = data
+            .filter(inv => 
+              inv.customer_name === formData.customer_name && 
+              inv.customer_phone === formData.customer_phone)
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+            
+          if (latestInvoice) {
+            console.log("Đã tìm thấy hóa đơn mới tạo:", latestInvoice);
+            return latestInvoice;
+          }
         }
+        
+        // Đảm bảo result chứa id và trả về cho form
+        return result;
       } catch (err) {
         setNotification({ message: "Tạo hóa đơn thất bại!", type: "error" });
         setShowProgress(true);
+        throw err; // Ném lỗi để InvoiceForm có thể bắt và xử lý
       }
     }
-    setShowForm(false);
+    // Không đóng form ở đây - để InvoiceForm tự xử lý việc đóng form
   };
 
   // Xử lý khi chọn/bỏ chọn tất cả - hai trạng thái: chọn tất cả các trang hoặc bỏ chọn tất cả
@@ -606,6 +625,7 @@ const InvoiceTable = ({ onEdit, onDelete, onView, onPrint }) => {
               invoice={selectedInvoice}
               onSubmit={handleInvoiceSubmit}
               onClose={() => setShowForm(false)}
+              setShowForm={setShowForm}
             />
           </div>
         </div>

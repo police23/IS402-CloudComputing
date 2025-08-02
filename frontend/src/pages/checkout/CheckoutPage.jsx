@@ -138,7 +138,11 @@ function CheckoutPage() {
 
   // Tính toán tổng tiền
   const subtotal = cartItems.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
-  const discount = appliedCoupon ? Math.round(subtotal * (appliedCoupon.discount / 100)) : 0;
+  const discount = appliedCoupon 
+    ? (appliedCoupon.type === 'percent' || appliedCoupon.discountType === 'percent')
+      ? Math.round(subtotal * (appliedCoupon.discount / 100))
+      : Number(appliedCoupon.discount)
+    : 0;
   
   // Lấy phí vận chuyển từ shipping method được chọn
   const selectedMethod = shippingMethods.find(method => method.id === selectedShippingMethod);
@@ -209,23 +213,7 @@ function CheckoutPage() {
 
     setIsLoading(true);
     try {
-      if (paymentMethod === 'online') {
-        const orderInfo = `Thanh toán đơn hàng cho ${shippingInfo.fullName}`;
-        const redirectUrl = window.location.origin + '/zalopay-result';
-        const res = await createZaloPayPayment({
-          amount: total,
-          orderInfo,
-          redirectUrl
-        });
-        if (res.data && res.data.order_url) {
-          window.location.href = res.data.order_url;
-        } else {
-          alert('Không lấy được link thanh toán ZaloPay');
-        }
-        setIsLoading(false);
-        return;
-      }
-      // Debug địa chỉ
+      // Chuẩn bị địa chỉ giao hàng
       console.log('selectedAddressId:', selectedAddressId);
       console.log('addressList:', addressList);
       const selectedAddress = addressList.find(a => a.id == selectedAddressId);
@@ -239,6 +227,8 @@ function CheckoutPage() {
           ].filter(Boolean).join(', ')
         : shippingInfo.address;
       console.log('Shipping address gửi lên backend:', fullAddress);
+      
+      // Chuẩn bị payload đơn hàng
       const orderPayload = {
         userID: user.id,
         shipping_method_id: selectedShippingMethod,
@@ -256,12 +246,37 @@ function CheckoutPage() {
         }))
       };
       console.log('Order payload gửi lên backend:', orderPayload);
-      const res = await axiosInstance.post('/orders', orderPayload);
+      
+      // Gửi đơn hàng
+      const response = await axiosInstance.post('/orders', orderPayload);
+      console.log('Order response:', response.data);
+      
+      // Xử lý phương thức thanh toán
+      if (paymentMethod === 'online') {
+        const paymentInfo = `Thanh toán đơn hàng cho ${shippingInfo.fullName}`;
+        const redirectUrl = window.location.origin + '/zalopay-result';
+        const res = await createZaloPayPayment({
+          amount: total,
+          orderInfo: paymentInfo,
+          redirectUrl
+        });
+        if (res.data && res.data.order_url) {
+          window.location.href = res.data.order_url;
+        } else {
+          alert('Không lấy được link thanh toán ZaloPay');
+        }
+        setIsLoading(false);
+        return;
+      }
+      
+      // Chuyển hướng đến trang đặt hàng thành công
       const orderInfo = {
-        orderCode: res.data.orderId,
-        paymentMethod,
-        total
+        id: response.data.orderId || response.data.id,
+        orderCode: response.data.orderCode || response.data.order_code,
+        total: total,
+        paymentMethod: paymentMethod
       };
+      
       navigate('/order-success', { state: { orderInfo } });
     } catch (error) {
       console.error('Order error:', error);
@@ -371,17 +386,17 @@ function CheckoutPage() {
         <div className="checkout-header">
           <h1>Thanh toán</h1>
           <div className="checkout-steps">
-            <div className="step completed">
+            <div key="checkout-step-1" className="step completed">
               <span className="step-number">✓</span>
               <span className="step-text">Giỏ hàng</span>
             </div>
-            <div className="step-line"></div>
-            <div className="step active">
+            <div key="checkout-line-1" className="step-line"></div>
+            <div key="checkout-step-2" className="step active">
               <span className="step-number">2</span>
               <span className="step-text">Thông tin giao hàng</span>
             </div>
-            <div className="step-line"></div>
-            <div className="step">
+            <div key="checkout-line-2" className="step-line"></div>
+            <div key="checkout-step-3" className="step">
               <span className="step-number">3</span>
               <span className="step-text">Đặt hàng thành công</span>
             </div>
@@ -573,27 +588,13 @@ function CheckoutPage() {
                 {appliedCoupon && (
                   <div className="detail-row">
                     <span>Khuyến mãi áp dụng:</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ color: '#48bb78', fontWeight: '500' }}>
-                        {(appliedCoupon.promotion_code || appliedCoupon.code || appliedCoupon.id)} - Giảm {appliedCoupon.discount}%
-                      </span>
-                      <button 
-                        onClick={handleRemoveCoupon}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#e53e3e',
-                          cursor: 'pointer',
-                          fontSize: '12px',
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          border: '1px solid #e53e3e'
-                        }}
-                        title="Bỏ chọn khuyến mãi"
-                      >
-                        ✕
-                      </button>
-                    </div>
+                    <span style={{ color: '#48bb78', fontWeight: '500' }}>
+                      {(appliedCoupon.promotion_code || appliedCoupon.code || appliedCoupon.id)} - {
+                        (appliedCoupon.type === 'percent' || appliedCoupon.discountType === 'percent')
+                          ? `Giảm ${appliedCoupon.discount}%`
+                          : `Giảm ${Number(appliedCoupon.discount).toLocaleString('vi-VN')}đ`
+                      }
+                    </span>
                   </div>
                 )}
                 {discount > 0 && (

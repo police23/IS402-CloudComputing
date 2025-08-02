@@ -7,7 +7,6 @@ import {
   faTimes, faUser, faEnvelope,
   faPhone, faUserTag, faLock, faVenusMars
 } from "@fortawesome/free-solid-svg-icons";
-import "../modals/Modals.css";
 import "./AccountForm.css";
 
 const AccountForm = ({ account, onSave, onCancel }) => {
@@ -216,7 +215,7 @@ const AccountForm = ({ account, onSave, onCancel }) => {
                         <option value="" disabled>Chọn vai trò</option>
                         <option value="sales">Nhân viên bán hàng</option>
                         <option value="warehouse">Nhân viên thủ kho</option>
-                        <option value="end_user">Người dùng cuối</option>
+                        
                         <option value="order_manager">Nhân viên quản lý đơn hàng</option>
                         <option value="shipper">Shipper</option>
                       </Field>

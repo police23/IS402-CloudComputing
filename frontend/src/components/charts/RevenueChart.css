@@ -53,8 +53,13 @@
   color: #333;
 }
 
-.export-pdf-btn {
-  background-color: #398b4e !important;
+.export-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.export-excel-btn {
+  background-color: #1E88E5 !important;
   color: white !important;
   border: none;
   padding: 9px 16px !important;
@@ -68,12 +73,17 @@
   gap: 8px;
 }
 
-.export-pdf-btn:hover {
-  background-color: #275c34 !important;
+.export-excel-btn:hover {
+  background-color: #1565C0 !important;
 }
 
-.export-pdf-btn:active {
-  background-color: #1e4728 !important;
+.export-excel-btn:active {
+  background-color: #0D47A1 !important;
+}
+
+.export-excel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .revenue-summary {

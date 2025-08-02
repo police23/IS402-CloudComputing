@@ -50,6 +50,16 @@ app.use('/api/addresses', addressRoutes);
 app.use('/api/shipping-methods', shippingMethodRoutes); 
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/reports', reportRoutes);
+
+// Middleware để log lỗi chi tiết
+app.use((err, req, res, next) => {
+  console.error("Lỗi server:", err.stack);
+  res.status(500).json({
+    message: "Lỗi server",
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Đã xảy ra lỗi server'
+  });
+});
+
 // Debug route
 app.get("/api-test", (req, res) => {
     res.json({ message: "API is working" });

@@ -68,7 +68,7 @@ const generateInvoicePDF = async (invoiceId, res) => {
     }
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename=invoice_${invoice.id || "unknown"}.pdf`);
+    res.setHeader("Content-Disposition", `attachment; filename=invoice-${invoice.id || "unknown"}.pdf`);
     doc.pipe(res);
 
     doc.fontSize(20).text(`HÓA ĐƠN BÁN SÁCH`, { align: "center" });

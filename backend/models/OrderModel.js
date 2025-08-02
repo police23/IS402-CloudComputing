@@ -41,20 +41,50 @@ const getAllOrdersByStatus = async (status, page = 1, pageSize = 10) => {
     // Map 'processing' status từ FE sang 'pending' trong DB
     const dbStatus = status === 'processing' ? 'pending' : status;
     const offset = (page - 1) * pageSize;
-    const [[{ total }]] = await db.query(
-        `SELECT COUNT(*) as total FROM orders WHERE status = ?`,
-        [dbStatus]
-    );
-    const [orders] = await db.query(
-        `SELECT o.*, s.name AS shipping_method_name, u.full_name, u.phone
-         FROM orders o
-         JOIN shipping_methods s ON s.id = o.shipping_method_id
-         JOIN users u ON u.id = o.user_id
-         WHERE o.status = ?
-         ORDER BY o.order_date DESC
-         LIMIT ? OFFSET ?`,
-        [dbStatus, pageSize, offset]
-    );
+    let total;
+    let orders;
+    if (dbStatus === 'delivering') {
+        // For delivering orders, include shipper information
+        const [[{ total: cnt }]] = await db.query(
+            `SELECT COUNT(*) as total
+             FROM orders o
+             JOIN order_assignments oa ON oa.order_id = o.id
+             WHERE o.status = ?`,
+            [dbStatus]
+        );
+        total = cnt;
+        const [result] = await db.query(
+            `SELECT o.*, s.name AS shipping_method_name, u.full_name, u.phone,
+                    sp.full_name AS shipper_name
+             FROM orders o
+             JOIN shipping_methods s ON s.id = o.shipping_method_id
+             JOIN users u ON u.id = o.user_id
+             JOIN order_assignments oa ON oa.order_id = o.id
+             JOIN users sp ON sp.id = oa.shipper_id
+             WHERE o.status = ?
+             ORDER BY o.order_date DESC
+             LIMIT ? OFFSET ?`,
+            [dbStatus, pageSize, offset]
+        );
+        orders = result;
+    } else {
+        const [[{ total: cnt }]] = await db.query(
+            `SELECT COUNT(*) as total FROM orders WHERE status = ?`,
+            [dbStatus]
+        );
+        total = cnt;
+        const [result] = await db.query(
+            `SELECT o.*, s.name AS shipping_method_name, u.full_name, u.phone
+             FROM orders o
+             JOIN shipping_methods s ON s.id = o.shipping_method_id
+             JOIN users u ON u.id = o.user_id
+             WHERE o.status = ?
+             ORDER BY o.order_date DESC
+             LIMIT ? OFFSET ?`,
+            [dbStatus, pageSize, offset]
+        );
+        orders = result;
+    }
     if (orders.length === 0) return { orders: [], total };
     const orderIds = orders.map(o => o.id);
     const [details] = await db.query(
@@ -199,6 +229,14 @@ const completeOrder = async (orderId) => {
     return { orderResult, assignResult };
 };
 
+const cancelOrder = async (orderId) => {
+    const [result] = await db.query(
+        `UPDATE orders SET status = 'cancelled' WHERE id = ?`,
+        [orderId]
+    );
+    return { success: true, message: 'Đơn hàng đã được hủy thành công' };
+};
+
 const assignOrderToShipper = async (orderId, shipperId, assignedBy) => {
     if (!orderId || !shipperId || !assignedBy) {
         console.error('assignOrderToShipper missing params:', { orderId, shipperId, assignedBy });
@@ -231,5 +269,6 @@ module.exports = {
     createOrder,
     confirmOrder,
     completeOrder,
+    cancelOrder,
     assignOrderToShipper
 };
