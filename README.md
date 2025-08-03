@@ -27,7 +27,7 @@ This project is a full-stack Book Store Management system designed to help manag
 
 #### Delivery Staff
 - Manage delivery processes and update shipment statuses.
-- Handle delivery confirmations and customer notifications.
+- Handle delivery confirmations
 
 ### Customer
 - Browse and search books by category, publisher, and promotions.
@@ -76,7 +76,7 @@ This project is a full-stack Book Store Management system designed to help manag
   ```
 
 ## Exporting Reports
-- Import statistics can be exported as PDF or Excel from the frontend charts (see `ImportBooksChart.jsx`).
+- Import statistics can be exported as PDF or Excel from the frontend charts
 
 ## License
 This project is for educational and demonstration purposes.
