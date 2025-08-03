@@ -81,60 +81,114 @@ This project is a full-stack Book Store Management system designed to help manag
 ## Product Interface
 Below are interface screenshots from the application (in the `images/` folder):
 
-- ![Home Page](images/HomePage.png)
-- ![Home Page (v2)](images/HomePage_2.png)
-- ![Home Page (v3)](images/HomePage_3.png)
-- ![Login Page](images/Login.png)
-- ![Forgot Password Step 1](images/ForgotPassword_1.png)
-- ![Forgot Password Step 2](images/ForgotPassword_2.png)
-- ![Create New Password](images/CreateNewPassword.png)
-- ![Account Management](images/AccountManagement.png)
-- ![Create Account for Employee](images/CreateAccountForEmployee.png)
-- ![Book Page](images/BookPage.png)
-- ![Book Management](images/BookManagement.png)
-- ![Book Details](images/BookDetails.png)
-- ![Add Book](images/AddBook.png)
-- ![Edit Book](images/EditBook.png)
-- ![Supplier Management](images/SupplierManagement.png)
-- ![Create New Supplier](images/CreateNewSupplier.png)
-- ![Edit Supplier](images/EditSupplier.png)
-- ![Change Rules](images/ChangeRules.png)
-- ![Promotion Management](images/PromotionManagement.png)
-- ![Create Promotion](images/CreatePromotion.png)
-- ![Edit Promotion](images/EditPromotion.png)
-- ![Import Management](images/ImportManagement.png)
-- ![Create New Import](<images/CreateNewImport (2).png>)
-- ![Import Details](images/ImportDetails.png)
-- ![Import Chart](images/ImportChart.png)
-- ![Import Chart (v2)](images/ImportChart_2.png)
-- ![Damaged Book](images/DamagedBook.png)
-- ![Create Damaged Books](images/CreateDamagedBooks.png)
-- ![Damaged Book Details](images/DamagedBookDetails.png)
-- ![Inventory Chart](images/InventoryChart.png)
-- ![Inventory Chart (v2)](images/InventoryChart_2.png)
-- ![Assign Shipper](images/AssignShipper.png)
-- ![Delivering Orders](images/DeliveringOrders.png)
-- ![Delivering Order Details](images/DeliveringOrderDetails.png)
-- ![Delivered Orders](images/DeliveredOrders.png)
-- ![View Processing Orders](images/ViewProcessingOrders.png)
-- ![View Delivering Orders](images/ViewDeliveringOrders.png)
-- ![View Delivered Orders](images/ViewDeliveredOrders.png)
-- ![Cart](images/Cart.png)
-- ![Checkout Step 1](images/Checkout_1.png)
-- ![Checkout Step 2](images/Checkout_2.png)
-- ![Checkout Step 3](images/Checkout_3.png)
-- ![My Orders](images/MyOrders.png)
-- ![Order Details](images/OrderDetails.png)
-- ![Create Invoice](images/CreateInvoice.png)
-- ![Create Invoice (v2)](images/CreateInvoice_2.png)
-- ![Invoice Details](images/InvoiceDetails.png)
-- ![Export Invoice](images/ExportInvoice.png)
-- ![Change Password](images/ChangePassword.png)
-- ![Top 10 Most Sold Books](images/Top10MostSoldBooks.png)
-- ![Revenue & Books Sold By Day](<images/Revenue&BooksSoldByDay.png>)
-- ![Revenue & Books Sold By Year](<images/Revenue&BooksSoldByYear.png>)
-- ![Profile](images/Profile.png)
-- ![Profile (v2)](images/Profile_2.png)
+- **Home Page**  
+  ![Home Page](images/HomePage.png)
+- **Home Page (v2)**  
+  ![Home Page (v2)](images/HomePage_2.png)
+- **Home Page (v3)**  
+  ![Home Page (v3)](images/HomePage_3.png)
+- **Login Page**  
+  ![Login Page](images/Login.png)
+- **Forgot Password Step 1**  
+  ![Forgot Password Step 1](images/ForgotPassword_1.png)
+- **Forgot Password Step 2**  
+  ![Forgot Password Step 2](images/ForgotPassword_2.png)
+- **Create New Password**  
+  ![Create New Password](images/CreateNewPassword.png)
+- **Account Management**  
+  ![Account Management](images/AccountManagement.png)
+- **Create Account for Employee**  
+  ![Create Account for Employee](images/CreateAccountForEmployee.png)
+- **Book Page**  
+  ![Book Page](images/BookPage.png)
+**Book Management**  
+  ![Book Management](images/BookManagement.png)
+**Book Details**  
+  ![Book Details](images/BookDetails.png)
+**Add Book**  
+  ![Add Book](images/AddBook.png)
+**Edit Book**  
+  ![Edit Book](images/EditBook.png)
+**Supplier Management**  
+  ![Supplier Management](images/SupplierManagement.png)
+**Create New Supplier**  
+  ![Create New Supplier](images/CreateNewSupplier.png)
+**Edit Supplier**  
+  ![Edit Supplier](images/EditSupplier.png)
+**Change Rules**  
+  ![Change Rules](images/ChangeRules.png)
+**Promotion Management**  
+  ![Promotion Management](images/PromotionManagement.png)
+**Create Promotion**  
+  ![Create Promotion](images/CreatePromotion.png)
+**Edit Promotion**  
+  ![Edit Promotion](images/EditPromotion.png)
+**Import Management**  
+  ![Import Management](images/ImportManagement.png)
+**Create New Import**  
+  ![Create New Import](<images/CreateNewImport (2).png>)
+**Import Details**  
+  ![Import Details](images/ImportDetails.png)
+**Import Chart**  
+  ![Import Chart](images/ImportChart.png)
+**Import Chart (v2)**  
+  ![Import Chart (v2)](images/ImportChart_2.png)
+**Damaged Book**  
+  ![Damaged Book](images/DamagedBook.png)
+**Create Damaged Books**  
+  ![Create Damaged Books](images/CreateDamagedBooks.png)
+**Damaged Book Details**  
+  ![Damaged Book Details](images/DamagedBookDetails.png)
+**Inventory Chart**  
+  ![Inventory Chart](images/InventoryChart.png)
+**Inventory Chart (v2)**  
+  ![Inventory Chart (v2)](images/InventoryChart_2.png)
+**Assign Shipper**  
+  ![Assign Shipper](images/AssignShipper.png)
+**Delivering Orders**  
+  ![Delivering Orders](images/DeliveringOrders.png)
+**Delivering Order Details**  
+  ![Delivering Order Details](images/DeliveringOrderDetails.png)
+**Delivered Orders**  
+  ![Delivered Orders](images/DeliveredOrders.png)
+**View Processing Orders**  
+  ![View Processing Orders](images/ViewProcessingOrders.png)
+**View Delivering Orders**  
+  ![View Delivering Orders](images/ViewDeliveringOrders.png)
+**View Delivered Orders**  
+  ![View Delivered Orders](images/ViewDeliveredOrders.png)
+**Cart**  
+  ![Cart](images/Cart.png)
+**Checkout Step 1**  
+  ![Checkout Step 1](images/Checkout_1.png)
+**Checkout Step 2**  
+  ![Checkout Step 2](images/Checkout_2.png)
+**Checkout Step 3**  
+  ![Checkout Step 3](images/Checkout_3.png)
+**My Orders**  
+  ![My Orders](images/MyOrders.png)
+**Order Details**  
+  ![Order Details](images/OrderDetails.png)
+**Create Invoice**  
+  ![Create Invoice](images/CreateInvoice.png)
+**Create Invoice (v2)**  
+  ![Create Invoice (v2)](images/CreateInvoice_2.png)
+**Invoice Details**  
+  ![Invoice Details](images/InvoiceDetails.png)
+**Export Invoice**  
+  ![Export Invoice](images/ExportInvoice.png)
+**Change Password**  
+  ![Change Password](images/ChangePassword.png)
+**Top 10 Most Sold Books**  
+  ![Top 10 Most Sold Books](images/Top10MostSoldBooks.png)
+**Revenue & Books Sold By Day**  
+  ![Revenue & Books Sold By Day](<images/Revenue&BooksSoldByDay.png>)
+**Revenue & Books Sold By Year**  
+  ![Revenue & Books Sold By Year](<images/Revenue&BooksSoldByYear.png>)
+**Profile**  
+  ![Profile](images/Profile.png)
+**Profile (v2)**  
+  ![Profile (v2)](images/Profile_2.png)
 
 ## License
 This project is for educational and demonstration purposes.
