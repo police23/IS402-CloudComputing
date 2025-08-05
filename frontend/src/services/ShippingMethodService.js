@@ -3,6 +3,19 @@ import axios from "axios";
 const API_URL = "http://localhost:5000/api/shipping-methods";
 
 export const getShippingMethods = async () => {
-  const response = await axios.get(API_URL);
-  return response.data;
+  try {
+    const response = await axios.get(API_URL);
+    console.log('ShippingMethodService - API response:', response.data); // Debug log
+    
+    // API trả về { success: true, data: [...] }
+    if (response.data && response.data.success && Array.isArray(response.data.data)) {
+      return response.data.data;
+    }
+    
+    // Fallback cho format cũ
+    return Array.isArray(response.data) ? response.data : [];
+  } catch (error) {
+    console.error('Error fetching shipping methods:', error);
+    return [];
+  }
 }; 

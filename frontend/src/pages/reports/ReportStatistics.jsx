@@ -4,9 +4,8 @@ import Top10BooksChart from "../../components/charts/Top10BooksChart";
 import StockChart from "../../components/charts/StockChart";
 import ImportBooksChart from "../../components/charts/ImportBooksChart";
 import "./ReportStatistics.css";
-import { getRevenueByYear, getTop10MostSoldBooks, getDailyRevenueByMonth } from "../../services/reportService";
-import { getAllBooks } from "../../services/BookService";
-import { getAllImports, getImportsByMonth, getImportDataByMonth, getImportDataByYear } from "../../services/ImportService";
+import { getRevenueByYear, getTop10MostSoldBooks, getDailyRevenueByMonthType } from "../../services/ReportService";
+import { getStockChartData, getImportChartDataByMonth, getImportChartDataByYear } from "../../services/ImportService";
 
 const TABS = [
   { key: "revenue", label: "Doanh thu & số lượng sách bán" },
@@ -41,23 +40,31 @@ const ReportStatistics = () => {
       if (revenueViewType === "monthly") {
         setRevenueData(undefined);
         getRevenueByYear(year, revenueType)
-          .then((data) => {
+          .then((response) => {
+            console.log("Revenue data response:", response);
             // Đảm bảo data luôn là object có key 'monthly'
-            if (Array.isArray(data)) {
-              setRevenueData({ monthly: data });
-            } else if (data && Array.isArray(data.monthly)) {
-              setRevenueData(data);
+            if (response && response.success && response.data) {
+              setRevenueData(response.data);
+            } else if (Array.isArray(response)) {
+              setRevenueData({ monthly: response });
             } else {
               setRevenueData({ monthly: [] });
             }
           })
-          .catch(() => setRevenueData(null));
+          .catch((error) => {
+            console.error("Error fetching revenue data:", error);
+            setRevenueData(null);
+          });
       } else if (revenueViewType === "daily") {
         setDailyRevenueData(undefined);
-        getDailyRevenueByMonth(month, year, revenueType)
-          .then((data) => {
-            console.log("Daily revenue data received:", data);
-            setDailyRevenueData(data);
+        getDailyRevenueByMonthType(month, year, revenueType)
+          .then((response) => {
+            console.log("Daily revenue data response:", response);
+            if (response && response.success && response.data) {
+              setDailyRevenueData(response.data);
+            } else {
+              setDailyRevenueData(null);
+            }
           })
           .catch((error) => {
             console.error("Error fetching daily revenue data:", error);
@@ -68,23 +75,50 @@ const ReportStatistics = () => {
     if (activeTab === "top10") {
       setTop10Books(undefined);
       getTop10MostSoldBooks(month, year, top10Type)
-        .then((books) => {
-          setTop10Books(books);
+        .then((response) => {
+          console.log("Top10 books response:", response);
+          if (response && response.success && response.data) {
+            setTop10Books(response.data);
+          } else if (Array.isArray(response)) {
+            setTop10Books(response);
+          } else {
+            setTop10Books([]);
+          }
         })
-        .catch(() => setTop10Books(null));
+        .catch((error) => {
+          console.error("Error fetching top10 books:", error);
+          setTop10Books(null);
+        });
     }
     if (activeTab === "stock") {
       setStockData(undefined);
-      getAllBooks()
-        .then((books) => setStockData({ books }))
-        .catch(() => setStockData(null));
-    }      if (activeTab === "import") {
+      getStockChartData()
+        .then((response) => {
+          console.log("Stock data response:", response);
+          if (response && response.success && response.data) {
+            setStockData({ books: response.data });
+          } else if (Array.isArray(response)) {
+            setStockData({ books: response });
+          } else {
+            setStockData({ books: [] });
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching stock data:", error);
+          setStockData(null);
+        });
+    }
+    if (activeTab === "import") {
       if (importViewType === "monthly") {
         setImportData(undefined);
-        getImportDataByYear(year)
-          .then((data) => {
-            console.log("Import data received:", data);
-            setImportData(data);
+        getImportChartDataByYear(year)
+          .then((response) => {
+            console.log("Import data response:", response);
+            if (response && response.success && response.data) {
+              setImportData(response.data);
+            } else {
+              setImportData(null);
+            }
           })
           .catch((error) => {
             console.error("Error fetching import data:", error);
@@ -92,10 +126,14 @@ const ReportStatistics = () => {
           });
       } else if (importViewType === "daily") {
         setDailyImportData(undefined);
-        getImportDataByMonth(year, month)
-          .then((data) => {
-            console.log("Daily import data received:", data);
-            setDailyImportData(data);
+        getImportChartDataByMonth(year, month)
+          .then((response) => {
+            console.log("Daily import data response:", response);
+            if (response && response.success && response.data) {
+              setDailyImportData(response.data);
+            } else {
+              setDailyImportData(null);
+            }
           })
           .catch((error) => {
             console.error("Error fetching daily import data:", error);

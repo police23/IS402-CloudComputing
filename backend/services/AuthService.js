@@ -1,16 +1,14 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
-const userModel = require('../models/UserModel');
+const { User } = require('../models');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const JWT_SECRET = 'yoursecretkey123';
 
-// Tạm thời lưu OTP trong memory (trong production nên dùng Redis)
 const otpStore = new Map();
 
 /**
- * Xác thực người dùng dựa trên username và password
  * @param {string} username 
  * @param {string} password 
  * @returns {Object} 
@@ -19,12 +17,13 @@ const authenticateUser = async (username, password) => {    if (!username || !pa
         throw new Error('Vui lòng cung cấp tên đăng nhập và mật khẩu');
     }
     
-    const [users] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+    const user = await User.findOne({
+        where: { username }
+    });
 
-    if (users.length === 0) {
+    if (!user) {
         throw new Error('Tên đăng nhập và/hoặc mật khẩu không đúng');
     }
-    const user = users[0];
     
     // Kiểm tra tài khoản có bị khóa không
     if (user.is_active === 0) {
@@ -111,7 +110,7 @@ const createEmailTransporter = () => {
 const sendOTP = async (email) => {
     try {
         // Kiểm tra email có tồn tại trong hệ thống không
-        const user = await userModel.getUserByEmail(email);
+        const user = await User.findOne({ where: { email } });
         if (!user) {
             throw new Error('Email không tồn tại trong hệ thống');
         }
@@ -230,7 +229,7 @@ const resetPassword = async (email, newPassword, resetToken) => {
         }
 
         // Lấy thông tin user
-        const user = await userModel.getUserByEmail(email);
+        const user = await User.findOne({ where: { email } });
         if (!user) {
             throw new Error('Không tìm thấy người dùng');
         }
@@ -240,7 +239,10 @@ const resetPassword = async (email, newPassword, resetToken) => {
         const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
         
         // Cập nhật mật khẩu trong database
-        await userModel.updateUserPassword(user.id, hashedPassword);
+        await User.update(
+            { password: hashedPassword },
+            { where: { id: user.id } }
+        );
         
         // Xóa reset token
         otpStore.delete(email);

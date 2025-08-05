@@ -62,14 +62,15 @@ const ImportTable = () => {
             importCode: imp.id,
             date: imp.import_date,
             supplier: imp.supplier,
+            employee: imp.employee, // Keep as object with proper alias
             importedBy: imp.employee,
             total: imp.total_price !== undefined ? imp.total_price : 0,
-            bookDetails: imp.bookDetails ? imp.bookDetails.map(d => ({
+            bookDetails: imp.details ? imp.details.map(d => ({
               id: d.id,
               bookId: d.book_id,
               book: d.book,
               quantity: d.quantity,
-              price: d.price
+              price: d.unit_price
             })) : []
           };
         });
@@ -395,14 +396,6 @@ const ImportTable = () => {
     });
   };
 
-  // Advanced search panel toggle: giữ lại bộ lọc khi đóng panel
-  const handleAdvancedSearchToggle = () => {
-    const newState = !isAdvancedSearchOpen;
-    setIsAdvancedSearchOpen(newState);
-    if (newState) setSimpleSearch({ field: 'importCode', value: '' });
-    setCurrentPage(1);
-  };
-
   return (
     <>
       {notification.message && (
@@ -463,7 +456,7 @@ const ImportTable = () => {
             
             <button 
               className={`filter-button ${isAdvancedSearchOpen ? 'active' : ''}`}
-              onClick={handleAdvancedSearchToggle}
+              onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
               title="Tìm kiếm nâng cao"
             >
               <FontAwesomeIcon icon={faFilter} />
@@ -599,10 +592,10 @@ const ImportTable = () => {
                 </td>
                 <td>{importItem.importCode}</td>
                 <td>{formatDate(importItem.date)}</td>
-                <td>{importItem.supplier}</td>
+                <td>{importItem.supplier?.name || importItem.supplier}</td>
                 <td>{calculateTotalBooks(importItem)}</td>
                 <td>{formatCurrency(importItem.total)}</td>
-                <td>
+                <td className="actions">
                   <button
                     className="btn btn-view"
                     onClick={() => handleViewDetails(importItem)}

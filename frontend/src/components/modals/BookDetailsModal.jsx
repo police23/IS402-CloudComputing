@@ -26,12 +26,12 @@ const BookDetailsModal = ({ book, onClose }) => {
       setDetails({
         title: book.title || "-",
         author: book.author || "-",
-        category: book.category || "-",
-        publisher: book.publisher || "-",
-        publicationYear: book.publicationYear || "-",
+        category: book.category?.name || book.category || "-",
+        publisher: book.publisher?.name || book.publisher || "-",
+        publicationYear: book.publication_year || book.publicationYear || "-",
         price: book.price ? book.price.toLocaleString("vi-VN") + " ₫" : "-",
-        stock: book.stock !== undefined ? book.stock : "-",
-        status: book.stock > 0 ? "Còn hàng" : "Hết hàng",
+        stock: book.quantity_in_stock ?? book.stock ?? "-",
+        status: (book.quantity_in_stock ?? book.stock ?? 0) > 0 ? "Còn hàng" : "Hết hàng",
         // isbn: book.isbn || "-",
         // language: book.language || "-",
         description: book.description || "-"
@@ -43,7 +43,11 @@ const BookDetailsModal = ({ book, onClose }) => {
 
   // Xử lý đường dẫn ảnh bìa
   let imageUrls = [];
-  if (book && Array.isArray(book.imageUrls) && book.imageUrls.length > 0) {
+  if (book && Array.isArray(book.images) && book.images.length > 0) {
+    imageUrls = book.images.map(img => 
+      img.image_path.startsWith('http') ? img.image_path : `http://localhost:5000${img.image_path}`
+    );
+  } else if (book && Array.isArray(book.imageUrls) && book.imageUrls.length > 0) {
     imageUrls = book.imageUrls.map(url =>
       url.startsWith('http') ? url : `http://localhost:5000${url}`
     );

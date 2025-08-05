@@ -8,8 +8,8 @@ const getAuthHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const getUserOrders = async () => {
-  const response = await axios.get(ORDER_API_URL, { headers: getAuthHeader() });
+export const getUserOrders = async (page = 1, pageSize = 10) => {
+  const response = await axios.get(`${ORDER_API_URL}?page=${page}&pageSize=${pageSize}`, { headers: getAuthHeader() });
   return response.data;
 };
 
@@ -71,7 +71,7 @@ export const getAllDeliveredOrders = async (page = 1, pageSize = 10) => {
 
 
 export const getConfirmedOrdersByUserID = async (page = 1, pageSize = 10) => {
-  const response = await axios.get(`${ORDER_API_URL}/confirmed/all?page=${page}&pageSize=${pageSize}`, { headers: getAuthHeader() });
+  const response = await axios.get(`${ORDER_API_URL}/confirmed?page=${page}&pageSize=${pageSize}`, { headers: getAuthHeader() });
   return response.data;
 };
 

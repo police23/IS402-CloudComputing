@@ -36,19 +36,28 @@ const ShipperTable = ({ type = "delivering" }) => {
       } else if (type === "delivered") {
         response = await getDeliveredOrdersByShipperID();
       } else {
-        response = { orders: [] };
+        response = { data: { orders: [] } };
       }
-      const mappedOrders = (response.orders || []).map(order => ({
+      const apiData = response.data || response;
+      const ordersData = apiData.orders || [];
+      const mappedOrders = ordersData.map(order => ({
         id: order.id,
         orderNumber: String(order.id),
-        customer: order.full_name || order.user_name || order.customer_name || "",
-        phone: order.phone,
-        orderDate: type === "delivered" ? order.completion_date : order.order_date,
+        customer: order.user?.full_name || order.full_name || order.user_name || order.customer_name || "",
+        phone: order.user?.phone || order.phone || "",
+        orderDate: type === "delivered"
+          ? (order.assignment?.completion_date || order.completion_date || order.order_date)
+          : order.order_date,
         status: order.status,
         totalAmount: order.final_amount,
-        items: order.orderDetails || [],
+        items: (order.details || order.orderDetails || []).map(item => ({
+          id: item.id,
+          name: item.Book?.title || item.title || item.name || "",
+          quantity: item.quantity,
+          price: item.unit_price || item.price
+        })),
         shippingAddress: order.shipping_address,
-        shippingMethod: order.shipping_method_name,
+        shippingMethod: order.shippingMethod?.name || order.shipping_method_name,
         paymentMethod: order.payment_method === 'online' ? 'ZaloPay' : 'Thanh toán khi nhận hàng',
         discountAmount: order.discount_amount,
         shippingFee: order.shipping_fee,

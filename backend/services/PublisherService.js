@@ -1,7 +1,7 @@
-const publisherModel = require("../models/PublisherModel");
+const { Publisher } = require("../models");
 
 const getAllPublishers = async () => {
-    return await publisherModel.getAllPublishers();
+    return await Publisher.findAll();
 };
 
 

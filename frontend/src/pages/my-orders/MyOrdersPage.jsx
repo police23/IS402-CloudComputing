@@ -46,8 +46,20 @@ const MyOrdersPage = () => {
         } else {
           response = await getUserOrders(page, pageSize);
         }
-        // API trả về { orders, total }
-        const ordersData = response.orders || response.data || [];
+        
+        // API trả về { success: true, data: { orders, total } }
+        console.log('Full API response:', response);
+        const apiData = response.data || response;
+        const ordersData = apiData.orders || [];
+        
+        if (!Array.isArray(ordersData)) {
+          console.error('Orders data is not an array:', ordersData);
+          setOrders([]);
+          setTotal(0);
+          setLoading(false);
+          return;
+        }
+        
         const mappedOrders = ordersData.map(order => ({
           id: order.id,
           orderNumber: String(order.id),
@@ -57,18 +69,19 @@ const MyOrdersPage = () => {
           discountAmount: order.discount_amount,
           shippingFee: order.shipping_fee,
           finalAmount: order.final_amount,
-          items: (order.orderDetails || []).map(item => ({
+          items: (order.details || order.orderDetails || []).map(item => ({
             id: item.id,
-            name: item.title,
+            name: item.Book?.title || item.title,
             quantity: item.quantity,
             price: item.unit_price
           })),
           shippingAddress: order.shipping_address,
-          shippingMethod: order.shipping_method_name,
+          shippingMethod: order.shippingMethod?.name || order.shipping_method_name,
           paymentMethod: order.payment_method === 'online' ? 'ZaloPay' : 'Thanh toán khi nhận hàng'
         }));
+        
         setOrders(mappedOrders);
-        setTotal(response.total || 0);
+        setTotal(apiData.total || 0);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching orders:', error);

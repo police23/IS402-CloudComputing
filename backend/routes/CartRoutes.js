@@ -6,6 +6,5 @@ router.use(verifyToken);
 router.get('/', CartController.getCart);
 router.post('/', CartController.addToCart);
 router.put('/quantity', CartController.updateQuantity);
-router.delete('/:bookID', CartController.removeFromCart);
-router.get('/total', CartController.getCartTotal);
+router.delete('/:id', CartController.removeFromCart);
 module.exports = router;

@@ -2,6 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+
+// Initialize all models and associations
+require('./models');
+
 const authRoutes = require('./routes/AuthRoutes');
 const categoryRoutes = require('./routes/CategoryRoutes');
 const DamageReportRoutes = require('./routes/DamageReportRoutes');
@@ -20,13 +24,10 @@ const shippingMethodRoutes = require('./routes/ShippingMethodRoutes');
 const ratingRoutes = require('./routes/RatingRoutes');
 const reportRoutes = require('./routes/ReportRoutes');
 const app = express();
-// Debug all incoming requests
-
 const PORT = process.env.PORT || 5000;
 const paymentRoutes = require('./routes/PaymentRoutes');
 
 
-// Middleware
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -51,21 +52,17 @@ app.use('/api/shipping-methods', shippingMethodRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/reports', reportRoutes);
 
-// Middleware để log lỗi chi tiết
 app.use((err, req, res, next) => {
-  console.error("Lỗi server:", err.stack);
-  res.status(500).json({
-    message: "Lỗi server",
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Đã xảy ra lỗi server'
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    message: err.message || 'Internal Server Error'
   });
 });
 
-// Debug route
 app.get("/api-test", (req, res) => {
     res.json({ message: "API is working" });
 });
 
-// Default route
 app.get('/', (req, res) => {
     res.send('API is running');
 });

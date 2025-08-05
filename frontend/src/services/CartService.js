@@ -83,12 +83,3 @@ export const removeFromCart = async (bookID) => {
     }
 };
 
-export const getCartTotal = async () => {
-    try {
-        const response = await apiClient.get('/cart/total');
-        return response.data;
-    } catch (error) {
-        console.error('Error getting cart total:', error);
-        throw error;
-    }
-};

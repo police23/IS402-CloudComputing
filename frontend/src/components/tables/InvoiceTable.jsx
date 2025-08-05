@@ -54,7 +54,7 @@ const InvoiceTable = ({ onEdit, onDelete, onView, onPrint }) => {
 
   useEffect(() => {
     getAllInvoices()
-      .then((data) => setInvoices(data))
+      .then((data) => setInvoices(Array.isArray(data) ? data : []))
       .catch((err) => {
         setInvoices([]);
         // Có thể hiển thị thông báo lỗi ở đây nếu muốn
@@ -71,10 +71,14 @@ const InvoiceTable = ({ onEdit, onDelete, onView, onPrint }) => {
           invoices.map(async (inv) => {
             try {
               const detail = await getInvoiceById(inv.id);
-              const bookDetails = Array.isArray(detail.bookDetails) ? detail.bookDetails : [];
+              // details có thể nằm ở detail.details hoặc detail.bookDetails
+              const bookDetails = Array.isArray(detail.details)
+                ? detail.details
+                : (Array.isArray(detail.bookDetails) ? detail.bookDetails : []);
               const total = bookDetails.reduce((sum, b) => {
                 const qty = Number(b.quantity) || 0;
-                const price = Number(b.unit_price || b.price) || 0;
+                // Giá có thể nằm ở b.unit_price, b.price hoặc b.book?.price
+                const price = Number(b.unit_price || b.price || (b.book && b.book.price) || 0);
                 return sum + qty * price;
               }, 0);
               const discount = Number(detail.discount_amount) || 0;
@@ -102,7 +106,7 @@ const InvoiceTable = ({ onEdit, onDelete, onView, onPrint }) => {
   }, [invoices]);
 
   // Filter invoices based on search criteria
-  const filteredInvoices = invoices.filter((invoice) => {
+  const filteredInvoices = (Array.isArray(invoices) ? invoices : []).filter((invoice) => {
     if (!isAdvancedSearchOpen) {
       // Simple search logic
       if (!simpleSearch.value) return true;
@@ -202,7 +206,7 @@ const InvoiceTable = ({ onEdit, onDelete, onView, onPrint }) => {
       }
       // Reload lại danh sách hóa đơn
       const data = await getAllInvoices();
-      setInvoices(data);
+      setInvoices(Array.isArray(data) ? data : []);
       setSelectedRows([]);
       setShowDeleteConfirmation(false);
       setNotification({ message: "Xóa hóa đơn thành công!", type: "success" });
@@ -246,7 +250,7 @@ const InvoiceTable = ({ onEdit, onDelete, onView, onPrint }) => {
         
         // Reload invoices from backend
         const data = await getAllInvoices();
-        setInvoices(data);
+        setInvoices(Array.isArray(data) ? data : []);
         setNotification({ message: "Tạo hóa đơn thành công!", type: "success" });
         setShowProgress(true);
         
@@ -539,7 +543,7 @@ const InvoiceTable = ({ onEdit, onDelete, onView, onPrint }) => {
                 </td>
                 <td>{invoice.id}</td>
                 <td>{invoice.customer_name}</td>
-                <td>{invoice.created_by_name || invoice.created_by}</td>
+                <td>{invoice.creator?.full_name || invoice.created_by_name || invoice.created_by || "---"}</td>
                 <td>
                   {
                     invoice.created_at

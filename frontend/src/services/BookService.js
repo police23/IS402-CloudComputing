@@ -88,7 +88,8 @@ export const getBookById = async (id) => {
 export const getLatestBooks = async () => {
   try {
     const response = await axios.get(`${API_URL}/latest-books`);
-    return response.data.success ? response.data.data : [];
+    // Backend trả về mảng sách trực tiếp, không có wrapper
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     if (error.response && error.response.data) {
       throw new Error(error.response.data.error || 'Failed to fetch latest books');
@@ -102,9 +103,12 @@ export const getLatestBooks = async () => {
 export const getTop10MostSoldBooksAll = async (month, year) => {
   try {
     const res = await axios.get(`http://localhost:5000/api/reports/top10-all?month=${month}&year=${year}`);
-    const books = res.data;
+    // Backend trả về { success: true, data: books }
+    const books = res.data.success ? res.data.data : res.data;
+    // Đảm bảo books là mảng
+    const booksArray = Array.isArray(books) ? books : [];
     // Trả về đúng format cho HomePage: name, price, image
-    return books.map(book => ({
+    return booksArray.map(book => ({
       id: book.id,
       name: book.title,
       price: book.price ? Number(book.price).toLocaleString('vi-VN') + 'đ' : '',
@@ -116,6 +120,7 @@ export const getTop10MostSoldBooksAll = async (month, year) => {
       total_sold: book.total_sold
     }));
   } catch (error) {
+    console.error('Error fetching top 10 books:', error);
     return [];
   }
 };

@@ -14,7 +14,6 @@ import {
 import BookForm from "../forms/BookForm";
 import BookDetailsModal from "../modals/BookDetailsModal";
 import ConfirmationModal from "../modals/ConfirmationModal";
-import { getAllBooks, createBook, updateBook, deleteBook } from "../../services/bookService";
 import "./BookTable.css";
 import "../../styles/SearchBar.css";
 import { formatCurrency } from "../../utils/format";
@@ -57,12 +56,15 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
   // Define fetchBooks function to load books from backend:
   const fetchBooks = async () => {
     try {
-      const data = await getAllBooks();
+      const response = await fetch("http://localhost:5000/api/books");
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch books: ${response.status}`);
+      }
+      const data = await response.json();
       setBooks(data);
     } catch (error) {
       console.error("Error fetching books:", error);
-      setNotification({ message: `Không thể tải danh sách sách: ${error.message}`, type: "error" });
-      setTimeout(() => setNotification({ message: "", type: "" }), 5000);
     }
   };
 
@@ -84,7 +86,7 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
           const catResponse = await fetch("http://localhost:5000/api/categories");
           if (catResponse.ok) {
             const catData = await catResponse.json();
-            setCategories(catData.success ? catData.data : catData || []);
+            setCategories(catData || []);
           } else {
             console.error("Failed to fetch categories:", catResponse.statusText);
             setCategories([]);
@@ -99,7 +101,7 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
           const pubResponse = await fetch("http://localhost:5000/api/publishers");
           if (pubResponse.ok) {
             const pubData = await pubResponse.json();
-            setPublishers(pubData.success ? pubData.data : pubData || []);
+            setPublishers(pubData || []);
           } else {
             console.error("Failed to fetch publishers:", pubResponse.statusText);
             setPublishers([]);
@@ -148,18 +150,22 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
           if (!isNaN(simpleSearch.value)) {
             return book.category_id === parseInt(simpleSearch.value);
           }
-          return book.category && book.category.toLowerCase().includes(searchValue);
+          const categoryName = book.category?.name || book.category || "";
+          return categoryName.toLowerCase().includes(searchValue);
         case "publisher":
           // For publisher, match by publisher_id if it's a number, otherwise by name
           if (!isNaN(simpleSearch.value)) {
             return book.publisher_id === parseInt(simpleSearch.value);
           }
-          return book.publisher && book.publisher.toLowerCase().includes(searchValue);
+          const publisherName = book.publisher?.name || book.publisher || "";
+          return publisherName.toLowerCase().includes(searchValue);
         case "all":
+          const categoryNameAll = book.category?.name || book.category || "";
+          const publisherNameAll = book.publisher?.name || book.publisher || "";
           return book.title.toLowerCase().includes(searchValue) ||
                  book.author.toLowerCase().includes(searchValue) ||
-                 (book.category && book.category.toLowerCase().includes(searchValue)) ||
-                 (book.publisher && book.publisher.toLowerCase().includes(searchValue));
+                 categoryNameAll.toLowerCase().includes(searchValue) ||
+                 publisherNameAll.toLowerCase().includes(searchValue);
         default:
           return true;
       }
@@ -187,8 +193,8 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
       }
       
       const matchesStatus = !advancedSearch.status || 
-        (advancedSearch.status === "instock" && book.stock > 0) || 
-        (advancedSearch.status === "outofstock" && book.stock <= 0);
+        (advancedSearch.status === "instock" && (book.quantity_in_stock ?? book.stock ?? 0) > 0) || 
+        (advancedSearch.status === "outofstock" && (book.quantity_in_stock ?? book.stock ?? 0) <= 0);
       
       return matchesTitle && matchesAuthor && matchesCategory && 
              matchesPublisher && matchesPrice && matchesStatus;
@@ -236,7 +242,13 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
   const confirmDelete = async () => {
     try {
       for (const id of selectedRows) {
-        await deleteBook(id);
+        const response = await fetch(`http://localhost:5000/api/books/${id}`, {
+          method: "DELETE"
+        });
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to delete book ${id}: ${errorText}`);
+        }
       }
       await fetchBooks(); // re-fetch the updated books list
       setSelectedRows([]);
@@ -245,35 +257,39 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
       setTimeout(() => setNotification({ message: "", type: "" }), 5000);
     } catch (error) {
       console.error("Error deleting book(s):", error);
-      setNotification({ message: `Xóa đầu sách thất bại: ${error.message}`, type: "error" });
-      setTimeout(() => setNotification({ message: "", type: "" }), 5000);
     }
   };
 
   const handleBookSubmit = async (formData) => {
     if (selectedBook) {
       try {
-        const response = await updateBook(selectedBook.id, formData);
+        const response = await fetch(`http://localhost:5000/api/books/${selectedBook.id}`, {
+          method: "PUT",
+          body: formData // Gửi trực tiếp FormData, KHÔNG set headers
+        });
+        if (!response.ok) throw new Error("Failed to update book");
+        // Instead of manually updating state, re-fetch the full list:
         await fetchBooks();
         setShowForm(false);
         setNotification({ message: "Sửa đầu sách thành công.", type: "update" });
         setTimeout(() => setNotification({ message: "", type: "" }), 5000);
       } catch (error) {
         console.error("Error updating book:", error);
-        setNotification({ message: `Sửa đầu sách thất bại: ${error.message}`, type: "error" });
-        setTimeout(() => setNotification({ message: "", type: "" }), 5000);
       }
     } else {
       try {
-        const response = await createBook(formData);
+        const response = await fetch("http://localhost:5000/api/books", {
+          method: "POST",
+          body: formData // Gửi trực tiếp FormData, KHÔNG set headers
+        });
+        if (!response.ok) throw new Error("Failed to add book");
+        // Rather than updating state with the response, re-fetch the full list:
         await fetchBooks();
         setShowForm(false);
         setNotification({ message: "Thêm đầu sách thành công.", type: "add" });
         setTimeout(() => setNotification({ message: "", type: "" }), 5000);
       } catch (error) {
         console.error("Error adding book:", error);
-        setNotification({ message: `Thêm đầu sách thất bại: ${error.message}`, type: "error" });
-        setTimeout(() => setNotification({ message: "", type: "" }), 5000);
       }
     }
   };
@@ -388,11 +404,30 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
     setCurrentPage(1);
   };
 
-  // Advanced search panel toggle: giữ lại bộ lọc khi đóng panel
+  // Handle advanced search panel toggle
   const handleAdvancedSearchToggle = () => {
     const newState = !isAdvancedSearchOpen;
     setIsAdvancedSearchOpen(newState);
-    if (newState) setSimpleSearch({ field: 'title', value: '' });
+    
+    // If opening advanced search, reset simple search
+    if (newState) {
+      setSimpleSearch({
+        field: "title",
+        value: ""
+      });
+    }
+    // If closing advanced search, reset advanced search
+    else {
+      setAdvancedSearch({
+        title: "",
+        author: "",
+        category_id: "",
+        publisher_id: "",
+        priceRange: { min: "", max: "" },
+        status: ""
+      });
+    }
+    
     setCurrentPage(1);
   };
 
@@ -661,14 +696,14 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
                 </td>
                 <td>{book.title}</td>
                 <td>{book.author}</td>
-                <td>{book.category}</td>
-                <td>{book.publisher}</td>
-                <td>{book.publicationYear || "-"}</td>
+                <td>{book.category?.name || book.category || "-"}</td>
+                <td>{book.publisher?.name || book.publisher || "-"}</td>
+                <td>{book.publication_year || book.publicationYear || "-"}</td>
                 <td>{formatCurrency(book.price)}</td>
-                <td>{book.stock}</td>
+                <td>{book.quantity_in_stock ?? book.stock ?? 0}</td>
                 <td>
-                  <span className={`status-badge status-${book.stock > 0 ? "active" : "out"}`}>
-                    {book.stock > 0 ? "Còn hàng" : "Hết hàng"}
+                  <span className={`status-badge status-${(book.quantity_in_stock ?? book.stock ?? 0) > 0 ? "active" : "out"}`}>
+                    {(book.quantity_in_stock ?? book.stock ?? 0) > 0 ? "Còn hàng" : "Hết hàng"}
                   </span>
                 </td>
               </tr>

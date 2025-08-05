@@ -25,7 +25,9 @@ const InvoiceDetailsModal = ({ isOpen, onClose, invoice }) => {
   };
 
   // bookDetails có thể không có nếu chỉ lấy danh sách hóa đơn, nên cần kiểm tra
-  const bookDetails = invoice.bookDetails && Array.isArray(invoice.bookDetails)
+  const bookDetails = (invoice.details && Array.isArray(invoice.details))
+    ? invoice.details
+    : (invoice.bookDetails && Array.isArray(invoice.bookDetails))
     ? invoice.bookDetails
     : [];
 
@@ -85,7 +87,7 @@ const InvoiceDetailsModal = ({ isOpen, onClose, invoice }) => {
                   {bookDetails.map((book, index) => (
                     <tr key={index}>
                       <td>{index + 1}</td>
-                      <td>{book.book_title || book.title || ""}</td>
+                      <td>{book.book?.title || book.book_title || book.title || "---"}</td>
                       <td>{book.quantity}</td>
                       <td>{formatCurrency(book.unit_price || book.price)}</td>
                       <td>{formatCurrency((book.quantity || 0) * (book.unit_price || book.price || 0))}</td>

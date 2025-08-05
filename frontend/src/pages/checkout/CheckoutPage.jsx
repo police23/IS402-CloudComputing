@@ -34,6 +34,9 @@ function CheckoutPage() {
   const [shippingMethods, setShippingMethods] = useState([]);
   const [selectedShippingMethod, setSelectedShippingMethod] = useState('');
 
+  // Debug log để kiểm tra shippingMethods
+  console.log('CheckoutPage - shippingMethods:', shippingMethods, 'type:', typeof shippingMethods, 'isArray:', Array.isArray(shippingMethods));
+
   // Load cart data nếu không có từ CartPage
   useEffect(() => {
     if (!cartData) {
@@ -57,12 +60,17 @@ function CheckoutPage() {
       });
       // Fetch shipping methods
       getShippingMethods().then(data => {
-        setShippingMethods(data);
-        if (data.length > 0) {
-          setSelectedShippingMethod(data[0].id);
+        console.log('CheckoutPage - getShippingMethods result:', data); // Debug log
+        const methods = Array.isArray(data) ? data : [];
+        console.log('CheckoutPage - processed methods:', methods); // Debug log
+        setShippingMethods(methods);
+        if (methods.length > 0) {
+          setSelectedShippingMethod(methods[0].id);
+          console.log('CheckoutPage - selected method ID:', methods[0].id); // Debug log
         }
       }).catch(error => {
         console.error('Error loading shipping methods:', error);
+        setShippingMethods([]);
       });
     }
   }, [user]);
@@ -112,18 +120,31 @@ function CheckoutPage() {
       setError(null);
       const response = await getCart();
       if (response.success) {
-        const transformedItems = response.data.map(item => ({
-          id: item.id,
-          bookId: item.book_id,
-          title: item.title,
-          author: item.author,
-          price: item.price,
-          originalPrice: item.original_price || item.price,
-          discount: item.original_price ? Math.round(((item.original_price - item.price) / item.original_price) * 100) : 0,
-          image_path: item.image_path,
-          quantity: item.quantity,
-          stock: item.stock
-        }));
+        const transformedItems = response.data.map(item => {
+          // Transform images để có cấu trúc giống CartPage
+          let images = item.images;
+          if ((!images || images.length === 0) && item.image_path) {
+            images = [{ image_path: item.image_path }];
+          }
+          let imageUrls = item.imageUrls;
+          if ((!imageUrls || imageUrls.length === 0) && item.image_path) {
+            imageUrls = [item.image_path];
+          }
+          return {
+            id: item.id,
+            bookId: item.book_id,
+            title: item.title,
+            author: item.author,
+            price: item.price,
+            originalPrice: item.original_price || item.price,
+            discount: item.original_price ? Math.round(((item.original_price - item.price) / item.original_price) * 100) : 0,
+            image_path: item.image_path,
+            images,
+            imageUrls,
+            quantity: item.quantity,
+            stock: item.stock
+          };
+        });
         setCartItems(transformedItems);
       } else {
         setError(response.message);
@@ -145,7 +166,7 @@ function CheckoutPage() {
     : 0;
   
   // Lấy phí vận chuyển từ shipping method được chọn
-  const selectedMethod = shippingMethods.find(method => method.id === selectedShippingMethod);
+  const selectedMethod = Array.isArray(shippingMethods) ? shippingMethods.find(method => method.id === selectedShippingMethod) : null;
   const shippingFee = selectedMethod ? Number(selectedMethod.fee) || 0 : 0;
   const total = subtotal - discount + shippingFee;
 
@@ -297,12 +318,24 @@ function CheckoutPage() {
     return amount.toLocaleString('vi-VN') + 'đ';
   };
 
-  // Hàm lấy URL ảnh đúng chuẩn backend
-  const getBookImageUrl = (imagePath) => {
-    if (!imagePath) return '/assets/book-default.jpg';
-    return imagePath.startsWith('http')
-      ? imagePath
-      : `http://localhost:5000${imagePath}`;
+  // Hàm lấy URL ảnh đúng chuẩn backend cho item
+  const getBookImageUrl = (item) => {
+    // Ưu tiên lấy từ images (mảng)
+    if (item.images && Array.isArray(item.images) && item.images.length > 0) {
+      const imagePath = item.images[0].image_path;
+      return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
+    }
+    // Fallback cho imageUrls (mảng)
+    if (item.imageUrls && Array.isArray(item.imageUrls) && item.imageUrls.length > 0) {
+      const url = item.imageUrls[0];
+      return url.startsWith('http') ? url : `http://localhost:5000${url}`;
+    }
+    // Fallback cho image_path
+    if (item.image_path) {
+      return item.image_path.startsWith('http') ? item.image_path : `http://localhost:5000${item.image_path}`;
+    }
+    // Ảnh mặc định
+    return '/assets/book-default.jpg';
   };
 
   const getCityName = (cityCode) => {
@@ -490,7 +523,7 @@ function CheckoutPage() {
             <div className="shipping-methods-section">
               <h2>Phương thức vận chuyển</h2>
               <div className="shipping-methods">
-                {shippingMethods.map(method => (
+                {Array.isArray(shippingMethods) && shippingMethods.map(method => (
                   <label key={method.id} className="shipping-method">
                     <input
                       type="radio"
@@ -513,42 +546,6 @@ function CheckoutPage() {
             <div className="order-summary">
               <h2>Tổng đơn hàng</h2>
               
-              {/* Khuyến mãi */}
-              {!appliedCoupon && (
-                <div className="coupon-section" style={{ marginBottom: '20px' }}>
-                  <h3 style={{ fontSize: '16px', marginBottom: '12px', color: '#4a5568' }}>Mã khuyến mãi</h3>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <input
-                      type="text"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      placeholder="Nhập mã khuyến mãi"
-                      style={{
-                        flex: 1,
-                        padding: '10px 12px',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '6px',
-                        fontSize: '14px'
-                      }}
-                    />
-                    <button
-                      onClick={handleApplyCoupon}
-                      style={{
-                        padding: '10px 16px',
-                        background: '#6ec6c6',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        fontWeight: '500'
-                      }}
-                    >
-                      Áp dụng
-                    </button>
-                  </div>
-                </div>
-              )}
               
               {/* Chi tiết sản phẩm */}
               <div className="order-items">
@@ -557,7 +554,7 @@ function CheckoutPage() {
                   {cartItems.map(item => (
                     <div key={item.id} className="order-item">
                       <div className="item-image">
-                        <img src={getBookImageUrl(item.image_path)} alt={item.title} />
+                        <img src={getBookImageUrl(item)} alt={item.title} />
                       </div>
                       <div className="item-info">
                         <h4 className="item-title">{item.title}</h4>

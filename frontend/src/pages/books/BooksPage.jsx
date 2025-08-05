@@ -163,16 +163,16 @@ function BooksPage() {
 
   // Lấy danh sách tác giả, thể loại, NXB động từ books
   const authors = Array.from(new Set(books.map(b => b.author))).filter(Boolean);
-  const categories = Array.from(new Set(books.map(b => b.category))).filter(Boolean);
-  const publishers = Array.from(new Set(books.map(b => b.publisher))).filter(Boolean);
+  const categories = Array.from(new Set(books.map(b => b.category?.name || b.category))).filter(Boolean);
+  const publishers = Array.from(new Set(books.map(b => b.publisher?.name || b.publisher))).filter(Boolean);
 
   // Lọc sách theo từng tiêu chí
   const filteredBooks = books.filter(book => {
     const matchName = name === '' || (book.title || book.name || '').toLowerCase().includes(name.toLowerCase());
     const matchAuthor = selectedAuthors.length === 0 || selectedAuthors.includes(book.author);
-    const matchCategory = selectedCategories.length === 0 || selectedCategories.includes(book.category);
-    const matchPublisher = selectedPublishers.length === 0 || selectedPublishers.includes(book.publisher);
-    const matchYear = selectedYears.length === 0 || selectedYears.includes(book.publicationYear);
+    const matchCategory = selectedCategories.length === 0 || selectedCategories.includes(book.category?.name || book.category);
+    const matchPublisher = selectedPublishers.length === 0 || selectedPublishers.includes(book.publisher?.name || book.publisher);
+    const matchYear = selectedYears.length === 0 || selectedYears.includes(book.publication_year || book.publicationYear);
     const matchPrice = book.price >= priceRange[0] && book.price <= priceRange[1];
     return matchName && matchAuthor && matchCategory && matchPublisher && matchYear && matchPrice;
   });
@@ -204,9 +204,18 @@ function BooksPage() {
 
   // Hàm lấy URL ảnh đúng chuẩn backend
   const getBookImageUrl = (book) => {
-    if (!book.imageUrls || book.imageUrls.length === 0) return '';
-    const url = book.imageUrls[0];
-    return url.startsWith('http') ? url : `http://localhost:5000${url}`;
+    // Kiểm tra nếu có images từ backend (BookImages model)
+    if (book.images && book.images.length > 0) {
+      const imagePath = book.images[0].image_path;
+      return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
+    }
+    // Fallback cho imageUrls (nếu có)
+    if (book.imageUrls && book.imageUrls.length > 0) {
+      const url = book.imageUrls[0];
+      return url.startsWith('http') ? url : `http://localhost:5000${url}`;
+    }
+    // Trả về ảnh mặc định nếu không có ảnh
+    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDIwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik04NSA5MEgxMTVWMTIwSDEwNVYxMTBIOTVWMTIwSDg1VjkwWiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNODUgMTQwSDE2NVYxNjBIODVWMTQwWiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNODUgMTgwSDE1NVYyMDBIODVWMTgwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4=';
   };
 
   // Xử lý thêm vào giỏ hàng

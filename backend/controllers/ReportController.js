@@ -1,57 +1,109 @@
 const reportService = require("../services/ReportService");
+
 const getRevenueByYearOffline = async (req, res) => {
     try {
         const year = req.query.year || req.params.year;
-        if (!year) return res.status(400).json({ message: "Thiếu tham số năm" });
-        const monthly = await reportService.getRevenueByYearOffline(year);
-        res.json({ monthly });
-    } catch (error) {
-        if (error.message === "Thiếu tham số năm") {
-            return res.status(400).json({ message: error.message });
+        if (!year) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Thiếu tham số năm" 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy doanh thu theo năm (offline)" });
+        
+        const monthly = await reportService.getRevenueByYearOffline(year);
+        res.json({ 
+            success: true, 
+            data: { monthly } 
+        });
+    } catch (error) {
+        console.error("Lỗi trong getRevenueByYearOffline:", error);
+        if (error.message === "Thiếu tham số năm") {
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
+        }
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy doanh thu theo năm (offline)" 
+        });
     }
 };
 
-// Doanh thu & số lượng bán theo 12 tháng của năm (online)
 const getRevenueByYearOnline = async (req, res) => {
     try {
         const year = req.query.year || req.params.year;
-        if (!year) return res.status(400).json({ message: "Thiếu tham số năm" });
-        const monthly = await reportService.getRevenueByYearOnline(year);
-        res.json({ monthly });
-    } catch (error) {
-        if (error.message === "Thiếu tham số năm") {
-            return res.status(400).json({ message: error.message });
+        if (!year) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Thiếu tham số năm" 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy doanh thu theo năm (online)" });
+        
+        const monthly = await reportService.getRevenueByYearOnline(year);
+        res.json({ 
+            success: true, 
+            data: { monthly } 
+        });
+    } catch (error) {
+        console.error("Lỗi trong getRevenueByYearOnline:", error);
+        if (error.message === "Thiếu tham số năm") {
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
+        }
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy doanh thu theo năm (online)" 
+        });
     }
 };
 
-// Doanh thu & số lượng bán theo 12 tháng của năm (tổng hợp)
 const getRevenueByYearAll = async (req, res) => {
     try {
         const year = req.query.year || req.params.year;
-        if (!year) return res.status(400).json({ message: "Thiếu tham số năm" });
-        const monthly = await reportService.getRevenueByYearAll(year);
-        res.json({ monthly });
-    } catch (error) {
-        if (error.message === "Thiếu tham số năm") {
-            return res.status(400).json({ message: error.message });
+        if (!year) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Thiếu tham số năm" 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy doanh thu theo năm (tổng hợp)" });
+        
+        const monthly = await reportService.getRevenueByYearAll(year);
+        res.json({ 
+            success: true, 
+            data: { monthly } 
+        });
+    } catch (error) {
+        console.error("Lỗi trong getRevenueByYearAll:", error);
+        if (error.message === "Thiếu tham số năm") {
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
+        }
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy doanh thu theo năm (tổng hợp)" 
+        });
     }
 };
-// Doanh thu & số lượng bán theo ngày (offline)
+
 const getDailyRevenueByMonthOffline = async (req, res) => {
     try {
         const month = req.query.month || req.params.month;
         const year = req.query.year || req.params.year;
         if (!month || !year) {
-            return res.status(400).json({ message: "Thiếu tham số tháng hoặc năm" });
+            return res.status(400).json({ 
+                success: false, 
+                message: "Thiếu tham số tháng hoặc năm" 
+            });
         }
+        
         const daysInMonth = new Date(year, month, 0).getDate();
         const dailyData = await reportService.getDailyRevenueByMonthOffline(month, year);
+        
         const normalized = [];
         for (let d = 1; d <= daysInMonth; d++) {
             const found = dailyData.find(item => Number(item.day) === d);
@@ -61,25 +113,40 @@ const getDailyRevenueByMonthOffline = async (req, res) => {
                 totalSold: found ? Number(found.totalSold) || 0 : 0
             });
         }
-        res.json({ daily: normalized });
+        
+        res.json({ 
+            success: true, 
+            data: { daily: normalized } 
+        });
     } catch (error) {
+        console.error("Lỗi trong getDailyRevenueByMonthOffline:", error);
         if (error.message === "Thiếu tham số tháng hoặc năm") {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy doanh thu theo ngày (offline)" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy doanh thu theo ngày (offline)" 
+        });
     }
 };
 
-// Doanh thu & số lượng bán theo ngày (online)
 const getDailyRevenueByMonthOnline = async (req, res) => {
     try {
         const month = req.query.month || req.params.month;
         const year = req.query.year || req.params.year;
         if (!month || !year) {
-            return res.status(400).json({ message: "Thiếu tham số tháng hoặc năm" });
+            return res.status(400).json({ 
+                success: false, 
+                message: "Thiếu tham số tháng hoặc năm" 
+            });
         }
+        
         const daysInMonth = new Date(year, month, 0).getDate();
         const dailyData = await reportService.getDailyRevenueByMonthOnline(month, year);
+        
         const normalized = [];
         for (let d = 1; d <= daysInMonth; d++) {
             const found = dailyData.find(item => Number(item.day) === d);
@@ -89,25 +156,40 @@ const getDailyRevenueByMonthOnline = async (req, res) => {
                 totalSold: found ? Number(found.totalSold) || 0 : 0
             });
         }
-        res.json({ daily: normalized });
+        
+        res.json({ 
+            success: true, 
+            data: { daily: normalized } 
+        });
     } catch (error) {
+        console.error("Lỗi trong getDailyRevenueByMonthOnline:", error);
         if (error.message === "Thiếu tham số tháng hoặc năm") {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy doanh thu theo ngày (online)" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy doanh thu theo ngày (online)" 
+        });
     }
 };
 
-// Doanh thu & số lượng bán theo ngày (tổng hợp online + offline)
 const getDailyRevenueByMonthAll = async (req, res) => {
     try {
         const month = req.query.month || req.params.month;
         const year = req.query.year || req.params.year;
         if (!month || !year) {
-            return res.status(400).json({ message: "Thiếu tham số tháng hoặc năm" });
+            return res.status(400).json({ 
+                success: false, 
+                message: "Thiếu tham số tháng hoặc năm" 
+            });
         }
+        
         const daysInMonth = new Date(year, month, 0).getDate();
         const dailyData = await reportService.getDailyRevenueByMonthAll(month, year);
+        
         const normalized = [];
         for (let d = 1; d <= daysInMonth; d++) {
             const found = dailyData.find(item => Number(item.day) === d);
@@ -117,20 +199,31 @@ const getDailyRevenueByMonthAll = async (req, res) => {
                 totalSold: found ? Number(found.totalSold) || 0 : 0
             });
         }
-        res.json({ daily: normalized });
+        
+        res.json({ 
+            success: true, 
+            data: { daily: normalized } 
+        });
     } catch (error) {
+        console.error("Lỗi trong getDailyRevenueByMonthAll:", error);
         if (error.message === "Thiếu tham số tháng hoặc năm") {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy doanh thu theo ngày (tổng hợp)" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy doanh thu theo ngày (tổng hợp)" 
+        });
     }
 };
-
 
 const getTotalRevenueByMonth = async (req, res) => {
     try {
         const month = req.query.month || req.params.month;
         const year = req.query.year || req.params.year;
+        
         if (year && !month) {
             // Nếu chỉ có year, trả về dữ liệu cho cả 12 tháng
             const monthly = [];
@@ -142,18 +235,36 @@ const getTotalRevenueByMonth = async (req, res) => {
                     totalSold: result.totalSold || 0
                 });
             }
-            return res.json({ monthly });
+            return res.json({ 
+                success: true, 
+                data: { monthly } 
+            });
         }
+        
         if (month && year) {
             const result = await reportService.getTotalRevenueByMonth(month, year);
-            return res.json(result);
+            return res.json({ 
+                success: true, 
+                data: result 
+            });
         }
-        return res.status(400).json({ message: "Thiếu tham số tháng hoặc năm" });
+        
+        return res.status(400).json({ 
+            success: false, 
+            message: "Thiếu tham số tháng hoặc năm" 
+        });
     } catch (error) {
+        console.error("Lỗi trong getTotalRevenueByMonth:", error);
         if (error.message === "Thiếu tham số tháng hoặc năm") {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy doanh thu theo tháng" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy doanh thu theo tháng" 
+        });
     }
 };
 
@@ -162,10 +273,15 @@ const getDailyRevenueByMonth = async (req, res) => {
         const month = req.query.month || req.params.month;
         const year = req.query.year || req.params.year;
         if (!month || !year) {
-            return res.status(400).json({ message: "Thiếu tham số tháng hoặc năm" });
+            return res.status(400).json({ 
+                success: false, 
+                message: "Thiếu tham số tháng hoặc năm" 
+            });
         }
+        
         const daysInMonth = new Date(year, month, 0).getDate();
         const dailyData = await reportService.getDailyRevenueByMonth(month, year);
+        
         // Chuẩn hóa dữ liệu: trả về đủ số ngày trong tháng
         const normalized = [];
         for (let d = 1; d <= daysInMonth; d++) {
@@ -176,12 +292,23 @@ const getDailyRevenueByMonth = async (req, res) => {
                 totalSold: found ? Number(found.totalSold) || 0 : 0
             });
         }
-        res.json({ daily: normalized });
+        
+        res.json({ 
+            success: true, 
+            data: { daily: normalized } 
+        });
     } catch (error) {
+        console.error("Lỗi trong getDailyRevenueByMonth:", error);
         if (error.message === "Thiếu tham số tháng hoặc năm") {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy doanh thu theo ngày" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy doanh thu theo ngày" 
+        });
     }
 };
 
@@ -189,13 +316,24 @@ const getTop10MostSoldBooksOffline = async (req, res) => {
     try {
         const month = req.query.month || req.params.month;
         const year = req.query.year || req.params.year;
+        
         const books = await reportService.getTop10MostSoldBooksOffline(month, year);
-        res.json(books);
+        res.json({ 
+            success: true, 
+            data: books 
+        });
     } catch (error) {
+        console.error("Lỗi trong getTop10MostSoldBooksOffline:", error);
         if (error.message === "Thiếu tham số tháng hoặc năm") {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy top 10 sách bán chạy offline" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy top 10 sách bán chạy offline" 
+        });
     }
 };
 
@@ -203,13 +341,24 @@ const getTop10MostSoldBooksOnline = async (req, res) => {
     try {
         const month = req.query.month || req.params.month;
         const year = req.query.year || req.params.year;
+        
         const books = await reportService.getTop10MostSoldBooksOnline(month, year);
-        res.json(books);
+        res.json({ 
+            success: true, 
+            data: books 
+        });
     } catch (error) {
+        console.error("Lỗi trong getTop10MostSoldBooksOnline:", error);
         if (error.message === "Thiếu tham số tháng hoặc năm") {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy top 10 sách bán chạy online" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy top 10 sách bán chạy online" 
+        });
     }
 };
 
@@ -217,54 +366,89 @@ const getTop10MostSoldBooksAll = async (req, res) => {
     try {
         const month = req.query.month || req.params.month;
         const year = req.query.year || req.params.year;
+        
         const books = await reportService.getTop10MostSoldBooksAll(month, year);
-        res.json(books);
+        res.json({ 
+            success: true, 
+            data: books 
+        });
     } catch (error) {
+        console.error("Lỗi trong getTop10MostSoldBooksAll:", error);
         if (error.message === "Thiếu tham số tháng hoặc năm") {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy top 10 sách bán chạy tổng hợp" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy top 10 sách bán chạy tổng hợp" 
+        });
     }
 };
 
-// API lấy chi tiết doanh thu theo từng sách theo tháng trong năm
 const getBookRevenueDetailsByYear = async (req, res) => {
     try {
         const year = req.query.year || req.params.year;
-        const type = req.query.type || 'all'; // mặc định lấy tất cả
+        const type = req.query.type || 'all';
         
         if (!year) {
-            return res.status(400).json({ message: "Thiếu tham số năm" });
+            return res.status(400).json({ 
+                success: false, 
+                message: "Thiếu tham số năm" 
+            });
         }
         
         const detailData = await reportService.getBookRevenueDetailsByYear(year, type);
-        res.json(detailData);
+        res.json({ 
+            success: true, 
+            data: detailData 
+        });
     } catch (error) {
+        console.error("Lỗi trong getBookRevenueDetailsByYear:", error);
         if (error.message === "Thiếu tham số năm") {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy chi tiết doanh thu theo sách theo tháng" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy chi tiết doanh thu theo sách theo tháng" 
+        });
     }
 };
 
-// API lấy chi tiết doanh thu theo từng sách theo ngày trong tháng
 const getBookRevenueDetailsByMonth = async (req, res) => {
     try {
         const month = req.query.month || req.params.month;
         const year = req.query.year || req.params.year;
-        const type = req.query.type || 'all'; // mặc định lấy tất cả
+        const type = req.query.type || 'all';
         
         if (!month || !year) {
-            return res.status(400).json({ message: "Thiếu tham số tháng hoặc năm" });
+            return res.status(400).json({ 
+                success: false, 
+                message: "Thiếu tham số tháng hoặc năm" 
+            });
         }
         
         const detailData = await reportService.getBookRevenueDetailsByMonth(month, year, type);
-        res.json(detailData);
+        res.json({ 
+            success: true, 
+            data: detailData 
+        });
     } catch (error) {
+        console.error("Lỗi trong getBookRevenueDetailsByMonth:", error);
         if (error.message === "Thiếu tham số tháng hoặc năm") {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ 
+                success: false, 
+                message: error.message 
+            });
         }
-        res.status(500).json({ message: "Lỗi server khi lấy chi tiết doanh thu theo sách theo ngày" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Lỗi server khi lấy chi tiết doanh thu theo sách theo ngày" 
+        });
     }
 };
 

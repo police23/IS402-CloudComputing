@@ -1,75 +1,95 @@
-const bookModel = require("../models/BookModel");
+const { Book, Category, Publisher, BookImages } = require('../models');
+const { Op } = require('sequelize');
 
 const getAllBooks = async () => {
-    return await bookModel.getAllBooks();
+  return await Book.findAll({
+    include: [
+      { model: Category, as: 'category', attributes: ['id', 'name'] },
+      { model: Publisher, as: 'publisher', attributes: ['id', 'name'] },
+      { model: BookImages, as: 'images', attributes: ['id', 'image_path'] }
+    ]
+  });
 };
 
 const createBook = async (bookData) => {
-    
-    const existingBooks = await bookModel.getAllBooks();
-    const existed = existingBooks.some(book => book.title === bookData.title);
-    if (existed) {
-        throw new Error("Sách đã tồn tại");
-    }
-    
-    return await bookModel.createBook(bookData);
+  const existed = await Book.findOne({ where: { title: bookData.title } });
+  if (existed) {
+    throw new Error('Sách đã tồn tại');
+  }
+  const book = await Book.create(bookData);
+  return book;
 };
 
 const updateBook = async (id, bookData) => {
-    // Kiểm tra dữ liệu đầu vào
-    if (!bookData.title || !bookData.author || !bookData.category_id || !bookData.publisher_id) {
-        throw new Error("Thiếu thông tin bắt buộc");
+  const book = await Book.findByPk(id);
+  if (bookData.title !== book.title) {
+    const existed = await Book.findOne({
+      where: {
+        title: bookData.title,
+        id: { [Op.ne]: id }
+      }
+    });
+    if (existed) {
+      throw new Error('Sách đã tồn tại');
     }
-    
-    // Kiểm tra xem sách có tồn tại không
-    const existingBooks = await bookModel.getAllBooks();
-    const existingBook = existingBooks.find(book => book.id === parseInt(id));
-    if (!existingBook) {
-        throw new Error("Sách không tồn tại");
-    }
-    
-    // Chỉ kiểm tra trùng tên nếu tên sách thay đổi
-    if (bookData.title !== existingBook.title) {
-        const duplicateTitle = existingBooks.some(book => 
-            book.title === bookData.title && book.id !== parseInt(id)
-        );
-        if (duplicateTitle) {
-            throw new Error("Sách đã tồn tại");
-        }
-    }
-    
-    return await bookModel.updateBook(id, bookData);
+  }
+  await book.update(bookData);
+  return book;
 };
 
 const deleteBook = async (id) => {
-    // Kiểm tra xem sách có tồn tại không
-    const existingBooks = await bookModel.getAllBooks();
-    const existingBook = existingBooks.find(book => book.id === parseInt(id));
-    if (!existingBook) {
-        throw new Error("Sách không tồn tại");
-    }
-    
-    return await bookModel.deleteBook(id);
+  const book = await Book.findByPk(id);
+  await book.destroy();
+  return { success: true };
 };
 
 const getOldStockBooks = async (months = 2) => {
-    return await bookModel.getOldStockBooks(months);
+  const now = new Date();
+  const compareDate = new Date(now.setMonth(now.getMonth() - months));
+  return await Book.findAll({
+    where: {
+      updated_at: { [Op.lte]: compareDate },
+      quantity_in_stock: { [Op.gt]: 0 }
+    },
+    order: [['updated_at', 'ASC']]
+  });
 };
 
 const getBookById = async (id) => {
-    return await bookModel.getBookById(id);
+  return await Book.findByPk(id, {
+    include: [
+      { model: Category, as: 'category', attributes: ['id', 'name'] },
+      { model: Publisher, as: 'publisher', attributes: ['id', 'name'] },
+      { model: BookImages, as: 'images', attributes: ['id', 'image_path'] }
+    ]
+  });
 };
 
+// getLatestBooks: lấy sách nhập mới nhất trong 1 tháng gần đây (cần bổ sung nếu có bảng nhập sách)
 const getLatestBooks = async () => {
-    return await bookModel.getLatestBooks();
+  // Chỉ trả về sách tạo trong 1 tháng gần đây
+  const now = new Date();
+  const compareDate = new Date(now.setMonth(now.getMonth() - 1));
+  return await Book.findAll({
+    where: {
+      created_at: { [Op.gte]: compareDate }
+    },
+    include: [
+      { model: Category, as: 'category', attributes: ['id', 'name'] },
+      { model: Publisher, as: 'publisher', attributes: ['id', 'name'] },
+      { model: BookImages, as: 'images', attributes: ['id', 'image_path'] }
+    ],
+    order: [['created_at', 'DESC']],
+    limit: 5
+  });
 };
 
 module.exports = {
-    getAllBooks,
-    getBookById,
-    createBook,
-    updateBook,
-    deleteBook,
-    getOldStockBooks,
-    getLatestBooks,
+  getAllBooks,
+  getBookById,
+  createBook,
+  updateBook,
+  deleteBook,
+  getOldStockBooks,
+  getLatestBooks,
 };

@@ -1,7 +1,12 @@
-const ShippingMethodModel = require("../models/ShippingMethodModel");
+const { ShippingMethod } = require('../models');
+
 const getAllShippingMethods = async () => {
-    return await ShippingMethodModel.getAllShippingMethods();
-}
+  return await ShippingMethod.findAll({
+    where: { is_active: true },
+    order: [['fee', 'ASC']]
+  });
+};
+
 module.exports = {
-    getAllShippingMethods,
-}
+  getAllShippingMethods,
+};

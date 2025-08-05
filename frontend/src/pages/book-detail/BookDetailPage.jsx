@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './BookDetailPage.css';
 import PublicHeader from '../../components/common/PublicHeader';
 import { getBookById } from '../../services/BookService';
@@ -10,6 +10,7 @@ import { rateBook, getRatingsByBookID, hasPurchasedBook } from '../../services/R
 function BookDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loadCartCount } = useAuth();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,22 +25,63 @@ function BookDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [canRate, setCanRate] = useState(false);
 
-  // Lấy dữ liệu sách từ backend
+  // Debug info
+  console.log('BookDetailPage render - book state:', book);
+  console.log('BookDetailPage render - loading:', loading);
+  console.log('BookDetailPage render - error:', error);
+  
+  // Debug book structure
+  if (book) {
+    console.log('Book category:', book.category, typeof book.category);
+    console.log('Book publisher:', book.publisher, typeof book.publisher);
+  }
+
   useEffect(() => {
+    let isMounted = true;
     const fetchBookData = async () => {
       try {
         setLoading(true);
         setError(null);
+        
+        console.log('BookDetailPage - ID from params:', id);
+        console.log('BookDetailPage - Location state:', location.state);
+        
+        // Ưu tiên lấy từ location.state nếu có
+        const bookFromState = location.state?.book;
+        if (bookFromState && bookFromState.id === Number(id)) {
+          console.log('Using book data from state:', bookFromState);
+          if (isMounted) {
+            setBook(bookFromState);
+            setLoading(false);
+          }
+          return;
+        }
+        
+        // Nếu không có thì gọi API
+        console.log('Fetching book data from API for id:', id);
         const data = await getBookById(id);
-        setBook(data);
+        console.log('Book data from API:', data);
+        
+        if (isMounted) {
+          if (data && data.id) {
+            setBook(data);
+          } else {
+            console.error('No valid book data received:', data);
+            setError('Không tìm thấy thông tin sách');
+          }
+          setLoading(false);
+        }
       } catch (err) {
-        setError('Không tìm thấy thông tin sách');
-      } finally {
-        setLoading(false);
+        console.error('Error fetching book:', err);
+        if (isMounted) {
+          setError('Không tìm thấy thông tin sách: ' + err.message);
+          setLoading(false);
+        }
       }
     };
     fetchBookData();
-  }, [id]);
+    return () => { isMounted = false; };
+  }, [id, location.state]);
 
   // Lấy đánh giá từ backend
   useEffect(() => {
@@ -200,13 +242,27 @@ function BookDetailPage() {
   }
 
   // Hiển thị lỗi
-  if (error || !book) {
+  if (error) {
     return (
       <div className="book-detail-page">
         <PublicHeader />
         <div className="book-detail-container">
           <div className="error">
-            {error || 'Không tìm thấy thông tin sách'}
+            {error}
+            <button onClick={() => navigate('/books')}>Quay lại danh sách sách</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!book) {
+    return (
+      <div className="book-detail-page">
+        <PublicHeader />
+        <div className="book-detail-container">
+          <div className="error">
+            Không tìm thấy thông tin sách
             <button onClick={() => navigate('/books')}>Quay lại danh sách sách</button>
           </div>
         </div>
@@ -215,11 +271,13 @@ function BookDetailPage() {
   }
 
   // Tính toán đánh giá trung bình và thống kê
-  const averageRating = reviews.length > 0 ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length : 0;
+  const averageRating = (reviews && Array.isArray(reviews) && reviews.length > 0) ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length : 0;
 
-  // Tính toán thống kê đánh giá
   const getRatingStats = () => {
-    if (!reviews) return {};
+    if (!reviews || !Array.isArray(reviews)) return {
+      counts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      percentages: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    };
     const stats = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     reviews.forEach(review => {
       stats[review.rating]++;
@@ -238,11 +296,26 @@ function BookDetailPage() {
   };
   const ratingStats = getRatingStats();
 
-  // Hàm lấy URL ảnh đúng chuẩn backend
   const getBookImageUrl = (book, idx = 0) => {
-    if (!book.imageUrls || book.imageUrls.length === 0) return '';
-    const url = book.imageUrls[idx] || book.imageUrls[0];
-    return url.startsWith('http') ? url : `http://localhost:5000${url}`;
+    if (book.images && book.images.length > 0) {
+      const imagePath = book.images[idx] ? book.images[idx].image_path : book.images[0].image_path;
+      return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
+    }
+    if (book.imageUrls && book.imageUrls.length > 0) {
+      const url = book.imageUrls[idx] || book.imageUrls[0];
+      return url.startsWith('http') ? url : `http://localhost:5000${url}`;
+    }
+    return '/assets/book-placeholder.jpg';
+  };
+
+  const getImageList = (book) => {
+    if (book.images && book.images.length > 0) {
+      return book.images.map(img => img.image_path.startsWith('http') ? img.image_path : `http://localhost:5000${img.image_path}`);
+    }
+    if (book.imageUrls && book.imageUrls.length > 0) {
+      return book.imageUrls.map(url => url.startsWith('http') ? url : `http://localhost:5000${url}`);
+    }
+    return ['/assets/book-placeholder.jpg'];
   };
 
   return (
@@ -268,24 +341,16 @@ function BookDetailPage() {
               />
             </div>
             <div className="image-thumbnails">
-              {book.imageUrls && book.imageUrls.length > 0 ? (
-                book.imageUrls.map((imgUrl, idx) => (
-                  <img
-                    key={idx}
-                    src={imgUrl.startsWith('http') ? imgUrl : `http://localhost:5000${imgUrl}`}
-                    alt={`${book.title || book.name} ${idx + 1}`}
-                    className={selectedImage === idx ? 'active' : ''}
-                    onClick={() => setSelectedImage(idx)}
-                    style={{ cursor: 'pointer' }}
-                  />
-                ))
-              ) : (
+              {getImageList(book).map((imgUrl, idx) => (
                 <img
-                  src="/assets/book-placeholder.jpg"
-                  alt="placeholder"
-                  className="active"
+                  key={idx}
+                  src={imgUrl}
+                  alt={`${book.title || book.name} ${idx + 1}`}
+                  className={selectedImage === idx ? 'active' : ''}
+                  onClick={() => setSelectedImage(idx)}
+                  style={{ cursor: 'pointer' }}
                 />
-              )}
+              ))}
             </div>
           </div>
           {/* Thông tin sách */}
@@ -317,11 +382,11 @@ function BookDetailPage() {
             <div className="book-meta">
               <div className="meta-item">
                 <span className="label">Thể loại:</span>
-                <span className="value">{book.category || 'Không rõ'}</span>
+                <span className="value">{(book.category && typeof book.category === 'object') ? book.category.name : (book.category || 'Không rõ')}</span>
               </div>
               <div className="meta-item">
                 <span className="label">Nhà xuất bản:</span>
-                <span className="value">{book.publisher || 'Không rõ'}</span>
+                <span className="value">{(book.publisher && typeof book.publisher === 'object') ? book.publisher.name : (book.publisher || 'Không rõ')}</span>
               </div>
               <div className="meta-item">
                 <span className="label">Năm xuất bản:</span>
@@ -489,7 +554,7 @@ function BookDetailPage() {
                   </div>
                 )}
                 <div className="reviews-list">
-                  {reviews && reviews.length > 0 ? (
+                  {reviews && Array.isArray(reviews) && reviews.length > 0 ? (
                     reviews.map(review => (
                       <div key={review.id} className="review-item">
                         <div className="review-header">

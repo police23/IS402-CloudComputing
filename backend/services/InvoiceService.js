@@ -1,31 +1,104 @@
+
 const PDFDocument = require("pdfkit");
 const path = require("path");
-const invoiceModel = require("../models/InvoiceModel");
+const { Invoice, InvoiceDetail, Book, User, Promotion } = require('../models');
 
 // Lấy danh sách hóa đơn
 const getAllInvoices = async () => {
-    return await invoiceModel.getAllInvoices();
+  return await Invoice.findAll({
+    include: [
+      { model: User, as: 'creator', attributes: ['full_name'] },
+      { model: Promotion, as: 'promotion', attributes: ['name'] },
+      { 
+        model: InvoiceDetail, 
+        as: 'details', 
+        include: [{ model: Book, as: 'book', attributes: ['title'] }] 
+      }
+    ],
+    order: [['created_at', 'DESC']]
+  });
 };
 
 const getInvoicesByUser = async (userId) => {
-    if (!userId) {
-        throw new Error("Thiếu tham số userId");
-    }
-    return await invoiceModel.getInvoicesByUser(userId);
-}
+  if (!userId) throw new Error("Thiếu tham số userId");
+  return await Invoice.findAll({
+    where: { created_by: userId },
+    include: [
+      { model: User, as: 'creator', attributes: ['full_name'] },
+      { model: Promotion, as: 'promotion', attributes: ['name'] },
+      { 
+        model: InvoiceDetail, 
+        as: 'details', 
+        include: [{ model: Book, as: 'book', attributes: ['title'] }] 
+      }
+    ],
+    order: [['created_at', 'DESC']]
+  });
+};
+
 // Thêm hóa đơn mới
 const addInvoice = async (invoiceData) => {
-    return await invoiceModel.addInvoice(invoiceData);
+  const { customer_name, customer_phone, total_amount, discount_amount, final_amount, promotion_code, created_by, created_at, bookDetails } = invoiceData;
+  // Kiểm tra tồn kho
+  for (const detail of bookDetails) {
+    const book = await Book.findByPk(detail.book_id);
+    const currentStock = book?.quantity_in_stock ?? 0;
+    if (detail.quantity > currentStock) {
+      throw {
+        status: 400,
+        message: `Sách ID ${detail.book_id} không đủ tồn kho. Hiện còn: ${currentStock}, yêu cầu: ${detail.quantity}`
+      };
+    }
+  }
+  // Tạo hóa đơn
+  const invoice = await Invoice.create({
+    customer_name,
+    customer_phone,
+    total_amount,
+    discount_amount,
+    final_amount,
+    promotion_code: promotion_code || null,
+    created_by,
+    created_at: created_at || new Date()
+  });
+  // Tạo chi tiết hóa đơn
+  for (const detail of bookDetails) {
+    await InvoiceDetail.create({
+      invoice_id: invoice.id,
+      book_id: detail.book_id,
+      quantity: detail.quantity,
+      unit_price: detail.unit_price
+    });
+    // Trừ tồn kho
+    const book = await Book.findByPk(detail.book_id);
+    book.quantity_in_stock -= detail.quantity;
+    await book.save();
+  }
+  return invoice;
 };
 
 // Lấy chi tiết hóa đơn theo id
 const getInvoiceById = async (invoiceId) => {
-    return await invoiceModel.getInvoiceById(invoiceId);
+  const invoice = await Invoice.findByPk(invoiceId, {
+    include: [
+      { model: User, as: 'creator', attributes: ['full_name'] },
+      { model: Promotion, as: 'promotion', attributes: ['name'] },
+      { 
+        model: InvoiceDetail, 
+        as: 'details', 
+        include: [{ model: Book, as: 'book', attributes: ['title'] }] 
+      }
+    ]
+  });
+  if (!invoice) return null;
+  return invoice;
 };
 
 // Xóa hóa đơn
 const deleteInvoice = async (invoiceId) => {
-    return await invoiceModel.deleteInvoice(invoiceId);
+  await InvoiceDetail.destroy({ where: { invoice_id: invoiceId } });
+  const result = await Invoice.destroy({ where: { id: invoiceId } });
+  return result;
 };
 
 // Lấy tổng doanh thu theo tháng trong năm

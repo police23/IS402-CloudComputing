@@ -1,27 +1,33 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db');
+const Order = require('./OrderModel');
+const Book = require('./BookModel');
 
-const Rule = sequelize.define('Rule', {
+const OrderDetail = sequelize.define('OrderDetail', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
   },
-  min_import_quantity: {
+  order_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  min_stock_before_import: {
+  book_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  max_promotion_duration: {
+  quantity: {
     type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  unit_price: {
+    type: DataTypes.DECIMAL(10, 0),
     allowNull: false,
   },
 }, {
-  tableName: 'rules',
+  tableName: 'order_details',
   timestamps: false,
 });
 
-module.exports = Rule;
+module.exports = { OrderDetail };

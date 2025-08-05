@@ -1,14 +1,18 @@
-const { DataTypes } = require('sequelize');
+const {DataTypes} = require('sequelize');
 const sequelize = require('../db');
 
-const Publisher = sequelize.define('Publisher', {
+const BookImages = sequelize.define('BookImages', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
   },
-  name: {
-    type: DataTypes.STRING,
+  book_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  image_path: {
+    type: DataTypes.STRING(255),
     allowNull: false,
   },
   created_at: {
@@ -16,14 +20,9 @@ const Publisher = sequelize.define('Publisher', {
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
-  updated_at: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW,
-  },
 }, {
-  tableName: 'publishers',
+  tableName: 'book_images',
   timestamps: false,
 });
 
-module.exports = Publisher;
+module.exports = BookImages;

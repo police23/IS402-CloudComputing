@@ -406,7 +406,6 @@ select.search-input {
   border-color: #bd2130;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .promotion-table {
         min-width: 800px;

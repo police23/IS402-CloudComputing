@@ -134,6 +134,8 @@ export const AuthProvider = ({ children }) => {
             }
 
             const userData = response.user || response;
+            const token = response.token;
+
             // Kiểm tra userData hợp lệ
             if (!userData || typeof userData !== "object" || (!userData.id && !userData.username)) {
                 throw new Error('Dữ liệu người dùng không hợp lệ');
@@ -146,7 +148,11 @@ export const AuthProvider = ({ children }) => {
             
             console.log("Login successful, user data:", userData);
 
+            // Lưu cả user và token vào localStorage
             localStorage.setItem('user', JSON.stringify(userData));
+            if (token) {
+                localStorage.setItem('token', token);
+            }
             setUser(userData);
 
             return userData;

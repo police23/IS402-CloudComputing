@@ -1,10 +1,33 @@
-const db = require("../db");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db');
 
-const getAllCategories = async () => {
-    const [rows] = await db.query("SELECT id, name, description, created_at, updated_at FROM categories");
-    return rows;
-};
+const Category = sequelize.define('Category', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+  },
+  updated_at: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+  },
+}, {
+  tableName: 'categories',
+  timestamps: false,
+});
 
-module.exports = {
-    getAllCategories,
-};
+module.exports = Category;

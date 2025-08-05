@@ -11,7 +11,8 @@ const getAuthHeader = () => {
 
 export const getAllInvoices = async () => {
   const response = await axios.get(API_URL, { headers: getAuthHeader() });
-  return response.data;
+  const data = response.data.data || response.data; // Handle both {data: []} and [] formats
+  return Array.isArray(data) ? data : [];
 };
 
 export const addInvoice = async (invoiceData) => {
@@ -56,7 +57,7 @@ export const addInvoice = async (invoiceData) => {
 
 export const getInvoiceById = async (id) => {
   const response = await axios.get(`${API_URL}/${id}`, { headers: getAuthHeader() });
-  return response.data;
+  return response.data.data || response.data;
 };
 
 export const deleteInvoice = async (id) => {

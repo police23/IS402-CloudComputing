@@ -1,7 +1,9 @@
-const categoryModel = require("../models/CategoryModel");
+const { Category } = require('../models');
 
 const getAllCategories = async () => {
-    return await categoryModel.getAllCategories();
+    return await Category.findAll({
+        order: [['name', 'ASC']]
+    });
 };
 
 module.exports = {

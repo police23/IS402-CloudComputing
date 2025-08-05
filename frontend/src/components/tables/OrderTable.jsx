@@ -54,7 +54,7 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      let response = { orders: [], total: 0 };
+      let response = { data: { orders: [], total: 0 } };
       // Dùng API /all cho OrderManagementPage (admin/manager)
       if (type === "processing") {
         response = await getAllProcessingOrders(currentPage, pageSize);
@@ -66,9 +66,22 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
         response = await getAllDeliveredOrders(currentPage, pageSize);
       }
       console.log('OrderTable fetchOrders response:', response);
-      setOrders(response.orders || []);
-      setTotal(response.total || 0);
-      console.log('orders after fetch:', response.orders);
+      
+      // API trả về { success: true, data: { orders, total } }
+      const apiData = response.data || response;
+      const ordersData = apiData.orders || [];
+      
+      if (!Array.isArray(ordersData)) {
+        console.error('Orders data is not an array:', ordersData);
+        setOrders([]);
+        setTotal(0);
+        setLoading(false);
+        return;
+      }
+      
+      setOrders(ordersData);
+      setTotal(apiData.total || 0);
+      console.log('orders after fetch:', ordersData);
     } catch (error) {
       setNotification({ message: "Lỗi khi tải đơn hàng.", type: "error" });
     } finally {
@@ -137,10 +150,10 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
 
   const totalPages = Math.ceil(total / pageSize);
 
-  // Pagination helpers
+  // Pagination helpers - Sử dụng server-side pagination
   const indexOfLastRecord = currentPage * pageSize;
   const indexOfFirstRecord = indexOfLastRecord - pageSize;
-  const currentRecords = orders.slice(indexOfFirstRecord, indexOfLastRecord);
+  const currentRecords = orders; // Đã được phân trang từ server
 
   // Tính toán lại canConfirm dựa trên selectedRows và orders
   const canConfirm = selectedRows.some(id => {
@@ -231,12 +244,13 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
                     />
                   </td>
                   <td>#{order.id || ''}</td>
-                  <td>{order.full_name || ''}</td>
-                  <td>{order.phone || ''}</td>
-                  <td>{Array.isArray(order.orderDetails) ? order.orderDetails.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) : 0}</td>
+                  <td>{order.user?.full_name || order.full_name || ''}</td>
+                  <td>{order.user?.phone || order.phone || ''}</td>
+                  <td>{Array.isArray(order.details) ? order.details.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) : 
+                      (Array.isArray(order.orderDetails) ? order.orderDetails.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) : 0)}</td>
                   <td>{formatDate(order.order_date)}</td>
-                  {type === 'delivering' && <td>{order.shipper_name || order.shipperName || 'Chưa có'}</td>}
-                  <td><strong>{formatCurrency(Number(order.total_amount) || 0)}</strong></td>
+                  {type === 'delivering' && <td>{order.assignment?.shipper?.full_name || order.shipper_name || order.shipperName || 'Chưa có'}</td>}
+                  <td><strong>{formatCurrency(Number(order.final_amount || order.total_amount) || 0)}</strong></td>
                 </tr>,
                 expandedRowId === order.id && (
                   <tr key={order.id + '-details'}>
@@ -246,13 +260,13 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
                           <div className="order-details-col order-details-col-1">
                             <div className="order-details-item"><b>Mã đơn:</b> #{order.id || ''}</div>
                             <div className="order-details-item"><b>Ngày đặt:</b> {formatDate(order.order_date)}</div>
-                            <div className="order-details-item"><b>Khách hàng:</b> {order.full_name || ''}</div>
-                            <div className="order-details-item"><b>SĐT:</b> {order.phone || ''}</div>
+                            <div className="order-details-item"><b>Khách hàng:</b> {order.user?.full_name || order.full_name || ''}</div>
+                            <div className="order-details-item"><b>SĐT:</b> {order.user?.phone || order.phone || ''}</div>
                           </div>
                           <div className="order-details-col order-details-col-2">
                             <div className="order-details-item"><b>Địa chỉ giao hàng:</b> {order.shipping_address}</div>
-                            <div className="order-details-item"><b>Phương thức thanh toán:</b> {order.payment_method}</div>
-                            <div className="order-details-item"><b>Phương thức vận chuyển:</b> {order.shipping_method_name || 'Không rõ'}</div>
+                            <div className="order-details-item"><b>Phương thức thanh toán:</b> {order.payment_method === 'online' ? 'ZaloPay' : 'Thanh toán khi nhận hàng'}</div>
+                            <div className="order-details-item"><b>Phương thức vận chuyển:</b> {order.shippingMethod?.name || order.shipping_method_name || 'Không rõ'}</div>
                           </div>
                         </div>
                         <div className="order-items-table-wrapper">
@@ -266,14 +280,14 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
                               </tr>
                             </thead>
                             <tbody>
-                              {order.orderDetails && order.orderDetails.length > 0 ? (
-                                order.orderDetails.map((item, idx) => {
+                              {(order.details || order.orderDetails) && (order.details || order.orderDetails).length > 0 ? (
+                                (order.details || order.orderDetails).map((item, idx) => {
                                   const quantity = Number(item.quantity) || 1;
-                                  const unitPrice = Number(item.price || item.unit_price) || 0;
+                                  const unitPrice = Number(item.unit_price || item.price) || 0;
                                   const totalPrice = unitPrice * quantity;
                                   return (
                                     <tr key={item.id || idx}>
-                                      <td>{item.title}</td>
+                                      <td>{item.Book?.title || item.title || item.name || ''}</td>
                                       <td>{quantity}</td>
                                       <td>{unitPrice ? formatCurrency(unitPrice) : '-'}</td>
                                       <td>{unitPrice ? formatCurrency(totalPrice) : '-'}</td>
@@ -287,7 +301,7 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
                           </table>
                         </div>
                         {(() => {
-                          // Không có giá trị đơn giá/SL trong orderDetails, chỉ hiển thị tổng tiền, phí, khuyến mãi
+                          // Hiển thị tổng tiền, phí, khuyến mãi từ backend
                           return (
                             <div className="order-details-summary">
                               <div className="order-details-summary-row"><span>Tổng tiền hàng:</span> <strong>{formatCurrency(Number(order.total_amount) || 0)}</strong></div>
@@ -307,10 +321,10 @@ const OrderTable = ({ type = "processing", isShipper = false }) => {
         </table>
       </div>
       {/* Pagination */}
-      {orders.length > 0 && (
+      {total > 0 && (
         <div className="pagination">
           <div className="pagination-info">
-            Hiển thị {indexOfFirstRecord + 1} đến {Math.min(indexOfLastRecord, orders.length)} của {orders.length} đơn hàng
+            Hiển thị {(currentPage - 1) * pageSize + 1} đến {Math.min(currentPage * pageSize, total)} của {total} đơn hàng
           </div>
           <div className="pagination-controls">
             <button

@@ -16,6 +16,9 @@ import "./Top10BooksChart.css";
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const Top10BooksTable = ({ books, month, year }) => {
+  // Ensure books is always an array
+  const safeBooks = Array.isArray(books) ? books : [];
+
   console.log("Top10BooksTable props:", { books, month, year }); // Debug log
   console.log("Month type:", typeof month, "Month value:", month); // Additional debug
   console.log("Year type:", typeof year, "Year value:", year); // Additional debug
@@ -89,7 +92,7 @@ const Top10BooksTable = ({ books, month, year }) => {
       const displayYear = year !== undefined && year !== null ? year : new Date().getFullYear();
       
       // Chuẩn bị dữ liệu cho Excel
-      const excelData = books.map((book, index) => ({
+      const excelData = safeBooks.map((book, index) => ({
         'STT': index + 1,
         'Tên sách': book.title,
         'Số lượng bán': Number(book.total_sold).toLocaleString('vi-VN'),
@@ -127,7 +130,7 @@ const Top10BooksTable = ({ books, month, year }) => {
     }
   };
 
-  if (!books || books.length === 0)
+  if (!safeBooks || safeBooks.length === 0)
     return (
       <div className="error-message">
         Không có dữ liệu cho báo cáo này.
@@ -136,11 +139,11 @@ const Top10BooksTable = ({ books, month, year }) => {
 
   // Chuẩn bị dữ liệu cho biểu đồ
   const chartData = {
-    labels: books.map((book) => book.title),
+    labels: safeBooks.map((book) => book.title),
     datasets: [
       {
         label: "Số lượng bán",
-        data: books.map((book) => book.total_sold),
+        data: safeBooks.map((book) => book.total_sold),
         backgroundColor: "#095e5a",
         borderColor: "#074c48",
         borderWidth: 1,

@@ -63,7 +63,7 @@ const DamageReportDetailsModal = ({ isOpen, onClose, damageReportData }) => {
               <div className="info-column">
                 <div className="info-item">
                   <label>Người tạo:</label>
-                  <span>{damageReportData.created_by_name || damageReportData.created_by || '---'}</span>
+                  <span>{damageReportData.creator?.full_name || damageReportData.created_by_name || damageReportData.created_by || '---'}</span>
                 </div>
                 <div className="info-item">
                   <label>Ghi chú:</label>
@@ -93,7 +93,7 @@ const DamageReportDetailsModal = ({ isOpen, onClose, damageReportData }) => {
                   bookList.map((book, idx) => (
                     <tr key={book.id || idx}>
                       <td>{idx + 1}</td>
-                      <td>{book.book_title}</td>
+                      <td>{book.book?.title || book.book_title || book.title || '---'}</td>
                       <td>{formatNumber(book.quantity)}</td>
                       <td>{book.reason}</td>
                     </tr>

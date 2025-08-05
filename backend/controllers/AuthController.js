@@ -27,8 +27,10 @@ exports.validateToken = async (req, res) => {
     try {
         const userId = req.user.id;
         
-        const userModel = require('../models/UserModel');
-        const user = await userModel.getUserById(userId);
+        const { User, Role } = require('../models');
+        const user = await User.findByPk(userId, {
+            include: [{ model: Role, as: 'role' }]
+        });
         
         if (!user) {
             return res.status(404).json({ message: 'Không tìm thấy thông tin người dùng' });

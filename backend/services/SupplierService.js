@@ -1,33 +1,34 @@
-const supplierModel = require("../models/SupplierModel");
+const { Supplier } = require('../models');
+const { Op } = require('sequelize');
 
-/**
- * Lấy tất cả nhà cung cấp
- * @returns {Promise<Array>} Danh sách các nhà cung cấp
- */
 const getAllSuppliers = async () => {
-    return await supplierModel.getAllSuppliers();
+  return await Supplier.findAll();
 };
 
 const createSupplier = async (supplierData) => {
-    const existingSuppliers = await supplierModel.getAllSuppliers();
-        const existed = existingSuppliers.some(supplier => supplier.name === supplierData.name);
-        if (existed) {
-            throw new Error("Nhà cung cấp đã tồn tại");
-        }
-    
-    return await supplierModel.createSupplier(supplierData);
+  const existed = await Supplier.findOne({ where: { name: supplierData.name } });
+  if (existed) throw new Error('Nhà cung cấp đã tồn tại');
+  const supplier = await Supplier.create(supplierData);
+  return supplier;
 };
 
 const updateSupplier = async (id, supplierData) => {
-    return await supplierModel.updateSupplier(id, supplierData);
-}
+  const supplier = await Supplier.findByPk(id);
+  if (!supplier) throw new Error('Supplier not found');
+  await supplier.update(supplierData);
+  return supplier;
+};
+
 const deleteSupplier = async (id) => {
-    return await supplierModel.deleteSupplier(id);
+  const supplier = await Supplier.findByPk(id);
+  if (!supplier) throw new Error('Supplier not found');
+  await supplier.destroy();
+  return { success: true };
 };
 
 module.exports = {
-    getAllSuppliers,
-    createSupplier,
-    updateSupplier,
-    deleteSupplier,
+  getAllSuppliers,
+  createSupplier,
+  updateSupplier,
+  deleteSupplier,
 };

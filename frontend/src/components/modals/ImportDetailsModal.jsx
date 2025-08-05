@@ -65,11 +65,11 @@ const ImportDetailsModal = ({ isOpen, onClose, importData }) => {
               <div className="info-column">
                 <div className="info-item">
                   <label>Nhà cung cấp:</label>
-                  <span>{importData.supplier}</span>
+                  <span>{importData.supplier?.name || importData.supplier || "---"}</span>
                 </div>
                 <div className="info-item">
                   <label>Người nhập:</label>
-                  <span>{importData.employee || importData.importedBy || "Admin"}</span>
+                  <span>{importData.employee?.full_name || importData.employee?.username || importData.importedBy || "Admin"}</span>
                 </div>
               </div>
             </div>
@@ -91,7 +91,7 @@ const ImportDetailsModal = ({ isOpen, onClose, importData }) => {
                 {importData.bookDetails.map((book, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
-                    <td>{book.book}</td>
+                    <td>{book.book?.title || book.book || book.book_title || "---"}</td>
                     <td>{book.quantity}</td>
                     <td>{formatCurrency(book.price)}</td>
                     <td>{formatCurrency(book.price * book.quantity)}</td>

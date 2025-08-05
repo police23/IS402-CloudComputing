@@ -36,3 +36,23 @@ export const getImportDataByYear = async (year) => {
   });
   return response.data;
 };
+
+// Thêm các hàm mới cho biểu đồ
+export const getImportChartDataByYear = async (year) => {
+  const response = await axios.get(`${API_URL}/chart/year`, {
+    params: { year }
+  });
+  return response.data;
+};
+
+export const getImportChartDataByMonth = async (year, month) => {
+  const response = await axios.get(`${API_URL}/chart/month`, {
+    params: { year, month }
+  });
+  return response.data;
+};
+
+export const getStockChartData = async () => {
+  const response = await axios.get(`${API_URL}/stock-chart`);
+  return response.data;
+};

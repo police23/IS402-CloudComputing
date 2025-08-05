@@ -23,12 +23,14 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
   // Fetch damage reports
   const fetchReports = async () => {
     try {
-      const res = await fetch("/api/damage-reports");
+      const res = await fetch("http://localhost:5000/api/damage-reports");
       if (!res.ok) throw new Error("Lỗi khi tải dữ liệu phiếu hư hỏng");
-      const data = await res.json();
-      setDamageReports(data);
+      const response = await res.json();
+      const data = response.data || response; // Handle both {data: []} and [] formats
+      setDamageReports(Array.isArray(data) ? data : []);
     } catch (err) {
       setNotification({ message: err.message || "Không thể tải dữ liệu", type: "error" });
+      setDamageReports([]); // Set empty array on error
     }
   };
   useEffect(() => { fetchReports(); }, []);
@@ -84,11 +86,14 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
   };
 
   // Filtered reports by search (simple + advanced)
-  const filteredReports = damageReports.filter((report) => {
+  const filteredReports = (Array.isArray(damageReports) ? damageReports : []).filter((report) => {
     // Advanced search
     if (advancedSearch.id || advancedSearch.created_by || advancedSearch.dateFrom || advancedSearch.dateTo) {
       const matchesId = !advancedSearch.id || String(report.id).includes(advancedSearch.id);
-      const matchesUser = !advancedSearch.created_by || (report.created_by_name && report.created_by_name.toLowerCase().includes(advancedSearch.created_by.toLowerCase()));
+      const matchesUser = !advancedSearch.created_by || (
+        (report.creator?.full_name && report.creator.full_name.toLowerCase().includes(advancedSearch.created_by.toLowerCase())) ||
+        (report.created_by_name && report.created_by_name.toLowerCase().includes(advancedSearch.created_by.toLowerCase()))
+      );
       let matchesDate = true;
       if (advancedSearch.dateFrom) {
         matchesDate = matchesDate && new Date(report.created_at) >= new Date(advancedSearch.dateFrom);
@@ -105,7 +110,8 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
       case 'id':
         return String(report.id).includes(searchValue);
       case 'created_by':
-        return report.created_by_name && report.created_by_name.toLowerCase().includes(searchValue);
+        return (report.creator?.full_name && report.creator.full_name.toLowerCase().includes(searchValue)) ||
+               (report.created_by_name && report.created_by_name.toLowerCase().includes(searchValue));
       default:
         return true;
     }
@@ -349,7 +355,7 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
                     />
                   </td>
                   <td style={{ width: '8%', minWidth: 60, maxWidth: 90 }}>{report.id}</td>
-                  <td>{report.created_by_name}</td>
+                  <td>{report.creator?.full_name || report.created_by_name || report.created_by || '---'}</td>
                   <td style={{ width: '10%', minWidth: 70, maxWidth: 110 }}>
                     {(() => {
                       if (!report.created_at) return "";

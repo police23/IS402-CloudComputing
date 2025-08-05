@@ -64,20 +64,40 @@ function CartPage() {
       setLoading(true);
       setError(null);
       const response = await getCart();
+      console.log('Cart API response:', response); // Debug log
       if (response.success) {
+        console.log('Cart items from backend:', response.data); // Debug log
         // Transform data để phù hợp với format hiện tại
-        const transformedItems = response.data.map(item => ({
-          id: item.id,
-          bookId: item.book_id,
-          title: item.title,
-          author: item.author,
-          price: item.price,
-          originalPrice: item.original_price || item.price,
-          discount: item.original_price ? Math.round(((item.original_price - item.price) / item.original_price) * 100) : 0,
-          image_path: item.image_path,
-          quantity: item.quantity,
-          stock: item.stock
-        }));
+        const transformedItems = response.data.map(item => {
+          console.log('Processing cart item:', item); // Debug log
+          console.log('Item images:', item.images); // Debug log
+          // Nếu không có images/imageUrls nhưng có image_path thì tạo mảng images
+          let images = item.images;
+          if ((!images || images.length === 0) && item.image_path) {
+            images = [{ image_path: item.image_path }];
+          }
+          // Nếu có imageUrls thì giữ nguyên
+          let imageUrls = item.imageUrls;
+          if ((!imageUrls || imageUrls.length === 0) && item.image_path) {
+            imageUrls = [item.image_path];
+          }
+          const transformedItem = {
+            id: item.id,
+            bookId: item.book_id,
+            title: item.title,
+            author: item.author,
+            price: item.price,
+            originalPrice: item.original_price || item.price,
+            discount: item.original_price ? Math.round(((item.original_price - item.price) / item.original_price) * 100) : 0,
+            image_path: item.image_path,
+            images,
+            imageUrls,
+            quantity: item.quantity,
+            stock: item.stock
+          };
+          console.log('Transformed item:', transformedItem); // Debug log
+          return transformedItem;
+        });
         setCartItems(transformedItems);
       } else {
         setError(response.message);
@@ -156,12 +176,38 @@ function CartPage() {
     return amount.toLocaleString('vi-VN') + 'đ';
   };
 
-  // Hàm lấy URL ảnh đúng chuẩn backend
-  const getBookImageUrl = (imagePath) => {
-    if (!imagePath) return '/assets/book-default.jpg';
-    return imagePath.startsWith('http')
-      ? imagePath
-      : `http://localhost:5000${imagePath}`;
+  // Hàm lấy URL ảnh đúng chuẩn backend cho item
+  const getBookImageUrl = (item) => {
+    console.log('getBookImageUrl - item:', item); // Debug log
+    // Ưu tiên lấy từ images (mảng)
+    if (item.images && Array.isArray(item.images) && item.images.length > 0) {
+      const imagePath = item.images[0].image_path;
+      console.log('Using images[0].image_path:', imagePath); // Debug log
+      return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
+    }
+    // Fallback cho imageUrls (mảng)
+    if (item.imageUrls && Array.isArray(item.imageUrls) && item.imageUrls.length > 0) {
+      const url = item.imageUrls[0];
+      console.log('Using imageUrls[0]:', url); // Debug log
+      return url.startsWith('http') ? url : `http://localhost:5000${url}`;
+    }
+    // Fallback cho image_path
+    if (item.image_path) {
+      console.log('Using image_path:', item.image_path); // Debug log
+      return item.image_path.startsWith('http') ? item.image_path : `http://localhost:5000${item.image_path}`;
+    }
+    // Fallback cho image hoặc cover
+    if (item.image) {
+      console.log('Using image:', item.image); // Debug log
+      return item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image}`;
+    }
+    if (item.cover) {
+      console.log('Using cover:', item.cover); // Debug log
+      return item.cover.startsWith('http') ? item.cover : `http://localhost:5000${item.cover}`;
+    }
+    // Ảnh mặc định
+    console.log('Using default image'); // Debug log
+    return '/assets/book-default.jpg';
   };
 
   // Kiểm tra user đã đăng nhập chưa
@@ -255,7 +301,7 @@ function CartPage() {
                 {cartItems.map(item => (
                   <div key={item.bookId} className="cart-item">
                     <div className="item-image">
-                      <img src={getBookImageUrl(item.image || item.cover || item.image_path)} alt={item.title} />
+                      <img src={getBookImageUrl(item)} alt={item.title} />
                     </div>
                     <div className="item-info">
                       <h3 className="item-title">{item.title}</h3>

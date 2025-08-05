@@ -183,10 +183,10 @@ function HomePage() {
           id: book.id,
           name: book.title,
           price: book.price ? `${book.price.toLocaleString()}đ` : '',
-          image: book.imageUrls && book.imageUrls.length > 0
-            ? (book.imageUrls[0].startsWith('/uploads')
-                ? BACKEND_URL + book.imageUrls[0]
-                : book.imageUrls[0])
+          image: book.images && book.images.length > 0
+            ? (book.images[0].image_path.startsWith('/uploads')
+                ? BACKEND_URL + book.images[0].image_path
+                : book.images[0].image_path)
             : '/assets/no-image.png'
         }))}
       />

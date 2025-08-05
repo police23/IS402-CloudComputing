@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./StockChart.css";
 import { getOldStockBooks } from "../../services/BookService";
-import * as XLSX from "xlsx";
 
 const StockTable = ({ data }) => {
   // State cho sắp xếp
@@ -41,59 +40,6 @@ const StockTable = ({ data }) => {
     return sorted;
   };
 
-  // Hàm xuất Excel
-  const exportToExcel = () => {
-    try {
-      // Chuẩn bị dữ liệu cho báo cáo tồn kho
-      const mainStockData = getSorted(books.map(b => ({ ...b, value: b.stock * b.price })), "main").map((book, idx) => ({
-        'STT': idx + 1,
-        'Tên sách': book.title,
-        'Thể loại': book.category || "-",
-        'Số lượng tồn': book.stock,
-        'Giá trị tồn kho': book.value.toLocaleString("vi-VN") + " VNĐ"
-      }));
-
-      // Thêm dòng tổng vào dữ liệu chính
-      mainStockData.push({
-        'STT': '',
-        'Tên sách': '',
-        'Thể loại': 'TỔNG:',
-        'Số lượng tồn': totalBooks,
-        'Giá trị tồn kho': totalValue.toLocaleString("vi-VN") + " VNĐ"
-      });
-
-      // Chuẩn bị dữ liệu cho báo cáo tồn kho lâu ngày
-      const oldStockData = getSorted(oldStockBooks.map(b => ({ ...b, value: b.stock * b.price })), "old").map((book, idx) => ({
-        'STT': idx + 1,
-        'Tên sách': book.title,
-        'Thể loại': book.category || "-",
-        'Số lượng tồn': book.stock,
-        'Giá trị tồn kho': book.value.toLocaleString("vi-VN") + " VNĐ"
-      }));
-
-      // Tạo workbook mới
-      const wb = XLSX.utils.book_new();
-      
-      // Tạo worksheet cho dữ liệu tồn kho chính
-      const mainWs = XLSX.utils.json_to_sheet(mainStockData);
-      
-      // Tạo worksheet cho dữ liệu tồn kho lâu ngày
-      const oldWs = XLSX.utils.json_to_sheet(oldStockData);
-      
-      // Thêm các worksheet vào workbook
-      XLSX.utils.book_append_sheet(wb, mainWs, "Báo cáo tồn kho");
-      XLSX.utils.book_append_sheet(wb, oldWs, "Tồn kho lâu ngày");
-      
-      // Xuất file Excel
-      const currentDate = new Date();
-      const fileName = `bao-cao-ton-kho-${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}.xlsx`;
-      XLSX.writeFile(wb, fileName);
-    } catch (error) {
-      console.error("Lỗi khi xuất Excel:", error);
-      alert("Có lỗi xảy ra khi xuất báo cáo Excel");
-    }
-  };
-
   // Hàm xử lý khi click header
   const handleSort = (key, table) => {
     setSortConfig((prev) => {
@@ -127,11 +73,7 @@ const StockTable = ({ data }) => {
   return (
     <div className="import-table-container">
       <h3 className="stock-table-title">Bảng tồn kho từng đầu sách</h3>
-      <div className="export-buttons">
-        <button className="export-excel-btn" onClick={exportToExcel}>
-          Xuất Excel
-        </button>
-      </div>
+      
 
       <table className="import-table stock-table">
         <thead>
@@ -149,7 +91,7 @@ const StockTable = ({ data }) => {
               <tr key={book.title}>
                 <td>{idx + 1}</td>
                 <td>{book.title}</td>
-                <td>{book.category || "-"}</td>
+                <td>{typeof book.category === "object" && book.category !== null ? book.category.name : (book.category || "-")}</td>
                 <td className={book.stock <= 3 ? "stock-low" : undefined}>{book.stock}</td>
                 <td>{book.value.toLocaleString("vi-VN")}</td>
               </tr>
@@ -188,7 +130,7 @@ const StockTable = ({ data }) => {
               <tr key={book.title}>
                 <td>{idx + 1}</td>
                 <td>{book.title}</td>
-                <td>{book.category || "-"}</td>
+                <td>{typeof book.category === "object" && book.category !== null ? book.category.name : (book.category || "-")}</td>
                 <td>{book.stock}</td>
                 <td>{book.value.toLocaleString("vi-VN")}</td>
               </tr>
