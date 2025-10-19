@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext.jsx';
 import LoginPage from './pages/auth/LoginPage';
 import AdminPanel from './pages/panel/AdminPanel.jsx';
-import SalesPanel from './pages/panel/SalesPanel.jsx';
 import InventoryPanel from './pages/panel/InventoryPanel.jsx';
 import HomePage from './pages/home/HomePage';
 import BooksPage from './pages/books/BooksPage';
@@ -11,19 +10,21 @@ import BookDetailPage from './pages/book-detail/BookDetailPage';
 import CartPage from './pages/cart/CartPage.jsx';
 import CheckoutPage from './pages/checkout/CheckoutPage.jsx';
 import OrderSuccessPage from './pages/order-success/OrderSuccessPage.jsx';
-import ZaloPayResultPage from './pages/ZaloPayResultPage';
 import AboutPage from './pages/about/AboutPage';
-import RegisterForm from './components/auth/RegisterForm';
 import ProfilePage from './pages/profile/ProfilePage.jsx';
 import MyOrdersPage from './pages/my-orders/MyOrdersPage.jsx';
 import OrderManagementPanel from './pages/panel/OrderManagerPanel.jsx';
 import ShipperPanel from './pages/panel/ShipperPanel.jsx';
-import AccountManagementPage from './pages/account-management/AccountManagementPage';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   console.log("Protected route check:", { user, requiredRole });
+
+  // Chờ auth khởi tạo xong để tránh redirect oan khi reload
+  if (loading) {
+    return null; // hoặc spinner nhẹ nếu muốn
+  }
 
   if (!user) {
     console.log("No user, redirecting to login");
@@ -45,23 +46,34 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   return children;
 };
 
+const HomeRoute = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && user && user.role_id !== 4) {
+      const redirectPath = user.role_id === 1 ? '/admin' :
+        user.role_id === 2 ? '/sales' :
+        user.role_id === 3 ? '/inventory' :
+        user.role_id === 5 ? '/order-manager' :
+        user.role_id === 6 ? '/shipper' : '/';
+      
+      if (redirectPath !== '/') {
+        navigate(redirectPath, { replace: true });
+      }
+    }
+  }, [user, loading, navigate]);
+
+  return <HomePage />;
+};
+
 function App() {
-  const { user } = useAuth();
-  console.log("App rendering, current user:", user);
-
-
+  const { user, loading } = useAuth();
+  console.log("App rendering, current user:", user, "loading:", loading);
 
   return (
     <Routes>
-      <Route path="/" element={
-        !user || user.role_id === 4 ? <HomePage /> :
-        <Navigate to={`/${user.role_id === 1 ? 'admin' :
-          user.role_id === 2 ? 'sales' :
-            user.role_id === 3 ? 'inventory' :
-              user.role_id === 5 ? 'order-manager' :
-                user.role_id === 6 ? 'shipper' : ''
-          }`} replace />
-      } />
+      <Route path="/" element={<HomeRoute />} />
 
       <Route path="/books" element={<BooksPage />} />
       <Route path="/book/:id" element={<BookDetailPage />} />
@@ -81,8 +93,6 @@ function App() {
       <Route path="/account" element={<ProfilePage />} />
 
       <Route path="/my-orders" element={<MyOrdersPage />} />
-
-      <Route path="/sales/*" element={<ProtectedRoute requiredRole={2}><SalesPanel /></ProtectedRoute>} />
       <Route path="/inventory/*" element={<ProtectedRoute requiredRole={3}><InventoryPanel /></ProtectedRoute>} />
       <Route path="/admin/*" element={<ProtectedRoute requiredRole={1}><AdminPanel /></ProtectedRoute>} />
       <Route path="/order-manager/*" element={<ProtectedRoute requiredRole={5}><OrderManagementPanel /></ProtectedRoute>} />
