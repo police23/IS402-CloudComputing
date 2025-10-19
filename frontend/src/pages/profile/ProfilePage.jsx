@@ -7,6 +7,7 @@ import PublicHeader from '../../components/common/PublicHeader.jsx';
 import { faEdit, faCheck, faTimes, faKey, faSpinner, faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import PasswordChange from "./PasswordChange.jsx";
+import AddressManagement from "./AddressManagement.jsx";
 
 const ProfilePage = () => {
   const { user } = useAuth();
@@ -14,6 +15,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("info");
   const [profileData, setProfileData] = useState({
     full_name: "",
     email: "",
@@ -287,6 +289,24 @@ const ProfilePage = () => {
       
       <div className="profile-card">
         {!showPasswordChange && (
+          <div className="tabs-container">
+            <button
+              className={`tab-button ${activeTab === "info" ? "active" : ""}`}
+              onClick={() => setActiveTab("info")}
+            >
+              Thông tin
+            </button>
+            <button
+              className={`tab-button ${activeTab === "address" ? "active" : ""}`}
+              onClick={() => setActiveTab("address")}
+            >
+              Địa chỉ
+            </button>
+          </div>
+        )}
+        {activeTab === "info" && (
+          <>
+            {!showPasswordChange && (
           <div className="profile-avatar-section" style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: 18}}>
             <div className="profile-avatar">
               {profileData.full_name ? profileData.full_name.charAt(0).toUpperCase() : "U"}
@@ -426,6 +446,14 @@ const ProfilePage = () => {
             }}
             onCancel={() => setShowPasswordChange(false)}
           />
+        )}
+          </>
+        )}
+        {activeTab === "address" && (
+          <AddressManagement onNotification={(message, type) => {
+            setNotification({ message, type });
+            setTimeout(() => setNotification({ message: "", type: "" }), 5000);
+          }} />
         )}
       </div>
       </div>

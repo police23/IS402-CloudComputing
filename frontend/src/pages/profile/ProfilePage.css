@@ -85,7 +85,7 @@ html, body, #root {
 
 .profile-header {
   width: 100%;
-  max-width: 700px;
+  max-width: 1000px;
   margin: 36px auto 18px auto;
   display: flex;
   justify-content: space-between;
@@ -105,7 +105,7 @@ html, body, #root {
 
 .profile-card {
   width: 100%;
-  max-width: 700px;
+  max-width: 1000px;
   background: #fff;
   border-radius: 22px;
   box-shadow: 0 4px 24px rgba(110,198,198,0.10);
@@ -168,9 +168,9 @@ html, body, #root {
 
 /* Make each info field one row, bigger font */
 .profile-form-columns {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px 48px;
   width: 100%;
   margin-bottom: 32px;
 }
@@ -181,10 +181,10 @@ html, body, #root {
 
 .form-row {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 32px;
-  margin-bottom: 18px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 0;
   width: 100%;
 }
 
@@ -192,13 +192,13 @@ html, body, #root {
   color: #095e5a;
   font-size: 1.45rem !important;
   font-weight: 700;
-  min-width: 160px;
-  max-width: 220px;
+  min-width: auto;
+  max-width: none;
   text-align: left;
   margin-bottom: 0;
   margin-right: 0;
   padding-left: 0;
-  margin-left: -18px;
+  margin-left: 0;
 }
 
 .form-row span,
@@ -216,7 +216,7 @@ html, body, #root {
   transition: all 0.3s ease;
   color: #222;
   font-weight: 500;
-  margin-left: 0px;
+  margin-left: 0;
 }
 
 .form-row textarea,
@@ -234,7 +234,7 @@ html, body, #root {
   transition: all 0.3s ease;
   color: #222;
   font-weight: 500;
-  margin-left: -8px;
+  margin-left: 0;
 }
 
 .form-row span {
@@ -281,6 +281,40 @@ html, body, #root {
   transform: translateY(-1px);
 }
 
+/* Tab Navigation Styles */
+.tabs-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e8f4f8;
+  padding-bottom: 0;
+  width: 100%;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 16px 24px;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+.tab-button:hover {
+  color: #095e5a;
+}
+
+.tab-button.active {
+  color: #095e5a;
+  border-bottom-color: #095e5a;
+  font-weight: 600;
+}
+
 @media (max-width: 1200px) {
   .profile-card, .profile-header {
     max-width: 98vw;
@@ -305,23 +339,23 @@ html, body, #root {
   .form-row {
     flex-direction: column;
     align-items: stretch;
-    gap: 0;
-    margin-bottom: 18px;
+    gap: 8px;
+    margin-bottom: 0;
   }
   .form-row label {
     min-width: unset;
     max-width: unset;
     text-align: left;
-    margin-bottom: 8px;
+    margin-bottom: 0;
     padding-left: 0;
-    margin-left: -8px;
+    margin-left: 0;
   }
   .form-row span,
   .form-row input, 
   .form-row textarea,
   .form-row select {
     padding-left: 6px;
-    margin-left: -4px;
+    margin-left: 0;
   }
 }
 @media (max-width: 600px) {
