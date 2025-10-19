@@ -47,16 +47,31 @@ const BookForm = ({ book, onSubmit, onClose }) => {
         ...prev,
         title: book.title || "",
         author: book.author || "",
-        publisher_id: book.publisher_id || "",
-        category_id: book.category_id || "",
+        // ensure select receives a string value
+        publisher_id: book.publisher_id != null ? String(book.publisher_id) : "",
+        category_id: book.category_id != null ? String(book.category_id) : "",
         description: book.description || "",
-        publicationYear: book.publicationYear || "",
+        // backend uses publication_year
+        publicationYear: (book.publication_year ?? book.publicationYear ?? "").toString(),
         price: book.price !== undefined && book.price !== null ? String(book.price) : "",
-        stock: book.stock !== undefined && book.stock !== null ? String(book.stock) : "",
+        // backend uses quantity_in_stock
+        stock: book.quantity_in_stock !== undefined && book.quantity_in_stock !== null
+          ? String(book.quantity_in_stock)
+          : "",
         images: [], // reset khi edit
       }));
-      // Nếu có nhiều ảnh, set preview là mảng
-      if (book.imageUrls && Array.isArray(book.imageUrls)) {
+      // Load ảnh có sẵn từ quan hệ images [{ id, image_path }]
+      if (Array.isArray(book.images) && book.images.length > 0) {
+        const toAbsolute = (p) => {
+          if (!p) return '';
+          // if already absolute
+          if (p.startsWith('http://') || p.startsWith('https://')) return p;
+          // server serves uploads at /uploads
+          return `http://localhost:5000${p.startsWith('/') ? p : `/${p}`}`;
+        };
+        setImagePreview(book.images.map(img => toAbsolute(img.image_path)));
+      } else if (book.imageUrls && Array.isArray(book.imageUrls)) {
+        // fallback for legacy prop
         setImagePreview(book.imageUrls.map(url => url.startsWith('http') ? url : `http://localhost:5000${url}`));
       } else if (book.imageUrl) {
         setImagePreview([book.imageUrl.startsWith('http') ? book.imageUrl : `http://localhost:5000${book.imageUrl}`]);

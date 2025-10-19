@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './BookDetailPage.css';
 import PublicHeader from '../../components/common/PublicHeader';
-import { getBookById } from '../../services/BookService';
+import { getBookById, getAllBooksPricing, getBooksByCategory } from '../../services/BookService';
 import { addToCart } from '../../services/CartService';
 import { useAuth } from '../../contexts/AuthContext';
 import { rateBook, getRatingsByBookID, hasPurchasedBook } from '../../services/RatingService';
@@ -24,6 +24,7 @@ function BookDetailPage() {
   const [myComment, setMyComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [canRate, setCanRate] = useState(false);
+  const [relatedBooks, setRelatedBooks] = useState([]);
 
   // Debug info
   console.log('BookDetailPage render - book state:', book);
@@ -50,8 +51,26 @@ function BookDetailPage() {
         const bookFromState = location.state?.book;
         if (bookFromState && bookFromState.id === Number(id)) {
           console.log('Using book data from state:', bookFromState);
+          let mergedFromState = bookFromState;
+          try {
+            if (mergedFromState.original_price == null || mergedFromState.discounted_price == null) {
+              const pricingRows = await getAllBooksPricing();
+              const pv = pricingRows.find(r => r.id === Number(id));
+              if (pv) {
+                mergedFromState = {
+                  ...mergedFromState,
+                  original_price: pv.original_price ?? mergedFromState.price,
+                  discounted_price: pv.discounted_price ?? null,
+                  category_name: pv.category_name ?? mergedFromState.category?.name ?? mergedFromState.category,
+                  publisher_name: pv.publisher_name ?? mergedFromState.publisher?.name ?? mergedFromState.publisher,
+                };
+              }
+            }
+          } catch (e) {
+            console.warn('Failed to enrich from pricing view (state path):', e);
+          }
           if (isMounted) {
-            setBook(bookFromState);
+            setBook(mergedFromState);
             setLoading(false);
           }
           return;
@@ -61,12 +80,28 @@ function BookDetailPage() {
         console.log('Fetching book data from API for id:', id);
         const data = await getBookById(id);
         console.log('Book data from API:', data);
+        let merged = data;
+        try {
+          const pricingRows = await getAllBooksPricing();
+          const pv = pricingRows.find(r => r.id === Number(id));
+          if (pv) {
+            merged = {
+              ...data,
+              original_price: pv.original_price ?? data.price,
+              discounted_price: pv.discounted_price ?? null,
+              category_name: pv.category_name ?? data.category?.name ?? data.category,
+              publisher_name: pv.publisher_name ?? data.publisher?.name ?? data.publisher,
+            };
+          }
+        } catch (e) {
+          console.warn('Failed to enrich from pricing view (API path):', e);
+        }
         
         if (isMounted) {
-          if (data && data.id) {
-            setBook(data);
+          if (merged && merged.id) {
+            setBook(merged);
           } else {
-            console.error('No valid book data received:', data);
+            console.error('No valid book data received:', merged);
             setError('Không tìm thấy thông tin sách');
           }
           setLoading(false);
@@ -121,10 +156,36 @@ function BookDetailPage() {
     checkCanRate();
   }, [user, id]);
 
-  // Tính toán giá sau giảm (chỉ khi book đã load)
-  const discountedPrice = book && typeof book.price !== 'undefined' ? Number(book.price) : 0;
-  const originalPrice = book && typeof book.originalPrice !== 'undefined' ? Number(book.originalPrice) : 0;
+  // Lấy sách liên quan cùng thể loại
+  useEffect(() => {
+    const fetchRelatedBooks = async () => {
+      if (!book || !book.category_id && !book.category) {
+        setRelatedBooks([]);
+        return;
+      }
+      try {
+        const categoryId = book.category_id || (book.category && typeof book.category === 'object' ? book.category.id : null);
+        if (!categoryId) {
+          setRelatedBooks([]);
+          return;
+        }
+        const related = await getBooksByCategory(categoryId, id, 6);
+        setRelatedBooks(related);
+      } catch (error) {
+        console.error('Error fetching related books:', error);
+        setRelatedBooks([]);
+      }
+    };
+    fetchRelatedBooks();
+  }, [book, id]);
+
+  // Tính toán giá gốc và giá sau giảm từ dữ liệu view nếu có
+  const originalPrice = book ? Number(book.original_price ?? book.price ?? 0) : 0;
+  const discountedPrice = book && book.discounted_price != null ? Number(book.discounted_price) : originalPrice;
   const savings = (originalPrice && discountedPrice) ? (originalPrice - discountedPrice) : 0;
+  const discountPercent = originalPrice > 0 && discountedPrice < originalPrice
+    ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+    : 0;
 
   // Xử lý thay đổi số lượng
   const handleQuantityChange = (newQuantity) => {
@@ -158,6 +219,28 @@ function BookDetailPage() {
     }
   };
 
+  // Xử lý thêm sách liên quan vào giỏ hàng
+  const handleAddToCartRelated = async (relatedBook) => {
+    if (!user) {
+      alert('Vui lòng đăng nhập để thêm sách vào giỏ hàng');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await addToCart(relatedBook.id, 1);
+      if (response.success) {
+        alert(`Đã thêm "${relatedBook.title || relatedBook.name}" vào giỏ hàng!`);
+        await loadCartCount();
+      } else {
+        alert(response.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng');
+      }
+    } catch (error) {
+      console.error('Error adding related book to cart:', error);
+      alert('Có lỗi xảy ra: ' + error.message);
+    }
+  };
+
   // Xử lý mua ngay
   const handleBuyNow = async () => {
     if (!book) return;
@@ -174,10 +257,10 @@ function BookDetailPage() {
           bookId: book.id,
           title: book.title,
           author: book.author,
-          price: book.price,
-          originalPrice: book.originalPrice || book.price,
-          discount: book.originalPrice ? Math.round(((book.originalPrice - book.price) / book.originalPrice) * 100) : 0,
-          image_path: book.imageUrls && book.imageUrls[0],
+          price: discountedPrice,
+          originalPrice: originalPrice,
+          discount: discountPercent,
+          image_path: (book.images && book.images[0]?.image_path) || (book.imageUrls && book.imageUrls[0]),
           quantity: quantity,
           stock: book.stock || book.quantity_in_stock || 0
         }
@@ -356,7 +439,6 @@ function BookDetailPage() {
           {/* Thông tin sách */}
           <div className="book-info">
             <h1 className="book-title">{book.title || book.name || 'Không rõ'}</h1>
-            <p className="book-author">Tác giả: {book.author || 'Không rõ'}</p>
             {/* Đánh giá */}
             <div className="book-rating">
               <div className="stars">
@@ -374,7 +456,7 @@ function BookDetailPage() {
               {originalPrice > discountedPrice && (
                 <>
                   <span className="original-price">{originalPrice.toLocaleString('vi-VN', { maximumFractionDigits: 0 })}đ</span>
-                  {book.discount && <span className="discount">-{book.discount}%</span>}
+                  {discountPercent > 0 && <span className="discount">-{discountPercent}%</span>}
                 </>
               )}
             </div>
@@ -382,19 +464,19 @@ function BookDetailPage() {
             <div className="book-meta">
               <div className="meta-item">
                 <span className="label">Thể loại:</span>
-                <span className="value">{(book.category && typeof book.category === 'object') ? book.category.name : (book.category || 'Không rõ')}</span>
+                <span className="value">{(book.category && typeof book.category === 'object') ? book.category.name : (book.category_name || book.category || 'Không rõ')}</span>
               </div>
               <div className="meta-item">
                 <span className="label">Nhà xuất bản:</span>
-                <span className="value">{(book.publisher && typeof book.publisher === 'object') ? book.publisher.name : (book.publisher || 'Không rõ')}</span>
+                <span className="value">{(book.publisher && typeof book.publisher === 'object') ? book.publisher.name : (book.publisher_name || book.publisher || 'Không rõ')}</span>
               </div>
               <div className="meta-item">
                 <span className="label">Năm xuất bản:</span>
-                <span className="value">{book.publicationYear || 'Không rõ'}</span>
+                <span className="value">{book.publication_year || book.publicationYear || 'Không rõ'}</span>
               </div>
               <div className="meta-item">
-                <span className="label">Tồn kho:</span>
-                <span className="value">{book.stock || book.quantity_in_stock || 0} cuốn</span>
+                <span className="label">Tác giả:</span>
+                <span className="value">{(book.author && typeof book.author === 'object') ? book.author.name : (book.author_name || book.author || 'Không rõ')}</span>
               </div>
             </div>
             {/* Tình trạng kho */}
@@ -452,11 +534,7 @@ function BookDetailPage() {
               </div>
               <div className="delivery-item">
                 <span className="icon">🔄</span>
-                <span>Đổi trả trong 30 ngày</span>
-              </div>
-              <div className="delivery-item">
-                <span className="icon">🛡️</span>
-                <span>Bảo hành chính hãng</span>
+                <span>Đổi trả trong 7 ngày</span>
               </div>
             </div>
           </div>
@@ -582,9 +660,48 @@ function BookDetailPage() {
             {activeTab === 'related' && (
               <div className="related-content">
                 <div className="related-books">
-                  <div className="no-related">
-                    <p>Chưa có sách liên quan.</p>
-                  </div>
+                  {relatedBooks && relatedBooks.length > 0 ? (
+                    <div className="related-books-grid">
+                      {relatedBooks.map(relatedBook => (
+                        <div key={relatedBook.id} className="related-book-card">
+                          <div className="related-book-image">
+                            <img
+                              src={getBookImageUrl(relatedBook) || '/assets/book-placeholder.jpg'}
+                              alt={relatedBook.title || relatedBook.name}
+                              onClick={() => navigate(`/book/${relatedBook.id}`, { state: { book: relatedBook } })}
+                              style={{ cursor: 'pointer' }}
+                            />
+                          </div>
+                          <h4 
+                            className="related-book-title"
+                            onClick={() => navigate(`/book/${relatedBook.id}`, { state: { book: relatedBook } })}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            {relatedBook.title || relatedBook.name}
+                          </h4>
+                          <p className="related-book-author">
+                            {relatedBook.author && typeof relatedBook.author === 'object' 
+                              ? relatedBook.author.name 
+                              : (relatedBook.author_name || relatedBook.author || 'Không rõ')}
+                          </p>
+                          <p className="related-book-price">
+                            {Number(relatedBook.price || 0).toLocaleString('vi-VN', { maximumFractionDigits: 0 })}đ
+                          </p>
+                          <button 
+                            className="btn-add-cart"
+                            onClick={() => handleAddToCartRelated(relatedBook)}
+                            style={{ width: '100%', marginTop: 8 }}
+                          >
+                            Thêm vào giỏ
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="no-related">
+                      <p>Chưa có sách liên quan cùng thể loại.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

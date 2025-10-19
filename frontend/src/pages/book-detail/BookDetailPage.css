@@ -666,6 +666,91 @@
   font-style: italic;
 }
 
+/* Sách liên quan */
+.related-content {
+  padding: 16px 0;
+}
+
+.related-books {
+  width: 100%;
+}
+
+.related-books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+.related-book-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+.related-book-card:hover {
+  box-shadow: 0 4px 12px rgba(110, 198, 198, 0.15);
+  transform: translateY(-4px);
+}
+
+.related-book-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.related-book-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.related-book-card:hover .related-book-image img {
+  transform: scale(1.05);
+}
+
+.related-book-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a365d;
+  margin: 8px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 32px;
+}
+
+.related-book-author {
+  font-size: 12px;
+  color: #718096;
+  margin: 6px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.related-book-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #6ec6c6;
+  margin: 8px 0;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .book-detail-main {
@@ -716,8 +801,8 @@
     width: 100%;
   }
   
-  .related-books {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  .related-books-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 16px;
   }
 }

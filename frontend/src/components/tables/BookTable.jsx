@@ -56,7 +56,8 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
   // Define fetchBooks function to load books from backend:
   const fetchBooks = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/books");
+      // Ask backend to return view data with discounted_price
+      const response = await fetch("http://localhost:5000/api/books?useView=1");
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch books: ${response.status}`);
@@ -150,18 +151,18 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
           if (!isNaN(simpleSearch.value)) {
             return book.category_id === parseInt(simpleSearch.value);
           }
-          const categoryName = book.category?.name || book.category || "";
+          const categoryName = book.category?.name || book.category_name || book.category || "";
           return categoryName.toLowerCase().includes(searchValue);
         case "publisher":
           // For publisher, match by publisher_id if it's a number, otherwise by name
           if (!isNaN(simpleSearch.value)) {
             return book.publisher_id === parseInt(simpleSearch.value);
           }
-          const publisherName = book.publisher?.name || book.publisher || "";
+          const publisherName = book.publisher?.name || book.publisher_name || book.publisher || "";
           return publisherName.toLowerCase().includes(searchValue);
         case "all":
-          const categoryNameAll = book.category?.name || book.category || "";
-          const publisherNameAll = book.publisher?.name || book.publisher || "";
+          const categoryNameAll = book.category?.name || book.category_name || book.category || "";
+          const publisherNameAll = book.publisher?.name || book.publisher_name || book.publisher || "";
           return book.title.toLowerCase().includes(searchValue) ||
                  book.author.toLowerCase().includes(searchValue) ||
                  categoryNameAll.toLowerCase().includes(searchValue) ||
@@ -186,7 +187,7 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
       // Handle price range with better validation
       let matchesPrice = true;
       if (advancedSearch.priceRange.min || advancedSearch.priceRange.max) {
-        const bookPrice = parseFloat(book.price);
+        const bookPrice = parseFloat(book.original_price ?? book.price);
         const minPrice = advancedSearch.priceRange.min ? parseFloat(advancedSearch.priceRange.min) : 0;
         const maxPrice = advancedSearch.priceRange.max ? parseFloat(advancedSearch.priceRange.max) : Infinity;
         matchesPrice = bookPrice >= minPrice && bookPrice <= maxPrice;
@@ -230,9 +231,20 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
     setShowForm(true);
   };
 
-  const handleEditBook = (book) => {
-    setSelectedBook(book);
-    setShowForm(true);
+  const handleEditBook = async (book) => {
+    try {
+      const id = book?.id ?? book;
+      const resp = await fetch(`http://localhost:5000/api/books/${id}`);
+      if (!resp.ok) throw new Error(`Failed to load book ${id}`);
+      const payload = await resp.json();
+      const fullBook = payload?.data ?? payload;
+      setSelectedBook(fullBook);
+      setShowForm(true);
+    } catch (err) {
+      console.error("Error loading book for edit:", err);
+      setNotification({ message: "Không tải được dữ liệu sách để sửa.", type: "error" });
+      setTimeout(() => setNotification({ message: "", type: "" }), 5000);
+    }
   };
 
   const handleDeleteBooks = () => {
@@ -646,11 +658,21 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
           <button
             className="btn btn-detail"
             disabled={selectedRows.length !== 1}
-            onClick={() => {
+            onClick={async () => {
               if (selectedRows.length === 1) {
                 const book = books.find((b) => b.id === selectedRows[0]);
-                setSelectedBook(book);
-                setShowDetails(true);
+                try {
+                  const resp = await fetch(`http://localhost:5000/api/books/${book.id}`);
+                  if (!resp.ok) throw new Error(`Failed to load book ${book.id}`);
+                  const payload = await resp.json();
+                  const fullBook = payload?.data ?? payload;
+                  setSelectedBook(fullBook);
+                  setShowDetails(true);
+                } catch (err) {
+                  console.error("Error loading book details:", err);
+                  setNotification({ message: "Không tải được chi tiết sách.", type: "error" });
+                  setTimeout(() => setNotification({ message: "", type: "" }), 5000);
+                }
               }
             }}
           >
@@ -677,6 +699,7 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
               <th>Nhà xuất bản</th>
               <th>Năm xuất bản</th>
               <th>Giá bán</th>
+              <th>Giá KM</th>
               <th>Tồn kho</th>
               <th>Trạng thái</th>
             </tr>
@@ -696,10 +719,15 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
                 </td>
                 <td>{book.title}</td>
                 <td>{book.author}</td>
-                <td>{book.category?.name || book.category || "-"}</td>
-                <td>{book.publisher?.name || book.publisher || "-"}</td>
+                <td>{book.category?.name || book.category_name || book.category || "-"}</td>
+                <td>{book.publisher?.name || book.publisher_name || book.publisher || "-"}</td>
                 <td>{book.publication_year || book.publicationYear || "-"}</td>
-                <td>{formatCurrency(book.price)}</td>
+                <td>{formatCurrency(book.original_price ?? book.price)}</td>
+                <td>
+                  {book.discounted_price == null
+                    ? "-"
+                    : formatCurrency(book.discounted_price)}
+                </td>
                 <td>{book.quantity_in_stock ?? book.stock ?? 0}</td>
                 <td>
                   <span className={`status-badge status-${(book.quantity_in_stock ?? book.stock ?? 0) > 0 ? "active" : "out"}`}>
@@ -711,7 +739,7 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
 
             {currentRecords.length === 0 && (
               <tr>
-                <td colSpan="9" style={{ textAlign: "center", padding: "20px" }}>
+                <td colSpan="10" style={{ textAlign: "center", padding: "20px" }}>
                   Không có dữ liệu
                 </td>
               </tr>

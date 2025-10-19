@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './BooksPage.css';
 import PublicHeader from '../../components/common/PublicHeader';
-import { getAllBooks } from '../../services/BookService';
+import { getAllBooks, getAllBooksPricing } from '../../services/BookService';
 import { addToCart } from '../../services/CartService';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -31,16 +31,35 @@ function BooksPage() {
 
   // Lấy sách từ API khi component mount
   useEffect(() => {
-    setLoading(true);
-    getAllBooks()
-      .then(data => {
-        setBooks(data);
+    const loadBooks = async () => {
+      setLoading(true);
+      try {
+        const [baseBooks, pricingRows] = await Promise.all([
+          getAllBooks(),
+          getAllBooksPricing(),
+        ]);
+        // Index pricing by id for quick merge
+        const priceById = new Map(pricingRows.map(r => [r.id, r]));
+        const merged = baseBooks.map(b => {
+          const pv = priceById.get(b.id);
+          if (!pv) return b;
+          return {
+            ...b,
+            original_price: pv.original_price ?? b.price,
+            discounted_price: pv.discounted_price ?? null,
+            // keep names for any UI use
+            category_name: pv.category_name ?? b.category?.name ?? b.category,
+            publisher_name: pv.publisher_name ?? b.publisher?.name ?? b.publisher,
+          };
+        });
+        setBooks(merged);
         setLoading(false);
-      })
-      .catch(err => {
+      } catch (err) {
         setError('Lỗi khi tải sách');
         setLoading(false);
-      });
+      }
+    };
+    loadBooks();
   }, []);
 
   // Tìm min/max giá động
@@ -163,17 +182,19 @@ function BooksPage() {
 
   // Lấy danh sách tác giả, thể loại, NXB động từ books
   const authors = Array.from(new Set(books.map(b => b.author))).filter(Boolean);
-  const categories = Array.from(new Set(books.map(b => b.category?.name || b.category))).filter(Boolean);
-  const publishers = Array.from(new Set(books.map(b => b.publisher?.name || b.publisher))).filter(Boolean);
+  const categories = Array.from(new Set(books.map(b => b.category?.name || b.category_name || b.category))).filter(Boolean);
+  const publishers = Array.from(new Set(books.map(b => b.publisher?.name || b.publisher_name || b.publisher))).filter(Boolean);
 
   // Lọc sách theo từng tiêu chí
   const filteredBooks = books.filter(book => {
     const matchName = name === '' || (book.title || book.name || '').toLowerCase().includes(name.toLowerCase());
     const matchAuthor = selectedAuthors.length === 0 || selectedAuthors.includes(book.author);
-    const matchCategory = selectedCategories.length === 0 || selectedCategories.includes(book.category?.name || book.category);
-    const matchPublisher = selectedPublishers.length === 0 || selectedPublishers.includes(book.publisher?.name || book.publisher);
+    const matchCategory = selectedCategories.length === 0 || selectedCategories.includes(book.category?.name || book.category_name || book.category);
+    const matchPublisher = selectedPublishers.length === 0 || selectedPublishers.includes(book.publisher?.name || book.publisher_name || book.publisher);
     const matchYear = selectedYears.length === 0 || selectedYears.includes(book.publication_year || book.publicationYear);
-    const matchPrice = book.price >= priceRange[0] && book.price <= priceRange[1];
+    // Lọc theo giá KM (nếu có), nếu không thì dùng giá gốc
+    const displayPrice = book.discounted_price != null ? Number(book.discounted_price) : Number(book.original_price ?? book.price ?? 0);
+    const matchPrice = displayPrice >= priceRange[0] && displayPrice <= priceRange[1];
     return matchName && matchAuthor && matchCategory && matchPublisher && matchYear && matchPrice;
   });
 
@@ -453,7 +474,14 @@ function BooksPage() {
                   <img src={getBookImageUrl(book)} alt={book.title || book.name} />
                   <div className="book-info">
                     <h3>{book.title || book.name}</h3>
-                    <p className="book-price">{book.price?.toLocaleString('vi-VN', { maximumFractionDigits: 0 })} VNĐ</p>
+                    {book.discounted_price != null ? (
+                      <div className="book-price-wrap">
+                        <span className="book-price-discount">{Number(book.discounted_price).toLocaleString('vi-VN', { maximumFractionDigits: 0 })} VNĐ</span>
+                        <span className="book-price-original">{Number(book.original_price ?? book.price).toLocaleString('vi-VN', { maximumFractionDigits: 0 })} VNĐ</span>
+                      </div>
+                    ) : (
+                      <p className="book-price">{Number(book.original_price ?? book.price).toLocaleString('vi-VN', { maximumFractionDigits: 0 })} VNĐ</p>
+                    )}
                   </div>
                 </div>
                 <div className="book-actions">
