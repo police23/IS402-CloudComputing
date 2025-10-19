@@ -126,12 +126,6 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
       
-      <Route path="/invoices" element={
-        <ProtectedRoute isAllowed={!!user && hasPermission('/invoices')}>
-          {getDashboardComponent()}
-        </ProtectedRoute>
-      } />
-      
       <Route path="/promotions" element={
         <ProtectedRoute isAllowed={!!user && hasPermission('/promotions')}>
           {getDashboardComponent()}
