@@ -367,30 +367,61 @@
   gap: 12px;
   max-height: 300px;
   overflow-y: auto;
+  align-items: stretch; /* ensure children stretch to full width */
+}
+
+/* Subtle custom scrollbar for the list */
+.order-items-list::-webkit-scrollbar {
+  width: 8px;
+}
+.order-items-list::-webkit-scrollbar-track {
+  background: #f0f9f9;
+  border-radius: 8px;
+}
+.order-items-list::-webkit-scrollbar-thumb {
+  background: #cdeeee;
+  border-radius: 8px;
+}
+.order-items-list::-webkit-scrollbar-thumb:hover {
+  background: #b9e5e5;
 }
 
 .order-item {
   display: grid;
-  grid-template-columns: 60px 1fr auto auto;
-  gap: 12px;
+  grid-template-columns: 60px minmax(0, 1fr) auto auto; /* allow center column to shrink smartly */
+  gap: 14px;
   align-items: center;
-  padding: 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #f8fafc;
+  padding: 14px 16px;
+  border: 1px solid #e6f7f7;
+  border-radius: 12px;
+  background: #f7fcfc;
+  box-shadow: 0 1px 6px rgba(110,198,198,0.08);
+  transition: box-shadow 0.2s, transform 0.12s, border-color 0.2s, background 0.2s;
+  width: 100%;
+  box-sizing: border-box; /* include padding/border in width */
+}
+
+.order-item:hover {
+  background: #f3fbfb;
+  border-color: #cdeeee;
+  box-shadow: 0 4px 14px rgba(110,198,198,0.14);
+  transform: translateY(-2px);
 }
 
 .order-item .item-image img {
   width: 60px !important;
   height: 70px !important;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 8px;
+  border: 2px solid #e6f7f7;
+  background: #fff;
 }
 
 .order-item .item-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  min-width: 0; /* enable text ellipsis */
 }
 
 .order-item .item-title {
@@ -399,6 +430,9 @@
   color: #2d3748;
   margin: 0;
   line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .order-item .item-author {
@@ -410,25 +444,29 @@
 .order-item .item-price {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .order-item .current-price {
-  font-weight: bold;
+  font-weight: 700;
   color: #6ec6c6;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .order-item .original-price {
-  color: #a0aec0;
+  color: #9ca3af;
   text-decoration: line-through;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .order-item .item-quantity {
   font-size: 13px;
   color: #4a5568;
-  font-weight: 500;
+  font-weight: 600;
+  background: #f0f9f9;
+  border: 1px solid #e2e8f0;
+  padding: 6px 10px;
+  border-radius: 999px;
 }
 
 .order-item .item-total {
@@ -436,9 +474,12 @@
 }
 
 .order-item .total-price {
-  font-weight: bold;
+  font-weight: 700;
   color: #6ec6c6;
   font-size: 14px;
+  background: #e6f7f7;
+  padding: 6px 10px;
+  border-radius: 999px;
 }
 
 /* Order Details */
