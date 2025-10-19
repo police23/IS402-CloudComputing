@@ -59,7 +59,7 @@
   opacity: 0.7;
 }
 
-.account-form input,
+.account-form input:not([type="checkbox"]):not([type="radio"]),
 .account-form select,
 .account-form textarea {
   width: 100%;
@@ -144,11 +144,29 @@
 .book-item {
   display: flex;
   align-items: center;
-  margin-bottom: 2px;
+  margin-bottom: 6px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.book-item:hover {
+  background-color: #f0f0f0;
+  border-radius: 4px;
 }
 
 .book-checkbox {
-  margin-right: 8px;
+  margin-right: 10px;
+  width: 16px !important;
+  height: 16px;
+  padding: 0 !important;
+  border: 1px solid #ccc !important;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.book-item span {
+  flex: 1;
+  line-height: 1.4;
 }
 
 .used-quantity-input {
@@ -162,11 +180,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  /* background-color: transparent; */ /* Bạn có thể sửa thành 'transparent' hoặc xóa hẳn dòng này */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  border: none;
+  outline: none;
 }
 
 .promotion-modal-content {
@@ -176,10 +196,12 @@
   min-height: 200px;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  border: none;
+  outline: none;
 }
 
 .promotion-modal-header {

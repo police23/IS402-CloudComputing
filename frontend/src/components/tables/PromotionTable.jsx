@@ -50,7 +50,7 @@ const getPromotionStatus = (start, end) => {
 };
 
 const PromotionTable = () => {
-  const [promotions, setPromotions] = useState([]); // Xóa dữ liệu mẫu và khởi tạo mảng rỗng
+  const [promotions, setPromotions] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [selectedPromotion, setSelectedPromotion] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -73,7 +73,6 @@ const PromotionTable = () => {
   const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
   // Advanced search state
   const [advancedSearch, setAdvancedSearch] = useState({
-    code: "",
     name: "",
     type: "",
     dateRange: { startDate: "", endDate: "" },
@@ -81,28 +80,20 @@ const PromotionTable = () => {
   });
   const fetchPromotions = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/promotions");
+  const response = await fetch("http://localhost:5000/api/promotions");
       if (response.ok) {
         const rawData = await response.json();
         // Đảm bảo chuyển đổi đúng tên trường từ backend sang frontend
-        const transformedData = rawData.map(p => {
-          // Tính toán trạng thái dựa trên ngày bắt đầu và kết thúc
-          const status = p.status || getPromotionStatus(p.start_date, p.end_date);
-          
-          return {
-            id: p.id,
-            code: p.promotion_code || '',
-            name: p.name || '',
-            type: p.type || 'fixed',
-            discount: p.discount || 0,
-            startDate: p.start_date || '',
-            endDate: p.end_date || '',
-            minPrice: p.min_price || 0,
-            quantity: p.quantity,
-            usedQuantity: p.used_quantity || 0,
-            status: status
-          };
-        });
+        const transformedData = rawData.map(p => ({
+          id: p.id,
+          name: p.name || '',
+          type: p.type || 'fixed',
+          discount: p.discount || 0,
+          startDate: p.start_date || '',
+          endDate: p.end_date || '',
+          status: getPromotionStatus(p.start_date, p.end_date),
+          books: p.books || [],
+        }));
         setPromotions(transformedData);
       } else {
         // Handle failed response silently
@@ -118,10 +109,9 @@ const PromotionTable = () => {
   }, []);
 
   const filteredPromotions = promotions.filter((promotion) => {
-    if (activeSearchMode === "advanced") {
+  if (activeSearchMode === "advanced") {
       // Advanced search logic
-      const matchesCode = !advancedSearch.code || 
-        (promotion.code || "").toLowerCase().includes(advancedSearch.code.toLowerCase());
+      const matchesCode = true; // code removed
       const matchesName = !advancedSearch.name || 
         (promotion.name || "").toLowerCase().includes(advancedSearch.name.toLowerCase());
       const matchesType = !advancedSearch.type || 
@@ -142,14 +132,14 @@ const PromotionTable = () => {
           if (promotionStartDate > filterEndDate) matchesStartDateRange = false;
         }
       }
-      return matchesCode && matchesName && matchesType && matchesStatus && matchesStartDateRange;
+      return matchesName && matchesType && matchesStatus && matchesStartDateRange;
     } else {
       // Simple search logic
       if (!simpleSearch.value) return true;
       const searchValue = simpleSearch.value.toLowerCase();
       switch (simpleSearch.field) {
         case "code":
-          return (promotion.code || "").toLowerCase().includes(searchValue);
+          return false; // code removed
         case "name":
           return (promotion.name || "").toLowerCase().includes(searchValue);
         case "type":
@@ -157,8 +147,7 @@ const PromotionTable = () => {
         case "status":
           return promotion.status === searchValue;
         case "all":
-          return (promotion.code || "").toLowerCase().includes(searchValue) ||
-                 (promotion.name || "").toLowerCase().includes(searchValue);
+          return (promotion.name || "").toLowerCase().includes(searchValue);
         default:
           return true;
       }
@@ -284,7 +273,6 @@ const PromotionTable = () => {
     // Reset advanced search when using simple search
     if (field === 'value' && value !== '') {
       setAdvancedSearch({
-        code: "",
         name: "",
         type: "",
         dateRange: { startDate: "", endDate: "" },
@@ -317,7 +305,6 @@ const PromotionTable = () => {
   // Reset all search fields
   const resetSearch = () => {
     setAdvancedSearch({
-      code: "",
       name: "",
       type: "",
       dateRange: { startDate: "", endDate: "" },
@@ -342,7 +329,6 @@ const PromotionTable = () => {
               onChange={(e) => handleSimpleSearchChange("field", e.target.value)}
             >
               
-              <option value="code">Mã KM</option>
               <option value="name">Tên KM</option>
               <option value="type">Loại KM</option>
               <option value="status">Trạng thái</option>
@@ -405,17 +391,6 @@ const PromotionTable = () => {
           {isAdvancedSearchOpen && (
             <div className="advanced-search-panel">
               <div className="search-row">
-                <div className="search-field">
-                  <label htmlFor="promotion-code-search">Mã khuyến mãi</label>
-                  <input
-                    id="promotion-code-search"
-                    type="text"
-                    placeholder="Nhập mã khuyến mãi"
-                    value={advancedSearch.code}
-                    onChange={(e) => handleAdvancedSearchChange("code", e.target.value)}
-                  />
-                </div>
-                
                 <div className="search-field">
                   <label htmlFor="promotion-name-search">Tên khuyến mãi</label>
                   <input
@@ -529,15 +504,11 @@ const PromotionTable = () => {
                   title={areAllItemsSelected ? "Bỏ chọn tất cả" : "Chọn tất cả"}
                 />
               </th>
-              <th>Mã KM</th>
               <th>Tên KM</th>
               <th>Loại KM</th>
               <th>Mức giảm</th>
               <th>Ngày bắt đầu</th>
               <th>Ngày kết thúc</th>
-              <th>Giá tối thiểu</th>
-              <th>Số lượng</th>
-              <th>Đã dùng</th>
               <th>Trạng thái</th>
             </tr>
           </thead>          <tbody>            {currentRecords.map((promotion) => (
@@ -552,15 +523,11 @@ const PromotionTable = () => {
                     onChange={() => toggleRowSelection(promotion.id)}
                   />
                 </td>
-                <td>{promotion.code || ''}</td>
                 <td>{promotion.name || ''}</td>
                 <td>{promotion.type === 'percent' ? 'Phần trăm' : 'Cố định'}</td>
                 <td>{promotion.type === 'percent' ? (promotion.discount + '%') : (Number(promotion.discount || 0).toLocaleString('vi-VN') + ' VNĐ')}</td>
                 <td>{formatDateForVN(promotion.startDate)}</td>
                 <td>{formatDateForVN(promotion.endDate)}</td>
-                <td>{promotion.minPrice ? Number(promotion.minPrice).toLocaleString('vi-VN') + ' VNĐ' : ''}</td>
-                <td>{promotion.quantity !== null && promotion.quantity !== undefined ? promotion.quantity : 'Không giới hạn'}</td>
-                <td>{promotion.usedQuantity !== undefined ? promotion.usedQuantity : 0}</td>
                 <td>
                   <span className={getStatusBadgeClass(promotion.status)}>
                     {getStatusText(promotion.status)}
@@ -571,7 +538,7 @@ const PromotionTable = () => {
 
             {currentRecords.length === 0 && (
               <tr>
-                <td colSpan="11" style={{ textAlign: "center", padding: "20px" }}>
+                <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
                   Không có dữ liệu
                 </td>
               </tr>

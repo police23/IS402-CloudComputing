@@ -7,11 +7,6 @@ const Promotion = sequelize.define('Promotion', {
     autoIncrement: true,
     primaryKey: true,
   },
-  promotion_code: {
-    type: DataTypes.STRING(50),
-    allowNull: false,
-    unique: true,
-  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -31,20 +26,6 @@ const Promotion = sequelize.define('Promotion', {
   end_date: {
     type: DataTypes.DATEONLY,
     allowNull: false,
-  },
-  min_price: {
-    type: DataTypes.DECIMAL(10, 0),
-    allowNull: true,
-    defaultValue: 0,
-  },
-  quantity: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-  },
-  used_quantity: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    defaultValue: 0,
   },
   created_at: {
     type: DataTypes.DATE,

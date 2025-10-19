@@ -14,14 +14,13 @@ const addPromotion = async (req, res) => {
     const result = await promotionService.addPromotion(req.body);
     res.status(201).json({ message: 'Thêm mới khuyến mãi thành công', data: result });
   } catch (error) {
-    res.status(500).json({ error: 'Đã xảy ra lỗi khi thêm mới khuyến mãi' });
+    res.status(error.status || 500).json({ error: error.message || 'Đã xảy ra lỗi khi thêm mới khuyến mãi' });
   }
 };
 
 const getAvailablePromotions = async (req, res) => {
   try {
-    const total_price = req.query.total_price ? parseFloat(req.query.total_price) : 0;
-    const promotions = await promotionService.getAvailablePromotions(total_price);
+    const promotions = await promotionService.getAvailablePromotions();
     res.status(200).json(promotions);
   } catch (error) {
     res.status(500).json({ error: 'Đã xảy ra lỗi khi lấy khuyến mãi khả dụng' });
@@ -34,7 +33,7 @@ const updatePromotion = async (req, res) => {
     const result = await promotionService.updatePromotion(id, req.body);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ error: 'Đã xảy ra lỗi khi cập nhật khuyến mãi' });
+    res.status(error.status || 500).json({ error: error.message || 'Đã xảy ra lỗi khi cập nhật khuyến mãi' });
   }
 };
 
@@ -48,10 +47,25 @@ const deletePromotion = async (req, res) => {
   }
 };
 
+const getAvailableBooks = async (req, res) => {
+  try {
+    const { start_date, end_date, exclude_id } = req.query;
+    const books = await promotionService.getAvailableBooksForRange({
+      startDate: start_date,
+      endDate: end_date,
+      excludePromotionId: exclude_id ? Number(exclude_id) : null,
+    });
+    res.status(200).json(books);
+  } catch (error) {
+    res.status(500).json({ error: 'Đã xảy ra lỗi khi lấy danh sách sách khả dụng' });
+  }
+};
+
 module.exports = {
   getPromotions,
   getAvailablePromotions,
   addPromotion,
   updatePromotion,
   deletePromotion,
+  getAvailableBooks,
 };

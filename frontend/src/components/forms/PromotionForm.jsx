@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faTag, faCalendar, faPercent, faInfoCircle, faMoneyBill } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faTag, faCalendar, faPercent, faMoneyBill } from "@fortawesome/free-solid-svg-icons";
 // Chỉ sử dụng Modals.css để tránh xung đột CSS
 import "../modals/Modals.css";
 import "./PromotionForm.css";
@@ -17,22 +17,15 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
     discount: "",
     startDate: todayStr, 
     endDate: "",
-    minPrice: "",
-    quantity: "",
-    usedQuantity: 0,
   });
 
   const [errors, setErrors] = useState({});
   const [rules, setRules] = useState({});
   const [books, setBooks] = useState([]); // Danh sách tất cả sách
   const [selectedBooks, setSelectedBooks] = useState([]); // Danh sách id sách được chọn
+  const [bookSearch, setBookSearch] = useState("");
 
-  // Xử lý định dạng giá tối thiểu
-  const formatMinPrice = (value) => {
-    if (!value) return "";
-    // Chỉ format khi hiển thị, không format khi setFormData
-    return Number(value).toLocaleString("vi-VN");
-  };
+  // No min price in new schema
 
   // Helper to safely get date string for input type="date"
   // Helper: Trả về đúng chuỗi yyyy-mm-dd từ database, không động chạm gì!
@@ -57,9 +50,7 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
         discount: promotion.discount || "",
         startDate: getDateStr(promotion.startDate || promotion.start_date),
         endDate: getDateStr(promotion.endDate || promotion.end_date),
-        minPrice: promotion.minPrice || promotion.min_price || "",
-        quantity: promotion.quantity !== undefined && promotion.quantity !== null ? promotion.quantity : "",
-        usedQuantity: promotion.usedQuantity || promotion.used_quantity || 0,
+        
       });
       if (promotion.bookIds || promotion.books) {
         setSelectedBooks(promotion.bookIds || (promotion.books ? promotion.books.map(b => b.id) : []));
@@ -85,12 +76,34 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
       .then(data => setRules(data));
   }, []);
 
-  // Fetch danh sách sách
+  // Fetch danh sách sách theo khoảng ngày để loại trừ sách đang nằm trong KM khác trùng ngày
   useEffect(() => {
-    fetch("http://localhost:5000/api/books")
-      .then(res => res.json())
-      .then(data => setBooks(data || []));
-  }, []);
+    const controller = new AbortController();
+    const load = async () => {
+      try {
+        if (!formData.startDate || !formData.endDate) {
+          // Chưa chọn đủ ngày -> không tải danh sách, hiển thị hướng dẫn
+          setBooks([]);
+          setSelectedBooks([]);
+          return;
+        }
+        const params = new URLSearchParams();
+        params.append('start_date', formData.startDate);
+        params.append('end_date', formData.endDate);
+        if (promotion?.id) params.append('exclude_id', String(promotion.id));
+        const url = `http://localhost:5000/api/promotions/available-books?${params.toString()}`;
+        const res = await fetch(url, { signal: controller.signal });
+        const data = res.ok ? await res.json() : [];
+        setBooks(Array.isArray(data) ? data : []);
+        // Loại bỏ các id đã không còn trong danh sách khả dụng
+        setSelectedBooks(prev => prev.filter(id => (Array.isArray(data) ? data : []).some(b => b.id === id)));
+      } catch (e) {
+        if (e.name !== 'AbortError') console.error(e);
+      }
+    };
+    load();
+    return () => controller.abort();
+  }, [formData.startDate, formData.endDate, promotion?.id]);
 
   useEffect(() => {
     if (promotion) {
@@ -100,10 +113,7 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
         discount: promotion.discount || "",
         startDate: (promotion.startDate || promotion.start_date || "").slice(0, 10),
         endDate: (promotion.endDate || promotion.end_date || "").slice(0, 10),
-        // Đảm bảo minPrice là số, không phải chuỗi đã format
-        minPrice: promotion.minPrice || promotion.min_price || "",
-        quantity: promotion.quantity !== undefined && promotion.quantity !== null ? promotion.quantity : "",
-        usedQuantity: promotion.usedQuantity || promotion.used_quantity || 0,
+        
       });
       if (promotion.bookIds || promotion.books) {
         setSelectedBooks(promotion.bookIds || (promotion.books ? promotion.books.map(b => b.id) : []));
@@ -129,12 +139,7 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
     if (!formData.discount) newErrors.discount = "Vui lòng nhập mức giảm giá";
     if (!formData.startDate) newErrors.startDate = "Vui lòng chọn ngày bắt đầu";
     if (!formData.endDate) newErrors.endDate = "Vui lòng chọn ngày kết thúc";
-    if (!formData.minPrice) newErrors.minPrice = "Vui lòng nhập giá tối thiểu";
     if (!formData.type) newErrors.type = "Vui lòng chọn loại khuyến mãi";
-    // Validate quantity: nếu nhập thì phải là số nguyên dương
-    if (formData.quantity !== "" && (isNaN(formData.quantity) || Number(formData.quantity) < 1 || !Number.isInteger(Number(formData.quantity)))) {
-      newErrors.quantity = "Số lượng áp dụng tối đa phải là số nguyên dương hoặc để trống";
-    }
     // Validate discount
     if (formData.type === "percent") {
       if (formData.discount && (isNaN(formData.discount) || formData.discount < 0 || formData.discount > 100)) {
@@ -151,7 +156,7 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
     if (formData.endDate && endDate < startDate) {
       newErrors.endDate = "Ngày kết thúc phải lớn hơn ngày bắt đầu";
     }
-    if (rules.max_promotion_duration && formData.startDate && formData.endDate) {
+  if (rules.max_promotion_duration && formData.startDate && formData.endDate) {
       const start = parseDateLocal(formData.startDate);
       const end = parseDateLocal(formData.endDate);
       const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
@@ -180,6 +185,22 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
     );
   };
 
+  const allVisibleBookIds = books
+    .filter(b => (b.title || "").toLowerCase().includes(bookSearch.toLowerCase()))
+    .map(b => b.id);
+
+  const areAllVisibleSelected = allVisibleBookIds.length > 0 && allVisibleBookIds.every(id => selectedBooks.includes(id));
+
+  const toggleSelectAllVisible = () => {
+    if (areAllVisibleSelected) {
+      // Deselect all visible
+      setSelectedBooks(prev => prev.filter(id => !allVisibleBookIds.includes(id)));
+    } else {
+      // Select all visible
+      setSelectedBooks(prev => Array.from(new Set([...prev, ...allVisibleBookIds])));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
@@ -194,9 +215,6 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
           discount: formData.discount,
           startDate: formData.startDate,
           endDate: formData.endDate,
-          minPrice: formData.minPrice,
-          quantity: formData.quantity === "" ? null : Number(formData.quantity),
-          usedQuantity: formData.usedQuantity,
           bookIds: selectedBooks,
         };
         
@@ -244,7 +262,8 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
         </div>
 
         <div className="promotion-modal-body">
-          <form onSubmit={handleSubmit} className="account-form">            <div className="form-columns">
+          <form onSubmit={handleSubmit} className="account-form">
+            <div className="form-columns">
               {/* Cột bên trái */}
               <div className="form-column">
                 <div className="form-group">
@@ -302,23 +321,7 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
                   {errors.discount && <div className="error-message">{errors.discount}</div>}
                 </div>
                 
-                <div className="form-group">
-                  <label htmlFor="quantity">
-                    <FontAwesomeIcon icon={faInfoCircle} className="form-icon" />
-                    Số lượng áp dụng tối đa
-                  </label>
-                  <input
-                    type="number"
-                    id="quantity"
-                    name="quantity"
-                    value={formData.quantity}
-                    onChange={handleChange}
-                    className={errors.quantity ? "error" : ""}
-                    placeholder="Không giới hạn nếu để trống"
-                    min="1"
-                  />
-                  {errors.quantity && <div className="error-message">{errors.quantity}</div>}
-                </div>
+                {/* quantity removed in new schema */}
               </div>
 
               {/* Cột bên phải */}
@@ -356,29 +359,53 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
                   {errors.endDate && <div className="error-message">{errors.endDate}</div>}
                 </div>
                 
-                <div className="form-group">
-                  <label htmlFor="minPrice">
-                    <FontAwesomeIcon icon={faInfoCircle} className="form-icon" />
-                    Giá tối thiểu
-                  </label>
-                  <input
-                    type="text"
-                    id="minPrice"
-                    name="minPrice"
-                    value={formatMinPrice(formData.minPrice)}
-                    onChange={e => {
-                      // Chỉ lấy số, loại bỏ dấu chấm/phẩy, giới hạn tối đa 9 ký tự số
-                      const raw = e.target.value.replace(/[^0-9]/g, "").slice(0, 9);
-                      setFormData(prev => ({ ...prev, minPrice: raw }));
-                      if (errors.minPrice) setErrors(prev => ({ ...prev, minPrice: "" }));
-                    }}
-                    className={errors.minPrice ? "error" : ""}
-                    placeholder="Nhập giá tối thiểu"
-                    min="0"
-                    autoComplete="off"
-                  />
-                  {errors.minPrice && <div className="error-message">{errors.minPrice}</div>}
-                </div>              </div>
+                {/* min price removed in new schema */}
+              </div>
+            </div>
+
+            {/* Chọn sản phẩm áp dụng */}
+            <div className="form-group">
+              <label>
+                Áp dụng cho sản phẩm
+              </label>
+              <input
+                type="text"
+                placeholder="Tìm kiếm sách theo tên..."
+                value={bookSearch}
+                onChange={(e) => setBookSearch(e.target.value)}
+                style={{ marginBottom: 8 }}
+              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                <button type="button" className="cancel-button" onClick={toggleSelectAllVisible} disabled={books.length === 0}>
+                  {areAllVisibleSelected ? 'Bỏ chọn tất cả đang hiển thị' : 'Chọn tất cả đang hiển thị'}
+                </button>
+                <span style={{ color: '#666', fontSize: 13 }}>
+                  Đang chọn {selectedBooks.length} sản phẩm
+                </span>
+              </div>
+              <div className="book-selection-container">
+                {!formData.startDate || !formData.endDate ? (
+                  <div className="book-empty-message">Chọn ngày bắt đầu và kết thúc để hiển thị sách khả dụng</div>
+                ) : (books && books.length > 0 ? (
+                  books
+                    .filter((b) => (b.title || "").toLowerCase().includes(bookSearch.toLowerCase()))
+                    .map((book) => (
+                      <label key={book.id} className="book-item">
+                        <input
+                          type="checkbox"
+                          className="book-checkbox"
+                          checked={selectedBooks.includes(book.id)}
+                          onChange={() => handleBookCheckbox(book.id)}
+                        />
+                        <span>
+                          {(book.title || 'Không tên')} {book.author ? `- ${book.author}` : ''}
+                        </span>
+                      </label>
+                    ))
+                ) : (
+                  <div className="book-empty-message">Không có sách khả dụng trong khoảng ngày này</div>
+                ))}
+              </div>
             </div>
 
             <div className="form-actions">
