@@ -38,13 +38,7 @@ const AccountManagementPage = ({ sidebarCollapsed = false }) => {
               <FontAwesomeIcon icon={faUserShield} />
               <span>Quản trị viên</span>
             </button>
-            <button
-              className={`account-tab ${activeTab === 'sales' ? 'active' : ''}`}
-              onClick={() => setActiveTab('sales')}
-            >
-              <FontAwesomeIcon icon={faUserCog} />
-              <span>Nhân viên bán hàng</span>
-            </button>
+    
             <button
               className={`account-tab ${activeTab === 'warehouse' ? 'active' : ''}`}
               onClick={() => setActiveTab('warehouse')}
