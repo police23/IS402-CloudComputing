@@ -14,6 +14,7 @@ const getCart = async (userID) => {
       where: { cart_id: cart.id },
       include: [{ 
         model: Book,
+        as: 'Book',
         include: [{ model: BookImages, as: 'images' }]
       }],
     });
@@ -57,7 +58,11 @@ const addToCart = async (userID, bookID, quantity) => {
     }
     let item = await CartDetail.findOne({ where: { cart_id: cart.id, book_id: bookID } });
     if (item) {
-      item.quantity += quantity;
+      const newQuantity = item.quantity + quantity;
+      if (newQuantity > book.quantity_in_stock) {
+        return { success: false, message: `Chỉ còn ${book.quantity_in_stock} sản phẩm trong kho` };
+      }
+      item.quantity = newQuantity;
       await item.save();
     } else {
       item = await CartDetail.create({ cart_id: cart.id, book_id: bookID, quantity });

@@ -83,3 +83,13 @@ export const removeFromCart = async (bookID) => {
     }
 };
 
+export const clearCart = async () => {
+    try {
+        const response = await apiClient.delete('/cart');
+        return response.data;
+    } catch (error) {
+        console.error('Error clearing cart:', error);
+        throw error;
+    }
+};
+

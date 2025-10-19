@@ -5,6 +5,7 @@ import PublicHeader from '../../components/common/PublicHeader';
 import { getCart, updateQuantity, removeFromCart } from '../../services/CartService';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
+import { getAllBooksPricing } from '../../services/BookService';
 
 function CartPage() {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ function CartPage() {
       if (response.success) {
         console.log('Cart items from backend:', response.data); // Debug log
         // Transform data để phù hợp với format hiện tại
-        const transformedItems = response.data.map(item => {
+  const transformedItems = response.data.map(item => {
           console.log('Processing cart item:', item); // Debug log
           console.log('Item images:', item.images); // Debug log
           // Nếu không có images/imageUrls nhưng có image_path thì tạo mảng images
@@ -81,14 +82,24 @@ function CartPage() {
           if ((!imageUrls || imageUrls.length === 0) && item.image_path) {
             imageUrls = [item.image_path];
           }
+          const currentPrice = (typeof item.discounted_price !== 'undefined' && item.discounted_price !== null)
+            ? Number(item.discounted_price)
+            : Number(item.price);
+          const origPrice = (typeof item.original_price !== 'undefined' && item.original_price !== null)
+            ? Number(item.original_price)
+            : Number(item.price);
+          const discountPercent = origPrice > 0 && currentPrice < origPrice
+            ? Math.round(((origPrice - currentPrice) / origPrice) * 100)
+            : 0;
+
           const transformedItem = {
             id: item.id,
             bookId: item.book_id,
             title: item.title,
             author: item.author,
-            price: item.price,
-            originalPrice: item.original_price || item.price,
-            discount: item.original_price ? Math.round(((item.original_price - item.price) / item.original_price) * 100) : 0,
+            price: currentPrice,
+            originalPrice: origPrice,
+            discount: discountPercent,
             image_path: item.image_path,
             images,
             imageUrls,
@@ -98,7 +109,30 @@ function CartPage() {
           console.log('Transformed item:', transformedItem); // Debug log
           return transformedItem;
         });
-        setCartItems(transformedItems);
+        // Enrich prices from pricing view (discounted/original)
+        try {
+          const pricingRows = await getAllBooksPricing();
+          const priceById = new Map(pricingRows.map(r => [r.id, r]));
+          const mergedItems = transformedItems.map(it => {
+            const pv = priceById.get(it.bookId);
+            if (!pv) return it;
+            const pvOriginal = Number(pv.original_price ?? it.originalPrice ?? it.price ?? 0);
+            const pvDiscounted = pv.discounted_price != null ? Number(pv.discounted_price) : pvOriginal;
+            const pvPercent = pvOriginal > 0 && pvDiscounted < pvOriginal
+              ? Math.round(((pvOriginal - pvDiscounted) / pvOriginal) * 100)
+              : 0;
+            return {
+              ...it,
+              price: pvDiscounted,
+              originalPrice: pvOriginal,
+              discount: pvPercent,
+            };
+          });
+          setCartItems(mergedItems);
+        } catch (e) {
+          console.warn('Failed to merge pricing view into cart items:', e);
+          setCartItems(transformedItems);
+        }
       } else {
         setError(response.message);
       }
@@ -348,55 +382,12 @@ function CartPage() {
           </div>
           <div className="order-summary">
             <h2>Tổng đơn hàng</h2>
-            {/* Khuyến mãi khả dụng */}
-            <div className="coupon-section">
-              <div className="available-promotions" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <label htmlFor="promotion-select" style={{ minWidth: 110 }}>Chọn khuyến mãi:</label>
-                <select
-                  id="promotion-select"
-                  value={appliedCoupon?.id || ""}
-                  onChange={e => {
-                    const promo = availablePromotions.find(p => String(p.id) === e.target.value);
-                    setAppliedCoupon(promo || null);
-                  }}
-                  style={{ width: "250px", padding: "10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                >
-                  <option value="">-- Không áp dụng khuyến mãi --</option>
-                  {availablePromotions.map(promo => (
-                    <option key={promo.id} value={promo.id}>
-                      {promo.promotion_code} (
-                        {promo.type === 'percent' || promo.discountType === 'percent' ?
-                          `Giảm ${promo.discount}%`
-                          : `Giảm ${Number(promo.discount).toLocaleString('vi-VN')}đ`
-                        }
-                      )
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {appliedCoupon && (
-                <div className="applied-coupon" style={{ marginTop: '12px' }}>
-                  <span>Đã chọn: {appliedCoupon.name} - {
-                    (appliedCoupon.type === 'percent' || appliedCoupon.discountType === 'percent')
-                      ? `Giảm ${appliedCoupon.discount}%`
-                      : `Giảm ${Number(appliedCoupon.discount).toLocaleString('vi-VN')}đ`
-                  }</span>
-                  <button onClick={() => setAppliedCoupon(null)}>Bỏ chọn</button>
-                </div>
-              )}
-            </div>
-
             {/* Chi tiết đơn hàng */}
             <div className="order-details">
               <div className="detail-row">
                 <span>Tạm tính ({cartItems.length} sản phẩm):</span>
                 <span>{formatCurrency(subtotal)}</span>
-              </div>
-              <div className="detail-row">
-                <span>Giảm giá:</span>
-                <span>-{formatCurrency(discount)}</span>
-              </div>
-              
+              </div>              
               <div className="detail-row total">
                 <span>Tổng cộng:</span>
                 <span>{formatCurrency(total)}</span>
