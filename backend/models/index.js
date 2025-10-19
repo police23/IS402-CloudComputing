@@ -11,6 +11,7 @@ const BookImages = require('./BookImagesModel');
 const Address = require('./AddressModel');
 const Supplier = require('./SupplierModel');
 const Promotion = require('./PromotionModel');
+const { PromotionDetail } = require('./PromotionDetailModel');
 const ShippingMethod = require('./ShippingMethodModel');
 const Rule = require('./RuleModel');
 
@@ -18,18 +19,10 @@ const Rule = require('./RuleModel');
 const { BookImport } = require('./ImportModel');
 const { ImportDetail } = require('./ImportDetailModel');
 
-// Invoice models
-const { Invoice } = require('./InvoiceModel');
-const { InvoiceDetail } = require('./InvoiceDetailModel');
-
 // Order models
 const { Order } = require('./OrderModel');
 const { OrderDetail } = require('./OrderDetailModel');
 const { OrderAssignment } = require('./OrderAssignmentModel');
-
-// Cart models
-const { Cart } = require('./CartModel');
-const { CartDetail } = require('./CartDetailModel');
 
 // Rating model
 const { Rating } = require('./RatingModel');
@@ -37,6 +30,9 @@ const { Rating } = require('./RatingModel');
 // Damage Report models
 const { DamageReport } = require('./DamageReportModel');
 const { DamageReportItem } = require('./DamageReportItemsModel');
+// Cart models
+const { Cart } = require('./CartModel');
+const { CartDetail } = require('./CartDetailModel');
 
 // =================
 // DEFINE ASSOCIATIONS
@@ -66,34 +62,16 @@ BookImport.hasMany(ImportDetail, { foreignKey: 'import_id', as: 'details', onDel
 Supplier.hasMany(BookImport, { foreignKey: 'supplier_id', as: 'imports' });
 User.hasMany(BookImport, { foreignKey: 'imported_by', as: 'imports' });
 
-// Import Detail associations
-ImportDetail.belongsTo(BookImport, { foreignKey: 'import_id', onDelete: 'CASCADE' });
-ImportDetail.belongsTo(Book, { foreignKey: 'book_id', as: 'book', onDelete: 'CASCADE' });
-Book.hasMany(ImportDetail, { foreignKey: 'book_id', as: 'importDetails' });
-
-// Invoice associations
-Invoice.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
-Invoice.belongsTo(Promotion, { foreignKey: 'promotion_code', targetKey: 'promotion_code', as: 'promotion' });
-Invoice.hasMany(InvoiceDetail, { foreignKey: 'invoice_id', as: 'details', onDelete: 'CASCADE' });
-
-User.hasMany(Invoice, { foreignKey: 'created_by', as: 'createdInvoices' });
-Promotion.hasMany(Invoice, { foreignKey: 'promotion_code', sourceKey: 'promotion_code', as: 'invoices' });
-
-// Invoice Detail associations
-InvoiceDetail.belongsTo(Invoice, { foreignKey: 'invoice_id', onDelete: 'SET NULL' });
-InvoiceDetail.belongsTo(Book, { foreignKey: 'book_id', as: 'book', onDelete: 'SET NULL' });
-Book.hasMany(InvoiceDetail, { foreignKey: 'book_id', as: 'invoiceDetails' });
-
 // Order associations
 Order.belongsTo(User, { foreignKey: 'user_id', as: 'user', onDelete: 'CASCADE' });
 Order.belongsTo(ShippingMethod, { foreignKey: 'shipping_method_id', as: 'shippingMethod', onDelete: 'SET NULL' });
-Order.belongsTo(Promotion, { foreignKey: 'promotion_code', targetKey: 'promotion_code', as: 'promotion', onDelete: 'SET NULL' });
+// Note: Previous association via promotion_code removed due to schema change
 Order.hasMany(OrderDetail, { foreignKey: 'order_id', as: 'details', onDelete: 'CASCADE' });
 Order.hasOne(OrderAssignment, { foreignKey: 'order_id', as: 'assignment', onDelete: 'CASCADE' });
 
 User.hasMany(Order, { foreignKey: 'user_id', as: 'orders' });
 ShippingMethod.hasMany(Order, { foreignKey: 'shipping_method_id', as: 'orders' });
-Promotion.hasMany(Order, { foreignKey: 'promotion_code', sourceKey: 'promotion_code', as: 'orders' });
+// Note: Previous association via promotion_code removed due to schema change
 
 // Order Detail associations
 OrderDetail.belongsTo(Order, { foreignKey: 'order_id', onDelete: 'CASCADE' });
@@ -107,17 +85,6 @@ OrderAssignment.belongsTo(User, { foreignKey: 'shipper_id', as: 'shipper', onDel
 
 User.hasMany(OrderAssignment, { foreignKey: 'assigned_by', as: 'assignedOrders' });
 User.hasMany(OrderAssignment, { foreignKey: 'shipper_id', as: 'shippedOrders' });
-
-// Cart associations
-Cart.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
-Cart.hasMany(CartDetail, { foreignKey: 'cart_id', onDelete: 'CASCADE' });
-
-User.hasOne(Cart, { foreignKey: 'user_id', as: 'cart' });
-
-// Cart Detail associations
-CartDetail.belongsTo(Cart, { foreignKey: 'cart_id', onDelete: 'CASCADE' });
-CartDetail.belongsTo(Book, { foreignKey: 'book_id' });
-Book.hasMany(CartDetail, { foreignKey: 'book_id', as: 'cartDetails' });
 
 // Rating associations
 Rating.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
@@ -137,6 +104,30 @@ DamageReportItem.belongsTo(DamageReport, { foreignKey: 'report_id', onDelete: 'C
 DamageReportItem.belongsTo(Book, { foreignKey: 'book_id', as: 'book' });
 Book.hasMany(DamageReportItem, { foreignKey: 'book_id', as: 'damageReportItems' });
 
+// Cart associations
+Cart.belongsTo(User, { foreignKey: 'user_id', as: 'user', onDelete: 'CASCADE' });
+User.hasOne(Cart, { foreignKey: 'user_id', as: 'cart' });
+
+Cart.hasMany(CartDetail, { foreignKey: 'cart_id', as: 'items', onDelete: 'CASCADE' });
+CartDetail.belongsTo(Cart, { foreignKey: 'cart_id', as: 'cart', onDelete: 'CASCADE' });
+
+CartDetail.belongsTo(Book, { foreignKey: 'book_id', as: 'Book', onDelete: 'CASCADE' });
+Book.hasMany(CartDetail, { foreignKey: 'book_id', as: 'cartItems' });
+
+// Promotion associations (many-to-many with Book via promotion_details)
+Promotion.belongsToMany(Book, {
+  through: PromotionDetail,
+  foreignKey: 'promotion_id',
+  otherKey: 'book_id',
+  as: 'books',
+});
+Book.belongsToMany(Promotion, {
+  through: PromotionDetail,
+  foreignKey: 'book_id',
+  otherKey: 'promotion_id',
+  as: 'promotions',
+});
+
 // =================
 // EXPORT ALL MODELS
 // =================
@@ -153,16 +144,14 @@ module.exports = {
   Promotion,
   ShippingMethod,
   Rule,
+  PromotionDetail,
   BookImport,
-  ImportDetail,
-  Invoice,
-  InvoiceDetail,
   Order,
   OrderDetail,
   OrderAssignment,
-  Cart,
-  CartDetail,
   Rating,
   DamageReport,
-  DamageReportItem
+  DamageReportItem,
+  Cart,
+  CartDetail
 };
