@@ -118,14 +118,14 @@ const getImportChartDataByYear = async (year) => {
   const { QueryTypes } = require('sequelize');
   
   const results = await sequelize.query(
-    `SELECT MONTH(bi.import_date) AS month,
-            SUM(id.quantity) AS totalBooks,
-            SUM(id.quantity * id.unit_price) AS totalCost
-     FROM book_imports bi
-     JOIN import_details id ON bi.id = id.import_id
-     WHERE YEAR(bi.import_date) = ?
-     GROUP BY MONTH(bi.import_date)
-     ORDER BY MONTH(bi.import_date)`,
+  `SELECT MONTH(bi.import_date) AS month,
+      SUM(id.quantity) AS totalBooks,
+      SUM(id.quantity * id.unit_price) AS totalCost
+   FROM book_imports bi
+   JOIN book_import_details id ON bi.id = id.import_id
+   WHERE YEAR(bi.import_date) = ?
+   GROUP BY MONTH(bi.import_date)
+   ORDER BY MONTH(bi.import_date)`,
     {
       replacements: [year],
       type: QueryTypes.SELECT
@@ -140,14 +140,14 @@ const getImportChartDataByMonth = async (year, month) => {
   const { QueryTypes } = require('sequelize');
   
   const results = await sequelize.query(
-    `SELECT DAY(bi.import_date) AS day,
-            SUM(id.quantity) AS totalBooks,
-            SUM(id.quantity * id.unit_price) AS totalCost
-     FROM book_imports bi
-     JOIN import_details id ON bi.id = id.import_id
-     WHERE YEAR(bi.import_date) = ? AND MONTH(bi.import_date) = ?
-     GROUP BY DAY(bi.import_date)
-     ORDER BY DAY(bi.import_date)`,
+  `SELECT DAY(bi.import_date) AS day,
+      SUM(id.quantity) AS totalBooks,
+      SUM(id.quantity * id.unit_price) AS totalCost
+   FROM book_imports bi
+   JOIN book_import_details id ON bi.id = id.import_id
+   WHERE YEAR(bi.import_date) = ? AND MONTH(bi.import_date) = ?
+   GROUP BY DAY(bi.import_date)
+   ORDER BY DAY(bi.import_date)`,
     {
       replacements: [year, month],
       type: QueryTypes.SELECT
