@@ -121,7 +121,7 @@ const AddressManagement = ({ onNotification }) => {
       <div className="address-header">
         <h3>
           <FontAwesomeIcon icon={faMapMarkerAlt} style={{ marginRight: "10px", color: "#4A7CAE" }} />
-          Quản lý địa chỉ giao hàng
+          Quản lý địa chỉ
         </h3>
         <button 
           className="btn btn-add"
@@ -134,13 +134,9 @@ const AddressManagement = ({ onNotification }) => {
       <div className="addresses-list">
         {addresses.length === 0 ? (
           <div className="no-addresses">
+            <FontAwesomeIcon icon={faMapMarkerAlt} size="3x" style={{ color: '#ccc', marginBottom: '16px' }} />
             <p>Bạn chưa có địa chỉ giao hàng nào.</p>
-            <button 
-              className="btn btn-add"
-              onClick={handleAddAddress}
-            >
-              <FontAwesomeIcon icon={faPlus} /> Thêm địa chỉ đầu tiên
-            </button>
+            <p className="no-addresses-hint">Hãy thêm địa chỉ mới bằng cách nhấn nút "Thêm địa chỉ mới" ở trên.</p>
           </div>
         ) : (
           addresses.map(address => (
