@@ -14,6 +14,18 @@ export const getAllBooks = async () => {
   }
 };
 
+// Fetch pricing view to get discounted_price/original_price without losing other associations
+export const getAllBooksPricing = async () => {
+  try {
+    const response = await axios.get(API_URL, { params: { useView: 1 } });
+    // Backend returns raw array from view
+    return Array.isArray(response.data) ? response.data : [];
+  } catch (error) {
+    console.error('Failed to fetch pricing view:', error?.response?.data || error.message);
+    return [];
+  }
+};
+
 export const getOldStockBooks = async (months = 2) => {
   try {
     const response = await axios.get(`${API_URL}/old-stock`, {
@@ -121,6 +133,22 @@ export const getTop10MostSoldBooksAll = async (month, year) => {
     }));
   } catch (error) {
     console.error('Error fetching top 10 books:', error);
+    return [];
+  }
+};
+
+// Lấy sách cùng thể loại (sách liên quan)
+export const getBooksByCategory = async (categoryId, excludeBookId, limit = 8) => {
+  try {
+    const response = await axios.get(`${API_URL}/category/${categoryId}`, {
+      params: {
+        excludeBookId,
+        limit
+      }
+    });
+    return response.data.success ? response.data.data : [];
+  } catch (error) {
+    console.error('Error fetching books by category:', error);
     return [];
   }
 };

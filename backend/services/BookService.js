@@ -1,5 +1,5 @@
-const { Book, Category, Publisher, BookImages } = require('../models');
-const { Op } = require('sequelize');
+const { Book, Category, Publisher, BookImages, sequelize } = require('../models');
+const { Op, QueryTypes } = require('sequelize');
 
 const getAllBooks = async () => {
   return await Book.findAll({
@@ -11,16 +11,38 @@ const getAllBooks = async () => {
   });
 };
 
-const createBook = async (bookData) => {
+const createBook = async (bookData, files = []) => {
   const existed = await Book.findOne({ where: { title: bookData.title } });
   if (existed) {
     throw new Error('Sách đã tồn tại');
   }
-  const book = await Book.create(bookData);
-  return book;
+
+  // Use transaction to ensure images are saved together with book
+  return await sequelize.transaction(async (t) => {
+    const book = await Book.create(bookData, { transaction: t });
+
+    if (Array.isArray(files) && files.length > 0) {
+      const imageRows = files.map((f) => ({
+        book_id: book.id,
+        image_path: `/uploads/${f.filename}`,
+      }));
+      await BookImages.bulkCreate(imageRows, { transaction: t });
+    }
+
+    // Return with associations so frontend sees images immediately
+    const created = await Book.findByPk(book.id, {
+      include: [
+        { model: Category, as: 'category', attributes: ['id', 'name'] },
+        { model: Publisher, as: 'publisher', attributes: ['id', 'name'] },
+        { model: BookImages, as: 'images', attributes: ['id', 'image_path'] },
+      ],
+      transaction: t,
+    });
+    return created;
+  });
 };
 
-const updateBook = async (id, bookData) => {
+const updateBook = async (id, bookData, files = []) => {
   const book = await Book.findByPk(id);
   if (bookData.title !== book.title) {
     const existed = await Book.findOne({
@@ -33,8 +55,25 @@ const updateBook = async (id, bookData) => {
       throw new Error('Sách đã tồn tại');
     }
   }
-  await book.update(bookData);
-  return book;
+  await sequelize.transaction(async (t) => {
+    await book.update(bookData, { transaction: t });
+    if (Array.isArray(files) && files.length > 0) {
+      const imageRows = files.map((f) => ({
+        book_id: book.id,
+        image_path: `/uploads/${f.filename}`,
+      }));
+      await BookImages.bulkCreate(imageRows, { transaction: t });
+    }
+  });
+
+  // Return with associations updated
+  return await Book.findByPk(id, {
+    include: [
+      { model: Category, as: 'category', attributes: ['id', 'name'] },
+      { model: Publisher, as: 'publisher', attributes: ['id', 'name'] },
+      { model: BookImages, as: 'images', attributes: ['id', 'image_path'] },
+    ],
+  });
 };
 
 const deleteBook = async (id) => {
@@ -84,6 +123,23 @@ const getLatestBooks = async () => {
   });
 };
 
+// Lấy sách cùng thể loại (sách liên quan)
+const getBooksByCategory = async (categoryId, excludeBookId, limit = 8) => {
+  return await Book.findAll({
+    where: {
+      category_id: categoryId,
+      id: { [Op.ne]: excludeBookId }
+    },
+    include: [
+      { model: Category, as: 'category', attributes: ['id', 'name'] },
+      { model: Publisher, as: 'publisher', attributes: ['id', 'name'] },
+      { model: BookImages, as: 'images', attributes: ['id', 'image_path'] }
+    ],
+    limit: limit,
+    order: [['created_at', 'DESC']]
+  });
+};
+
 module.exports = {
   getAllBooks,
   getBookById,
@@ -92,4 +148,17 @@ module.exports = {
   deleteBook,
   getOldStockBooks,
   getLatestBooks,
+  getBooksByCategory,
+};
+
+// New method: get books with pricing from DB view
+module.exports.getAllBooksPricing = async () => {
+  const rows = await sequelize.query(
+    `SELECT v.*, c.name AS category_name, p.name AS publisher_name
+     FROM v_books_pricing v
+     LEFT JOIN categories c ON c.id = v.category_id
+     LEFT JOIN publishers p ON p.id = v.publisher_id`,
+    { type: QueryTypes.SELECT }
+  );
+  return rows;
 };

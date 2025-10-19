@@ -2,6 +2,11 @@ const bookService = require('../services/BookService');
 
 const getAllBooks = async (req, res) => {
   try {
+    // Optional query param useView=1 to fetch from pricing view
+    if (req.query.useView === '1') {
+      const rows = await bookService.getAllBooksPricing();
+      return res.json(rows);
+    }
     const books = await bookService.getAllBooks();
     res.json(books);
   } catch (error) {
@@ -18,8 +23,9 @@ const createBook = async (req, res) => {
     bookData.publication_year = bookData.publication_year ? Number(bookData.publication_year) : null;
     bookData.price = bookData.price ? Number(bookData.price) : null;
     bookData.quantity_in_stock = bookData.quantity_in_stock ? Number(bookData.quantity_in_stock) : null;
-    
-    const book = await bookService.createBook(bookData);
+    const files = Array.isArray(req.files) ? req.files : [];
+
+    const book = await bookService.createBook(bookData, files);
     res.status(201).json(book);
   } catch (error) {
     console.error('Error adding book:', error);
@@ -37,7 +43,8 @@ const updateBook = async (req, res) => {
     bookData.price = bookData.price ? Number(bookData.price) : null;
     bookData.quantity_in_stock = bookData.quantity_in_stock ? Number(bookData.quantity_in_stock) : null;
     // bookData.imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
-    const book = await bookService.updateBook(id, bookData);
+    const files = Array.isArray(req.files) ? req.files : [];
+    const book = await bookService.updateBook(id, bookData, files);
     res.json(book);
   } catch (error) {
     console.error('Error updating book:', error);
@@ -102,6 +109,28 @@ const getLatestBooks = async (req, res) => {
   }
 };
 
+const getBooksByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const { excludeBookId, limit } = req.query;
+    const books = await bookService.getBooksByCategory(
+      categoryId,
+      excludeBookId ? parseInt(excludeBookId) : null,
+      limit ? parseInt(limit) : 8
+    );
+    res.json({
+      success: true,
+      data: books
+    });
+  } catch (error) {
+    console.error('Error fetching books by category:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to fetch books by category' 
+    });
+  }
+};
+
 module.exports = {
   getAllBooks,
   createBook,
@@ -110,4 +139,5 @@ module.exports = {
   getOldStockBooks,
   getBookById,
   getLatestBooks,
+  getBooksByCategory,
 };
