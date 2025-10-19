@@ -18,7 +18,6 @@ import Header from "../../components/common/Header.jsx";
 import BookTable from "../../components/tables/BookTable.jsx";
 import ImportTable from "../../components/tables/ImportTable.jsx";
 import SupplierTable from "../../components/tables/SupplierTable.jsx";
-import InvoiceTable from "../../components/tables/InvoiceTable.jsx";
 import PromotionTable from "../../components/tables/PromotionTable.jsx";
 import DamageReportTable from "../../components/tables/DamageReportTable.jsx";
 import DamageReportDetailsModal from "../../components/modals/DamageReportDetailsModal.jsx";
@@ -55,12 +54,7 @@ const adminMenuItems = [
     icon: <FontAwesomeIcon icon={faTruck} />,
     showActions: true,
   },
-  {
-    path: "invoices",
-    label: "Bán hàng",
-    icon: <FontAwesomeIcon icon={faFileInvoice} />,
-    showActions: true,
-  },
+
   {
     path: "promotions",
     label: "Khuyến mãi",
@@ -125,7 +119,6 @@ const AdminDashboard = () => {
     // Check for admin role
     if (user.role_id !== 1) {
       console.log("Not admin, redirecting");
-      // Chuyển hướng đến dashboard tương ứng với vai trò
       if (user.role_id === 2) {
         navigate('/sales-dashboard');
       } else if (user.role_id === 3) {
@@ -186,15 +179,7 @@ const AdminDashboard = () => {
         return <DamageReportTable onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />;
       case "suppliers":
         return <SupplierTable onEdit={handleEdit} onDelete={handleDelete} />;
-      case "invoices":
-        return (
-          <InvoiceTable
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onView={handleView}
-            onPrint={handlePrint}
-          />
-        );
+      
       case "promotions":
         return (
           <PromotionTable
