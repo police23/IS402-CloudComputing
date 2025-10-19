@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import authService from '../services/AuthService';
-import { getCart } from '../services/CartService';
+import { getCart, addToCart as addToCartApi } from '../services/CartService';
+import GuestCart from '../utils/GuestCart';
 
 const AuthContext = createContext();
 
@@ -13,7 +14,20 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    // Khởi tạo user ngay từ localStorage để tránh trạng thái null tạm thời khi reload
+    const [user, setUser] = useState(() => {
+        try {
+            const storedUser = localStorage.getItem('user');
+            if (!storedUser) return null;
+            const parsed = JSON.parse(storedUser);
+            if (parsed && typeof parsed === 'object' && (parsed.id || parsed.username)) {
+                return parsed;
+            }
+            return null;
+        } catch {
+            return null;
+        }
+    });
     const [cartItemCount, setCartItemCount] = useState(0);
     const [loading, setLoading] = useState(true);   
     useEffect(() => {
@@ -71,7 +85,8 @@ export const AuthProvider = ({ children }) => {
         if (user) {
             loadCartCount();
         } else {
-            setCartItemCount(0);
+            // dùng guest cart count khi chưa đăng nhập
+            setCartItemCount(GuestCart.countItems());
         }
     }, [user]);
 
@@ -155,6 +170,25 @@ export const AuthProvider = ({ children }) => {
             }
             setUser(userData);
 
+            // Merge guest cart -> server cart (best-effort)
+            const guestItems = GuestCart.getItems();
+            if (Array.isArray(guestItems) && guestItems.length > 0) {
+                for (const it of guestItems) {
+                    try {
+                        if (it && it.bookID && it.quantity > 0) {
+                            await addToCartApi(it.bookID, it.quantity);
+                        }
+                    } catch (e) {
+                        // bỏ qua từng lỗi item, tiếp tục item khác
+                        console.warn('Merge guest cart item failed', it, e?.response?.data || e?.message);
+                    }
+                }
+                // clear guest cart sau khi merge
+                GuestCart.clear();
+            }
+            // load lại số lượng giỏ từ server
+            await loadCartCount();
+
             return userData;
         } catch (error) {
             console.error('Login error:', error);
@@ -165,7 +199,10 @@ export const AuthProvider = ({ children }) => {
     // Logout function
     const logout = () => {
         localStorage.removeItem('user');
+        localStorage.removeItem('token');
         setUser(null);
+        // tùy chọn: giữ nguyên guest cart (không clear) để người dùng tiếp tục mua như khách
+        setCartItemCount(GuestCart.countItems());
     };
 
     const updateCartCount = (newCount) => {
@@ -186,7 +223,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };
