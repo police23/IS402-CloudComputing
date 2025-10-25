@@ -3,7 +3,20 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-// Initialize all models and associations
+// =============================
+// ⚙️ Cấu hình kết nối Azure MySQL
+// =============================
+process.env.DB_DIALECT = 'mysql';
+process.env.DB_HOST = 'mybookstore-mysql.mysql.database.azure.com';
+process.env.DB_PORT = '3306';
+process.env.DB_USER = 'adminuser';
+process.env.DB_PASSWORD = 'Haxuanbac123456.';
+process.env.DB_NAME = 'bookstoredb'; // bạn sẽ tạo DB này trong Azure portal (tab Databases)
+process.env.DATABASE_URL = `mysql://${process.env.DB_USER}:${encodeURIComponent(process.env.DB_PASSWORD)}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}?ssl=true`;
+
+// =============================
+// Initialize all models
+// =============================
 require('./models');
 
 const authRoutes = require('./routes/AuthRoutes');
@@ -22,14 +35,14 @@ const orderRoutes = require('./routes/OrderRoutes');
 const shippingMethodRoutes = require('./routes/ShippingMethodRoutes');
 const ratingRoutes = require('./routes/RatingRoutes');
 const reportRoutes = require('./routes/ReportRoutes');
-const app = express();
-const PORT = process.env.PORT || 5000;
 const paymentRoutes = require('./routes/PaymentRoutes');
 
+const app = express();
+const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
-  "https://polite-plant-0a1f5f900.3.azurestaticapps.net", // frontend trên Azure
-  "http://localhost:5173" // cho phép khi chạy local dev
+  "https://polite-plant-0a1f5f900.3.azurestaticapps.net",
+  "http://localhost:5173"
 ];
 
 app.use(cors({
@@ -37,11 +50,12 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 }));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static(require('path').join(__dirname, 'uploads')));
 
-// Test route - để kiểm tra API hoạt động
+// Test route
 app.get("/api-test", (req, res) => {
     res.json({ message: "API is working", timestamp: new Date() });
 });
@@ -50,6 +64,7 @@ app.get('/', (req, res) => {
     res.send('API is running');
 });
 
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -68,6 +83,7 @@ app.use('/api/shipping-methods', shippingMethodRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/reports', reportRoutes);
 
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
@@ -75,7 +91,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler - phải ở cuối cùng
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found", path: req.path });
 });
