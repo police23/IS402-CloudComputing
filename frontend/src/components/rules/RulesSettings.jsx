@@ -36,7 +36,8 @@ const RulesSettings = () => {
   useEffect(() => {
     const fetchRules = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/rules");
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_BASE}/rules`);
         if (response.ok) {
           const data = await response.json();
           setRules({
@@ -106,7 +107,8 @@ const RulesSettings = () => {
   // Xử lý khi nhấn nút lưu
   const handleSave = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/rules", {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_BASE}/rules`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

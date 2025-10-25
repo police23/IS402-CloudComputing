@@ -80,7 +80,8 @@ const PromotionTable = () => {
   });
   const fetchPromotions = async () => {
     try {
-  const response = await fetch("http://localhost:5000/api/promotions");
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_BASE}/promotions`);
       if (response.ok) {
         const rawData = await response.json();
         // Đảm bảo chuyển đổi đúng tên trường từ backend sang frontend
@@ -194,9 +195,10 @@ const PromotionTable = () => {
 
   const confirmDelete = async () => {
     try {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
       // Xóa từng khuyến mãi được chọn
       await Promise.all(selectedRows.map(async (id) => {
-        await fetch(`http://localhost:5000/api/promotions/${id}`, {
+        await fetch(`${API_BASE}/promotions/${id}`, {
           method: "DELETE"
         });
       }));

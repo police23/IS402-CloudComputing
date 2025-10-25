@@ -220,12 +220,13 @@ const AccountTable = ({ initialFilterRole = 'all' }) => {
   // Xử lý xác nhận hành động
   const handleConfirmAction = async () => {
     setIsConfirmModalOpen(false);
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
     switch (confirmAction.type) {
       case 'delete':
         try {
           // Gọi API xóa tài khoản
-          const response = await fetch(`http://localhost:5000/api/users/${confirmAction.id}`, {
+          const response = await fetch(`${API_BASE}/users/${confirmAction.id}`, {
             method: 'DELETE'
           });
 
@@ -250,7 +251,7 @@ const AccountTable = ({ initialFilterRole = 'all' }) => {
       case 'toggleStatus':
         try {
           // Gọi API để thay đổi trạng thái tài khoản (active/inactive)
-          const response = await fetch(`http://localhost:5000/api/users/${confirmAction.id}/status`, {
+          const response = await fetch(`${API_BASE}/users/${confirmAction.id}/status`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json'
@@ -293,10 +294,11 @@ const AccountTable = ({ initialFilterRole = 'all' }) => {
     try {
       let result;
       console.log("Saving account:", account);
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
       if (selectedAccount) {
         // Chỉnh sửa tài khoản: gọi trực tiếp API
-        const res = await fetch(`http://localhost:5000/api/users/${selectedAccount.id}`, {
+        const res = await fetch(`${API_BASE}/users/${selectedAccount.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -321,7 +323,7 @@ const AccountTable = ({ initialFilterRole = 'all' }) => {
         setTimeout(() => setNotification({ message: "", type: "" }), 5000);
       } else {
         // Thêm tài khoản mới: gọi trực tiếp API
-        const res = await fetch('http://localhost:5000/api/users', {
+        const res = await fetch(`${API_BASE}/users`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

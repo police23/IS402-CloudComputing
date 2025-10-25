@@ -133,7 +133,8 @@ const PasswordChange = ({ user, onNotification, onCancel }) => {
     
     try {
       try {
-        await axios.post(`http://localhost:5000/api/users/${user.id}/change-password`, {
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        await axios.post(`${API_BASE}/users/${user.id}/change-password`, {
           currentPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword
         });

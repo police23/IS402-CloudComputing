@@ -42,20 +42,21 @@ const BookDetailsModal = ({ book, onClose }) => {
   if (!book) return null;
 
   // Xử lý đường dẫn ảnh bìa
+  const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
   let imageUrls = [];
   if (book && Array.isArray(book.images) && book.images.length > 0) {
     imageUrls = book.images.map(img => 
-      img.image_path.startsWith('http') ? img.image_path : `http://localhost:5000${img.image_path}`
+      img.image_path.startsWith('http') ? img.image_path : `${BACKEND_URL}${img.image_path}`
     );
   } else if (book && Array.isArray(book.imageUrls) && book.imageUrls.length > 0) {
     imageUrls = book.imageUrls.map(url =>
-      url.startsWith('http') ? url : `http://localhost:5000${url}`
+      url.startsWith('http') ? url : `${BACKEND_URL}${url}`
     );
   } else if (book && book.imageUrl) {
     imageUrls = [
       book.imageUrl.startsWith('http')
         ? book.imageUrl
-        : `http://localhost:5000${book.imageUrl}`
+        : `${BACKEND_URL}${book.imageUrl}`
     ];
   }
 

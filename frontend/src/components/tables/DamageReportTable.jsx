@@ -23,7 +23,8 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
   // Fetch damage reports
   const fetchReports = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/damage-reports");
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${API_BASE}/damage-reports`);
       if (!res.ok) throw new Error("Lỗi khi tải dữ liệu phiếu hư hỏng");
       const response = await res.json();
       const data = response.data || response; // Handle both {data: []} and [] formats

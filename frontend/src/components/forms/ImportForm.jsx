@@ -31,7 +31,8 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/suppliers");
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_BASE}/suppliers`);
         if (response.ok) {
           const data = await response.json();
           setSuppliers(data);
@@ -46,7 +47,8 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
   // Load books from database
   useEffect(() => {
     // Tải dữ liệu sách với cách đơn giản nhất
-    fetch("http://localhost:5000/api/books")
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    fetch(`${API_BASE}/books`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -61,7 +63,7 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
           console.log("Sử dụng data.data từ API");
           setBooks(data.data);
         } 
-        // Kiểm tra xem data có phải là đối tượng có thuộc tính results là mảng không
+        // Kiểm tra xem data có phải là đối tượng có thuộc tính results là mảy không
         else if (data && data.results && Array.isArray(data.results)) {
           console.log("Sử dụng data.results từ API");
           setBooks(data.results);
@@ -74,7 +76,7 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
         // Nếu không khớp với bất kỳ cấu trúc nào, sử dụng mảng cứng
         else {
           console.error("Không thể xác định cấu trúc dữ liệu books:", data);
-          // Sử dụng mảng cứng để có thể tiếp tục
+          // Sử dụng mảy cứng để có thể tiếp tục
           const hardcodedBooks = [
             { id: 1, title: "Dế Mèn Phiêu Lưu Ký" },
             { id: 2, title: "Tuổi Trẻ Đáng Giá Bao Nhiêu" },
@@ -92,7 +94,8 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
 
   // Load rules from database
   useEffect(() => {
-    fetch("http://localhost:5000/api/rules")
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    fetch(`${API_BASE}/rules`)
       .then(res => res.json())
       .then(data => setRules(data));
   }, []);

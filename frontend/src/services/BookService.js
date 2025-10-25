@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/books";
+const API_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/books`;
 
 export const getAllBooks = async () => {
   try {
@@ -114,7 +114,8 @@ export const getLatestBooks = async () => {
 // Lấy top 10 sách bán chạy (có ảnh) theo tháng/năm
 export const getTop10MostSoldBooksAll = async (month, year) => {
   try {
-    const res = await axios.get(`http://localhost:5000/api/reports/top10-all?month=${month}&year=${year}`);
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    const res = await axios.get(`${API_BASE}/reports/top10-all?month=${month}&year=${year}`);
     // Backend trả về { success: true, data: books }
     const books = res.data.success ? res.data.data : res.data;
     // Đảm bảo books là mảng
@@ -126,7 +127,7 @@ export const getTop10MostSoldBooksAll = async (month, year) => {
       price: book.price ? Number(book.price).toLocaleString('vi-VN') + 'đ' : '',
       image: book.image_path
         ? (book.image_path.startsWith('/uploads')
-            ? 'http://localhost:5000' + book.image_path
+            ? (import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000') + book.image_path
             : book.image_path)
         : '/assets/no-image.png',
       total_sold: book.total_sold

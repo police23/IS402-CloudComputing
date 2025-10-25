@@ -45,7 +45,8 @@ const SupplierTable = () => {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/suppliers");
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_BASE}/suppliers`);
         if (!response.ok) {
           const errorText = await response.text();
           console.error("API error response:", errorText);

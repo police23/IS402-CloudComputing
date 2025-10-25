@@ -161,7 +161,7 @@ function HomePage() {
   const [promotions, setPromotions] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
   const [pricingMap, setPricingMap] = useState({});
-  const BACKEND_URL = "http://localhost:5000";
+  const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
 
   useEffect(() => {
     getLatestBooks()

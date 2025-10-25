@@ -225,15 +225,16 @@ function BooksPage() {
 
   // Hàm lấy URL ảnh đúng chuẩn backend
   const getBookImageUrl = (book) => {
+    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
     // Kiểm tra nếu có images từ backend (BookImages model)
     if (book.images && book.images.length > 0) {
       const imagePath = book.images[0].image_path;
-      return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
+      return imagePath.startsWith('http') ? imagePath : `${BACKEND_URL}${imagePath}`;
     }
     // Fallback cho imageUrls (nếu có)
     if (book.imageUrls && book.imageUrls.length > 0) {
       const url = book.imageUrls[0];
-      return url.startsWith('http') ? url : `http://localhost:5000${url}`;
+      return url.startsWith('http') ? url : `${BACKEND_URL}${url}`;
     }
     // Trả về ảnh mặc định nếu không có ảnh
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDIwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik04NSA5MEgxMTVWMTIwSDEwNVYxMTBIOTVWMTIwSDg1VjkwWiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNODUgMTQwSDE2NVYxNjBIODVWMTQwWiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNODUgMTgwSDE1NVYyMDBIODVWMTgwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4=';

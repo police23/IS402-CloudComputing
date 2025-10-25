@@ -213,31 +213,32 @@ function CartPage() {
   // Hàm lấy URL ảnh đúng chuẩn backend cho item
   const getBookImageUrl = (item) => {
     console.log('getBookImageUrl - item:', item); // Debug log
+    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
     // Ưu tiên lấy từ images (mảng)
     if (item.images && Array.isArray(item.images) && item.images.length > 0) {
       const imagePath = item.images[0].image_path;
       console.log('Using images[0].image_path:', imagePath); // Debug log
-      return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
+      return imagePath.startsWith('http') ? imagePath : `${BACKEND_URL}${imagePath}`;
     }
     // Fallback cho imageUrls (mảng)
     if (item.imageUrls && Array.isArray(item.imageUrls) && item.imageUrls.length > 0) {
       const url = item.imageUrls[0];
       console.log('Using imageUrls[0]:', url); // Debug log
-      return url.startsWith('http') ? url : `http://localhost:5000${url}`;
+      return url.startsWith('http') ? url : `${BACKEND_URL}${url}`;
     }
     // Fallback cho image_path
     if (item.image_path) {
       console.log('Using image_path:', item.image_path); // Debug log
-      return item.image_path.startsWith('http') ? item.image_path : `http://localhost:5000${item.image_path}`;
+      return item.image_path.startsWith('http') ? item.image_path : `${BACKEND_URL}${item.image_path}`;
     }
     // Fallback cho image hoặc cover
     if (item.image) {
       console.log('Using image:', item.image); // Debug log
-      return item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image}`;
+      return item.image.startsWith('http') ? item.image : `${BACKEND_URL}${item.image}`;
     }
     if (item.cover) {
       console.log('Using cover:', item.cover); // Debug log
-      return item.cover.startsWith('http') ? item.cover : `http://localhost:5000${item.cover}`;
+      return item.cover.startsWith('http') ? item.cover : `${BACKEND_URL}${item.cover}`;
     }
     // Ảnh mặc định
     console.log('Using default image'); // Debug log

@@ -57,7 +57,8 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
   const fetchBooks = async () => {
     try {
       // Ask backend to return view data with discounted_price
-      const response = await fetch("http://localhost:5000/api/books?useView=1");
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_BASE}/books?useView=1`);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch books: ${response.status}`);
@@ -82,9 +83,10 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
   useEffect(() => {
     const fetchCategoriesAndPublishers = async () => {
       try {
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
         // Fetch categories
         try {
-          const catResponse = await fetch("http://localhost:5000/api/categories");
+          const catResponse = await fetch(`${API_BASE}/categories`);
           if (catResponse.ok) {
             const catData = await catResponse.json();
             setCategories(catData || []);
@@ -99,7 +101,8 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
 
         // Fetch publishers
         try {
-          const pubResponse = await fetch("http://localhost:5000/api/publishers");
+          const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+          const pubResponse = await fetch(`${API_BASE}/publishers`);
           if (pubResponse.ok) {
             const pubData = await pubResponse.json();
             setPublishers(pubData || []);
@@ -234,7 +237,8 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
   const handleEditBook = async (book) => {
     try {
       const id = book?.id ?? book;
-      const resp = await fetch(`http://localhost:5000/api/books/${id}`);
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const resp = await fetch(`${API_BASE}/books/${id}`);
       if (!resp.ok) throw new Error(`Failed to load book ${id}`);
       const payload = await resp.json();
       const fullBook = payload?.data ?? payload;
@@ -253,8 +257,9 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
 
   const confirmDelete = async () => {
     try {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
       for (const id of selectedRows) {
-        const response = await fetch(`http://localhost:5000/api/books/${id}`, {
+        const response = await fetch(`${API_BASE}/books/${id}`, {
           method: "DELETE"
         });
         if (!response.ok) {
@@ -275,7 +280,8 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
   const handleBookSubmit = async (formData) => {
     if (selectedBook) {
       try {
-        const response = await fetch(`http://localhost:5000/api/books/${selectedBook.id}`, {
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_BASE}/books/${selectedBook.id}`, {
           method: "PUT",
           body: formData // Gửi trực tiếp FormData, KHÔNG set headers
         });
@@ -290,7 +296,8 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
       }
     } else {
       try {
-        const response = await fetch("http://localhost:5000/api/books", {
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_BASE}/books`, {
           method: "POST",
           body: formData // Gửi trực tiếp FormData, KHÔNG set headers
         });
@@ -662,7 +669,8 @@ const BookTable = ({ onEdit, onDelete, onView }) => {
               if (selectedRows.length === 1) {
                 const book = books.find((b) => b.id === selectedRows[0]);
                 try {
-                  const resp = await fetch(`http://localhost:5000/api/books/${book.id}`);
+                  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+                  const resp = await fetch(`${API_BASE}/books/${book.id}`);
                   if (!resp.ok) throw new Error(`Failed to load book ${book.id}`);
                   const payload = await resp.json();
                   const fullBook = payload?.data ?? payload;

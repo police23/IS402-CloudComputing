@@ -380,23 +380,25 @@ function BookDetailPage() {
   const ratingStats = getRatingStats();
 
   const getBookImageUrl = (book, idx = 0) => {
+    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
     if (book.images && book.images.length > 0) {
       const imagePath = book.images[idx] ? book.images[idx].image_path : book.images[0].image_path;
-      return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
+      return imagePath.startsWith('http') ? imagePath : `${BACKEND_URL}${imagePath}`;
     }
     if (book.imageUrls && book.imageUrls.length > 0) {
       const url = book.imageUrls[idx] || book.imageUrls[0];
-      return url.startsWith('http') ? url : `http://localhost:5000${url}`;
+      return url.startsWith('http') ? url : `${BACKEND_URL}${url}`;
     }
     return '/assets/book-placeholder.jpg';
   };
 
   const getImageList = (book) => {
+    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
     if (book.images && book.images.length > 0) {
-      return book.images.map(img => img.image_path.startsWith('http') ? img.image_path : `http://localhost:5000${img.image_path}`);
+      return book.images.map(img => img.image_path.startsWith('http') ? img.image_path : `${BACKEND_URL}${img.image_path}`);
     }
     if (book.imageUrls && book.imageUrls.length > 0) {
-      return book.imageUrls.map(url => url.startsWith('http') ? url : `http://localhost:5000${url}`);
+      return book.imageUrls.map(url => url.startsWith('http') ? url : `${BACKEND_URL}${url}`);
     }
     return ['/assets/book-placeholder.jpg'];
   };

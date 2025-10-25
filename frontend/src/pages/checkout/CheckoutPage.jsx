@@ -320,19 +320,20 @@ function CheckoutPage() {
 
   // Hàm lấy URL ảnh đúng chuẩn backend cho item
   const getBookImageUrl = (item) => {
+    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
     // Ưu tiên lấy từ images (mảng)
     if (item.images && Array.isArray(item.images) && item.images.length > 0) {
       const imagePath = item.images[0].image_path;
-      return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
+      return imagePath.startsWith('http') ? imagePath : `${BACKEND_URL}${imagePath}`;
     }
     // Fallback cho imageUrls (mảng)
     if (item.imageUrls && Array.isArray(item.imageUrls) && item.imageUrls.length > 0) {
       const url = item.imageUrls[0];
-      return url.startsWith('http') ? url : `http://localhost:5000${url}`;
+      return url.startsWith('http') ? url : `${BACKEND_URL}${url}`;
     }
     // Fallback cho image_path
     if (item.image_path) {
-      return item.image_path.startsWith('http') ? item.image_path : `http://localhost:5000${item.image_path}`;
+      return item.image_path.startsWith('http') ? item.image_path : `${BACKEND_URL}${item.image_path}`;
     }
     // Ảnh mặc định
     return '/assets/book-default.jpg';

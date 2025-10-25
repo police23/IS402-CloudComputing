@@ -36,16 +36,17 @@ export const fetchWithAuth = async (url, options = {}) => {
 
 // Modify each route to accept options for public access
 export const fetchData = async (endpoint, needsAuth = true) => {
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
     try {
         // For public endpoints, use regular fetch
         if (!needsAuth) {
-            const response = await fetch(`http://localhost:5000/api/${endpoint}`);
+            const response = await fetch(`${API_BASE}/${endpoint}`);
             if (!response.ok) throw new Error(`Failed to fetch ${endpoint}`);
             return await response.json();
         }
 
         // For protected endpoints, use fetchWithAuth
-        const response = await fetchWithAuth(`http://localhost:5000/api/${endpoint}`);
+        const response = await fetchWithAuth(`${API_BASE}/${endpoint}`);
         if (!response.ok) throw new Error(`Failed to fetch ${endpoint}`);
         return await response.json();
     } catch (error) {

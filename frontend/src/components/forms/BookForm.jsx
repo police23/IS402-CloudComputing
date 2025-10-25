@@ -62,19 +62,22 @@ const BookForm = ({ book, onSubmit, onClose }) => {
       }));
       // Load ảnh có sẵn từ quan hệ images [{ id, image_path }]
       if (Array.isArray(book.images) && book.images.length > 0) {
+        const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
         const toAbsolute = (p) => {
           if (!p) return '';
           // if already absolute
           if (p.startsWith('http://') || p.startsWith('https://')) return p;
           // server serves uploads at /uploads
-          return `http://localhost:5000${p.startsWith('/') ? p : `/${p}`}`;
+          return `${BACKEND_URL}${p.startsWith('/') ? p : `/${p}`}`;
         };
         setImagePreview(book.images.map(img => toAbsolute(img.image_path)));
       } else if (book.imageUrls && Array.isArray(book.imageUrls)) {
         // fallback for legacy prop
-        setImagePreview(book.imageUrls.map(url => url.startsWith('http') ? url : `http://localhost:5000${url}`));
+        const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
+        setImagePreview(book.imageUrls.map(url => url.startsWith('http') ? url : `${BACKEND_URL}${url}`));
       } else if (book.imageUrl) {
-        setImagePreview([book.imageUrl.startsWith('http') ? book.imageUrl : `http://localhost:5000${book.imageUrl}`]);
+        const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
+        setImagePreview([book.imageUrl.startsWith('http') ? book.imageUrl : `${BACKEND_URL}${book.imageUrl}`]);
       } else {
         setImagePreview([]);
       }
@@ -93,7 +96,8 @@ const BookForm = ({ book, onSubmit, onClose }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/categories");
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_BASE}/categories`);
         if (response.ok) {
           const data = await response.json();
           setCategories(data.success ? data.data : data);
@@ -108,7 +112,8 @@ const BookForm = ({ book, onSubmit, onClose }) => {
   useEffect(() => {
     const fetchPublishers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/publishers");
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_BASE}/publishers`);
         if (response.ok) {
           const data = await response.json();
           setPublishers(data.success ? data.data : data);
