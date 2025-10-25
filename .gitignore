@@ -139,3 +139,5 @@ cython_debug/
 *.njsproj
 *.sln
 *.sw?
+# Ignore local environment
+.env.local
