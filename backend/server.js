@@ -41,6 +41,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static(require('path').join(__dirname, 'uploads')));
 
+// Test route - để kiểm tra API hoạt động
+app.get("/api-test", (req, res) => {
+    res.json({ message: "API is working", timestamp: new Date() });
+});
+
+app.get('/', (req, res) => {
+    res.send('API is running');
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -66,12 +75,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.get("/api-test", (req, res) => {
-    res.json({ message: "API is working" });
-});
-
-app.get('/', (req, res) => {
-    res.send('API is running');
+// 404 handler - phải ở cuối cùng
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found", path: req.path });
 });
 
 app.listen(PORT, () => {
