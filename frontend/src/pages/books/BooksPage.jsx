@@ -225,7 +225,7 @@ function BooksPage() {
 
   // Hàm lấy URL ảnh đúng chuẩn backend
   const getBookImageUrl = (book) => {
-    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
+    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '');
     // Kiểm tra nếu có images từ backend (BookImages model)
     if (book.images && book.images.length > 0) {
       const imagePath = book.images[0].image_path;

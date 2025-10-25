@@ -320,7 +320,7 @@ function CheckoutPage() {
 
   // Hàm lấy URL ảnh đúng chuẩn backend cho item
   const getBookImageUrl = (item) => {
-    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
+    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '');
     // Ưu tiên lấy từ images (mảng)
     if (item.images && Array.isArray(item.images) && item.images.length > 0) {
       const imagePath = item.images[0].image_path;

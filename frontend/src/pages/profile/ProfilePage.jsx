@@ -80,7 +80,7 @@ const ProfilePage = () => {
     setError(null);
     
     try {      
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
       // Try with and without localhost prefix
       let response;
       try {
@@ -194,7 +194,7 @@ const ProfilePage = () => {
         is_active: 1 // Keep active
       };
       try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const API_BASE = import.meta.env.VITE_API_BASE_URL;
         const response = await axios.put(`${API_BASE}/users/${user.id}`, updateData);
       } catch (localErr) {
         // Nếu lỗi từ localhost có chứa thông báo cụ thể, ném lỗi đó ra

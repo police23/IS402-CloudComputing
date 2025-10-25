@@ -52,7 +52,7 @@ const ImportTable = () => {
   // Đưa fetchImports ra ngoài useEffect để có thể gọi lại ở confirmDelete
   const fetchImports = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
       const res = await fetch(`${API_BASE}/imports`);
       if (res.ok) {
         const rawData = await res.json();
@@ -86,7 +86,7 @@ const ImportTable = () => {
   // Fetch suppliers for dropdown
   const fetchSuppliers = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_BASE}/suppliers`);
       if (response.ok) {
         const data = await response.json();
@@ -204,7 +204,7 @@ const ImportTable = () => {
 
   const confirmDelete = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
       for (const id of selectedRows) {
         // Xóa phiếu nhập với id đã chọn
         const response = await fetch(`${API_BASE}/imports/${id}`, {
@@ -242,7 +242,7 @@ const ImportTable = () => {
     } else {
       // Add new import (call API)
       try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const API_BASE = import.meta.env.VITE_API_BASE_URL;
         const res = await fetch(`${API_BASE}/imports`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -80,7 +80,7 @@ const PromotionTable = () => {
   });
   const fetchPromotions = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_BASE}/promotions`);
       if (response.ok) {
         const rawData = await response.json();
@@ -195,7 +195,7 @@ const PromotionTable = () => {
 
   const confirmDelete = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
       // Xóa từng khuyến mãi được chọn
       await Promise.all(selectedRows.map(async (id) => {
         await fetch(`${API_BASE}/promotions/${id}`, {

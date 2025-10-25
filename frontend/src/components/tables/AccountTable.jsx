@@ -220,7 +220,7 @@ const AccountTable = ({ initialFilterRole = 'all' }) => {
   // Xử lý xác nhận hành động
   const handleConfirmAction = async () => {
     setIsConfirmModalOpen(false);
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
     switch (confirmAction.type) {
       case 'delete':
@@ -294,7 +294,7 @@ const AccountTable = ({ initialFilterRole = 'all' }) => {
     try {
       let result;
       console.log("Saving account:", account);
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
       if (selectedAccount) {
         // Chỉnh sửa tài khoản: gọi trực tiếp API

@@ -42,7 +42,7 @@ const BookDetailsModal = ({ book, onClose }) => {
   if (!book) return null;
 
   // Xử lý đường dẫn ảnh bìa
-  const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
+  const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '');
   let imageUrls = [];
   if (book && Array.isArray(book.images) && book.images.length > 0) {
     imageUrls = book.images.map(img => 

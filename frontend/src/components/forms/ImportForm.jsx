@@ -31,7 +31,7 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const API_BASE = import.meta.env.VITE_API_BASE_URL;
         const response = await fetch(`${API_BASE}/suppliers`);
         if (response.ok) {
           const data = await response.json();
@@ -47,7 +47,7 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
   // Load books from database
   useEffect(() => {
     // Tải dữ liệu sách với cách đơn giản nhất
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    const API_BASE = import.meta.env.VITE_API_BASE_URL;
     fetch(`${API_BASE}/books`)
       .then(response => {
         if (!response.ok) {
@@ -94,7 +94,7 @@ const ImportForm = ({ importData, onSubmit, onClose }) => {
 
   // Load rules from database
   useEffect(() => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    const API_BASE = import.meta.env.VITE_API_BASE_URL;
     fetch(`${API_BASE}/rules`)
       .then(res => res.json())
       .then(data => setRules(data));

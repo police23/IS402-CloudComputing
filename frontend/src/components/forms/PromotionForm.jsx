@@ -71,7 +71,7 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
   }, []);
 
   useEffect(() => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    const API_BASE = import.meta.env.VITE_API_BASE_URL;
     fetch(`${API_BASE}/rules`)
       .then(res => res.json())
       .then(data => setRules(data));
@@ -92,7 +92,7 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
         params.append('start_date', formData.startDate);
         params.append('end_date', formData.endDate);
         if (promotion?.id) params.append('exclude_id', String(promotion.id));
-        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const API_BASE = import.meta.env.VITE_API_BASE_URL;
         const url = `${API_BASE}/promotions/available-books?${params.toString()}`;
         const res = await fetch(url, { signal: controller.signal });
         const data = res.ok ? await res.json() : [];
@@ -222,7 +222,7 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
         
         // Log để kiểm tra payload
         console.log("Payload sẽ gửi đi:", payload);
-        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
         if (promotion && promotion.id) {
           response = await fetch(`${API_BASE}/promotions/${promotion.id}`, {

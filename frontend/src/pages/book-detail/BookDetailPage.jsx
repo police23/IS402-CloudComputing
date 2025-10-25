@@ -380,7 +380,7 @@ function BookDetailPage() {
   const ratingStats = getRatingStats();
 
   const getBookImageUrl = (book, idx = 0) => {
-    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
+    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '');
     if (book.images && book.images.length > 0) {
       const imagePath = book.images[idx] ? book.images[idx].image_path : book.images[0].image_path;
       return imagePath.startsWith('http') ? imagePath : `${BACKEND_URL}${imagePath}`;
@@ -393,7 +393,7 @@ function BookDetailPage() {
   };
 
   const getImageList = (book) => {
-    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:5000";
+    const BACKEND_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '');
     if (book.images && book.images.length > 0) {
       return book.images.map(img => img.image_path.startsWith('http') ? img.image_path : `${BACKEND_URL}${img.image_path}`);
     }
