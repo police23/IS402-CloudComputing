@@ -27,7 +27,16 @@ const PORT = process.env.PORT || 5000;
 const paymentRoutes = require('./routes/PaymentRoutes');
 
 
-app.use(cors({ origin: "http://localhost:5173" }));
+const allowedOrigins = [
+  "https://polite-plant-0a1f5f900.3.azurestaticapps.net", // frontend trên Azure
+  "http://localhost:5173" // cho phép khi chạy local dev
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static(require('path').join(__dirname, 'uploads')));
