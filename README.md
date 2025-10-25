@@ -17,10 +17,6 @@ This project is a full-stack Book Store Management system designed to help manag
 - Record and track book imports and damage reports.
 - Adjust inventory levels and manage stock accuracy.
 
-#### Sales Staff
-- Process customer orders and handle payments.
-- Create, send, and manage invoices.
-
 #### Order Management Staff
 - Monitor and update order statuses.
 - Coordinate shipments and manage shipping methods.
@@ -169,14 +165,6 @@ Below are interface screenshots from the application (in the `images/` folder):
   ![My Orders](images/MyOrders.png)
 **Order Details**  
   ![Order Details](images/OrderDetails.png)
-**Create Invoice**  
-  ![Create Invoice](images/CreateInvoice.png)
-**Create Invoice (v2)**  
-  ![Create Invoice (v2)](images/CreateInvoice_2.png)
-**Invoice Details**  
-  ![Invoice Details](images/InvoiceDetails.png)
-**Export Invoice**  
-  ![Export Invoice](images/ExportInvoice.png)
 **Change Password**  
   ![Change Password](images/ChangePassword.png)
 **Top 10 Most Sold Books**  
