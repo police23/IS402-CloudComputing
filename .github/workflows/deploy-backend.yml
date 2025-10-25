@@ -19,15 +19,18 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Install dependencies
         run: npm install
-        
+
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to Azure Web App
-        uses: azure/we
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'my-bookstore-backend'
+          package: .
