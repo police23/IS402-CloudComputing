@@ -15,6 +15,7 @@ import ProfilePage from './pages/profile/ProfilePage.jsx';
 import MyOrdersPage from './pages/my-orders/MyOrdersPage.jsx';
 import OrderManagementPanel from './pages/panel/OrderManagerPanel.jsx';
 import ShipperPanel from './pages/panel/ShipperPanel.jsx';
+import axios from "axios";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, loading } = useAuth();
@@ -45,7 +46,6 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
   return children;
 };
-
 const HomeRoute = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -63,6 +63,17 @@ const HomeRoute = () => {
       }
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    axios
+      .get("https://my-bookstore-backend-linux-bzcyc3bncbgwhyfq.southeastasia-01.azurewebsites.net/api-test")
+      .then((res) => {
+        console.log("Backend connected successfully:", res.data);
+      })
+      .catch((err) => {
+        console.error("Backend connection failed:", err);
+      });
+  }, []);
 
   return <HomePage />;
 };
