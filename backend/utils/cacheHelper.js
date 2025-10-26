@@ -42,7 +42,7 @@ class CacheHelper {
       const serialized = typeof value === 'string' ? value : JSON.stringify(value);
       
       if (ttl) {
-        await redis.set(key, serialized, { EX: ttl });
+        await redis.set(key, serialized, 'EX', ttl);
       } else {
         await redis.set(key, serialized);
       }
