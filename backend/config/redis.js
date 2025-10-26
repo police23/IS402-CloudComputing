@@ -1,13 +1,19 @@
-const Redis = require('ioredis');
+import Redis from "ioredis";
 
-const redis = new Redis({
-  host: process.env.REDIS_HOST,  // ex: mybookstore-redis.redis.cache.windows.net
+const redisClient = new Redis({
+  host: process.env.REDIS_HOST, // mybookstore-redis.redis.cache.windows.net
   port: process.env.REDIS_PORT || 6380,
-  password: process.env.REDIS_PASSWORD,  // your primary key
-  tls: {}, // required for Azure Redis
+  password: process.env.REDIS_PASSWORD,
+  username: "default", 
+  tls: {},              
 });
 
-redis.on('connect', () => console.log('Connected to Azure Redis Cache'));
-redis.on('error', (err) => console.error('Redis error', err));
+redisClient.on("connect", () => {
+  console.log("✅ Connected to Azure Redis Cache");
+});
 
-module.exports = redis;
+redisClient.on("error", (err) => {
+  console.error("❌ Redis connection error:", err);
+});
+
+export default redisClient;
