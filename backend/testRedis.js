@@ -1,17 +1,8 @@
-import Redis from "ioredis";
-import dotenv from "dotenv";
+const redis = require("./config/redis");
 
-dotenv.config();
-
-const client = new Redis({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  username: process.env.REDIS_USERNAME,
-  password: process.env.REDIS_PASSWORD,
-  tls: process.env.REDIS_TLS === "true" ? {} : undefined,
-});
-
-client.on("connect", () => console.log("Connected to Redis"));
-client.on("error", (err) => console.error("Redis error:", err.message));
-
-client.ping().then((res) => console.log("Ping:", res));
+(async () => {
+  await redis.set("test:book", JSON.stringify({ title: "Redis Works!" }), "EX", 10);
+  const val = await redis.get("test:book");
+  console.log("✅ Redis test value:", val);
+  process.exit(0);
+})();
