@@ -367,7 +367,7 @@ const getTop10MostSoldBooksAll = async (req, res) => {
         const month = req.query.month || req.params.month;
         const year = req.query.year || req.params.year;
         
-        const books = await reportService.getTop10MostSoldBooksAll(month, year);
+        const books = await reportService.getTop10MostSoldBooksOnline(month, year);
         res.json({ 
             success: true, 
             data: books 
