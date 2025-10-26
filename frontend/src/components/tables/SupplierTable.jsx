@@ -147,8 +147,9 @@ const SupplierTable = () => {
 
   const confirmDelete = async () => {
     try {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
       for (const id of selectedRows) {
-        const response = await fetch(`http://localhost:5000/api/suppliers/${id}`, {
+        const response = await fetch(`${API_BASE}/suppliers/${id}`, {
           method: "DELETE"
         });
         if (!response.ok) {
@@ -169,7 +170,8 @@ const SupplierTable = () => {
   const handleSupplierSubmit = async (formData) => {
     if (selectedSupplier) {
       try {
-        const response = await fetch(`http://localhost:5000/api/suppliers/${selectedSupplier.id}`, {
+        const API_BASE = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE}/suppliers/${selectedSupplier.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData)
@@ -189,7 +191,8 @@ const SupplierTable = () => {
       }
     } else {
       try {
-        const response = await fetch("http://localhost:5000/api/suppliers", {
+        const API_BASE = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE}/suppliers`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData)

@@ -41,7 +41,8 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
     getAllBooks()
       .then(data => setBooks(Array.isArray(data) ? data : []))
       .catch(() => setBooks([]));
-    fetch("/api/users")
+    const API_BASE = import.meta.env.VITE_API_BASE_URL;
+    fetch(`${API_BASE}/users`)
       .then(res => res.json())
       .then(data => setUsers(data))
       .catch(() => setUsers([]));
@@ -167,8 +168,9 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
   // Hàm xác nhận xóa
   async function confirmDelete() {
     try {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
       for (const id of selectedRows) {
-        await fetch(`/api/damage-reports/${id}`, { method: "DELETE" });
+        await fetch(`${API_BASE}/damage-reports/${id}`, { method: "DELETE" });
       }
       setNotification({ message: `Đã xóa ${selectedRows.length} phiếu sách hỏng thành công!`, type: "success" });
       setShowDeleteConfirmation(false);
@@ -280,7 +282,8 @@ const DamageReportTable = ({ onEdit, onDelete, onView }) => {
         <DamageReportForm
           onSubmit={async (formData) => {
             try {
-              await fetch("/api/damage-reports", {
+              const API_BASE = import.meta.env.VITE_API_BASE_URL;
+              await fetch(`${API_BASE}/damage-reports`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),

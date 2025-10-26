@@ -51,7 +51,8 @@ function CartPage() {
 
   const fetchAvailablePromotions = async () => {
     try {
-      const res = await axios.get('/api/promotions/available', {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
+      const res = await axios.get(`${API_BASE}/promotions/available`, {
         params: { total_price: subtotal }
       });
       setAvailablePromotions(res.data || []);

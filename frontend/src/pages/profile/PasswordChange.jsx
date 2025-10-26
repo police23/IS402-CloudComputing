@@ -132,41 +132,11 @@ const PasswordChange = ({ user, onNotification, onCancel }) => {
     setPasswordChanging(true);
     
     try {
-      try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL;
-        await axios.post(`${API_BASE}/users/${user.id}/change-password`, {
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
-        });
-      } catch (localErr) {
-        if (
-          localErr.response &&
-          (localErr.response.status === 401 ||
-            (localErr.response.data &&
-              typeof localErr.response.data.error === "string" &&
-              (
-                localErr.response.data.error.toLowerCase().includes("incorrect") ||
-                localErr.response.data.error.toLowerCase().includes("wrong") ||
-                localErr.response.data.error.toLowerCase().includes("mật khẩu") ||
-                localErr.response.data.error.toLowerCase().includes("không đúng") ||
-                localErr.response.data.error.toLowerCase().includes("sai")
-              )
-            )
-          )
-        ) {
-          setPasswordErrors({
-            ...passwordErrors,
-            currentPassword: "Mật khẩu cũ không đúng"
-          });
-          onNotification("Mật khẩu cũ không đúng", "error");
-          setPasswordChanging(false);
-          return;
-        }
-        await axios.post(`/api/users/${user.id}/change-password`, {
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
-        });
-      }
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
+      await axios.post(`${API_BASE}/users/${user.id}/change-password`, {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
       onNotification("Mật khẩu đã được thay đổi thành công!", "success");
       setPasswordData({
         currentPassword: "",

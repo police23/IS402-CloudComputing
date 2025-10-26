@@ -81,15 +81,7 @@ const ProfilePage = () => {
     
     try {      
       const API_BASE = import.meta.env.VITE_API_BASE_URL;
-      // Try with and without localhost prefix
-      let response;
-      try {
-        // First try with configured API URL
-        response = await axios.get(`${API_BASE}/users/${user.id}`);
-      } catch (localErr) {
-        // If that fails, try relative URL
-        response = await axios.get(`/api/users/${user.id}`);
-      }
+      const response = await axios.get(`${API_BASE}/users/${user.id}`);
         const rawUserData = response.data;
       
       // Format user data using the helper function
@@ -193,17 +185,8 @@ const ProfilePage = () => {
               user.role_id === 3 ? 'warehouse' : 'sales',
         is_active: 1 // Keep active
       };
-      try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL;
-        const response = await axios.put(`${API_BASE}/users/${user.id}`, updateData);
-      } catch (localErr) {
-        // Nếu lỗi từ localhost có chứa thông báo cụ thể, ném lỗi đó ra
-        if (localErr.response && localErr.response.data && localErr.response.data.error) {
-          throw localErr;
-        }
-        // Nếu không, thử endpoint tương đối
-        const response = await axios.put(`/api/users/${user.id}`, updateData);
-      }
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
+      await axios.put(`${API_BASE}/users/${user.id}`, updateData);
       setNotification({ message: "Thông tin đã được cập nhật thành công!", type: "success" });
       setTimeout(() => setNotification({ message: "", type: "" }), 5000);
       

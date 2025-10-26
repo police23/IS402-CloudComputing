@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 // type: 'all' | 'offline' | 'online'
 // viewType: 'monthly' | 'daily'
@@ -18,14 +19,14 @@ const useRevenueStats = (type, viewType, year, month) => {
     let url = "";
     if (viewType === "monthly") {
       // Theo tháng, lấy cho cả năm, theo loại thống kê
-      if (type === "offline") url = `/api/reports/revenue-offline?year=${year}`;
-      else if (type === "online") url = `/api/reports/revenue-online?year=${year}`;
-      else url = `/api/reports/revenue-all?year=${year}`;
+      if (type === "offline") url = `${API_BASE}/reports/revenue-offline?year=${year}`;
+      else if (type === "online") url = `${API_BASE}/reports/revenue-online?year=${year}`;
+      else url = `${API_BASE}/reports/revenue-all?year=${year}`;
     } else if (viewType === "daily") {
       // Theo ngày, lấy theo tháng và loại thống kê
-      if (type === "offline") url = `/api/reports/daily-revenue-offline?month=${month}&year=${year}`;
-      else if (type === "online") url = `/api/reports/daily-revenue-online?month=${month}&year=${year}`;
-      else url = `/api/reports/daily-revenue-all?month=${month}&year=${year}`;
+      if (type === "offline") url = `${API_BASE}/reports/daily-revenue-offline?month=${month}&year=${year}`;
+      else if (type === "online") url = `${API_BASE}/reports/daily-revenue-online?month=${month}&year=${year}`;
+      else url = `${API_BASE}/reports/daily-revenue-all?month=${month}&year=${year}`;
     }
 
     axios

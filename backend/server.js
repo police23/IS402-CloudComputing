@@ -6,13 +6,17 @@ const bodyParser = require('body-parser');
 // =============================
 // ⚙️ Cấu hình kết nối Azure MySQL
 // =============================
-process.env.DB_DIALECT = 'mysql';
-process.env.DB_HOST = 'mybookstore-mysql.mysql.database.azure.com';
-process.env.DB_PORT = '3306';
-process.env.DB_USER = 'adminuser';
-process.env.DB_PASSWORD = 'Haxuanbac123456.';
-process.env.DB_NAME = 'bookstoredb'; // bạn sẽ tạo DB này trong Azure portal (tab Databases)
-process.env.DATABASE_URL = `mysql://${process.env.DB_USER}:${encodeURIComponent(process.env.DB_PASSWORD)}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}?ssl=true`;
+const {
+  DB_DIALECT,
+  DB_HOST,
+  DB_PORT,
+  DB_USER,
+  DB_PASSWORD,
+  DB_NAME
+} = process.env;
+
+process.env.DATABASE_URL = `mysql://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@${DB_HOST}:${DB_PORT}/${DB_NAME}?ssl=true`;
+
 
 // =============================
 // Initialize all models
