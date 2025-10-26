@@ -58,6 +58,7 @@ BookImages.belongsTo(Book, { foreignKey: 'book_id', as: 'book' });
 BookImport.belongsTo(Supplier, { foreignKey: 'supplier_id', as: 'supplier' });
 BookImport.belongsTo(User, { foreignKey: 'imported_by', as: 'employee' });
 BookImport.hasMany(ImportDetail, { foreignKey: 'import_id', as: 'details', onDelete: 'CASCADE' });
+ImportDetail.belongsTo(Book, { foreignKey: 'book_id', as: 'book' });
 
 Supplier.hasMany(BookImport, { foreignKey: 'supplier_id', as: 'imports' });
 User.hasMany(BookImport, { foreignKey: 'imported_by', as: 'imports' });
