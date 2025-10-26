@@ -1,20 +1,34 @@
 
 const { BookImport, ImportDetail } = require('../models');
 const { Op } = require('sequelize');
+const cacheHelper = require('../utils/cacheHelper');
 
+const CACHE_KEYS = {
+  ALL_IMPORTS: 'imports:all',
+};
+
+const CACHE_TTL = {
+  IMPORTS_LIST: 900, // 15 minutes
+};
 
 const getAllImports = async () => {
-  return await BookImport.findAll({
-    include: [
-      'supplier', 
-      'employee', 
-      {
-        association: 'details',
-        include: ['book']
-      }
-    ],
-    order: [['import_date', 'DESC']]
-  });
+  return await cacheHelper.getOrSet(
+      CACHE_KEYS.ALL_IMPORTS,
+      async () => {
+          return await BookImport.findAll({
+              include: [
+                  'supplier', 
+                  'employee', 
+                  {
+                      association: 'details',
+                      include: ['book']
+                  }
+              ],
+              order: [['import_date', 'DESC']]
+          });
+      },
+      CACHE_TTL.IMPORTS_LIST
+  );
 };
 
 
@@ -37,6 +51,8 @@ const createImport = async (importData) => {
       });
     }
   }
+  // Invalidate cache
+  await cacheHelper.del(CACHE_KEYS.ALL_IMPORTS);
   // Return import with details
   return await BookImport.findByPk(bookImport.id, { 
     include: [

@@ -1,17 +1,49 @@
 const bcrypt = require('bcrypt');
 const { User } = require('../models');
 const { Op } = require('sequelize');
+const cacheHelper = require('../utils/cacheHelper');
+
+const CACHE_KEYS = {
+  ALL_USERS: 'users:all',
+  ALL_SHIPPERS: 'users:shippers',
+  USERS_BY_ROLE: (roleId) => `users:role:${roleId}`,
+  USER_BY_ID: (id) => `users:${id}`,
+};
+
+const CACHE_TTL = {
+  USERS_LIST: 1800,     // 30 minutes
+  SHIPPERS_LIST: 1800,  // 30 minutes
+  USER_DETAIL: 1200,    // 20 minutes
+};
 
 const getAllUsers = async () => {
-  return await User.findAll();
+  return await cacheHelper.getOrSet(
+      CACHE_KEYS.ALL_USERS,
+      async () => {
+          return await User.findAll();
+      },
+      CACHE_TTL.USERS_LIST
+  );
 };
 
 const getAllShippers = async () => {
-  return await User.findAll({ where: { role_id: 6, is_active: 1 } });
+  return await cacheHelper.getOrSet(
+      CACHE_KEYS.ALL_SHIPPERS,
+      async () => {
+          return await User.findAll({ where: { role_id: 6, is_active: 1 } });
+      },
+      CACHE_TTL.SHIPPERS_LIST
+  );
 };
 
 const getUsersByRole = async (role_id) => {
-  return await User.findAll({ where: { role_id } });
+  return await cacheHelper.getOrSet(
+      CACHE_KEYS.USERS_BY_ROLE(role_id),
+      async () => {
+          return await User.findAll({ where: { role_id } });
+      },
+      CACHE_TTL.USERS_LIST
+  );
 };
 
 const getUserById = async (id) => {
@@ -87,6 +119,8 @@ const addUser = async (userData) => {
     role_id,
     is_active
   });
+  // Invalidate user caches
+  await cacheHelper.delMany([CACHE_KEYS.ALL_USERS, CACHE_KEYS.ALL_SHIPPERS, CACHE_KEYS.USERS_BY_ROLE(role_id)]);
   return user;
 };
 
@@ -143,6 +177,8 @@ const updateUser = async (id, userData) => {
     updateData.password = await bcrypt.hash(password, saltRounds);
   }
   await user.update(updateData);
+  // Invalidate user caches
+  await cacheHelper.delMany([CACHE_KEYS.ALL_USERS, CACHE_KEYS.ALL_SHIPPERS, CACHE_KEYS.USERS_BY_ROLE(user.role_id), CACHE_KEYS.USER_BY_ID(id)]);
   return user;
 };
 
@@ -150,6 +186,8 @@ const deleteUser = async (id) => {
   const user = await User.findByPk(id);
   if (!user) throw { status: 404, message: 'User not found' };
   await user.destroy();
+  // Invalidate user caches
+  await cacheHelper.delMany([CACHE_KEYS.ALL_USERS, CACHE_KEYS.ALL_SHIPPERS, CACHE_KEYS.USERS_BY_ROLE(user.role_id), CACHE_KEYS.USER_BY_ID(id)]);
   return { message: 'User deleted successfully' };
 };
 

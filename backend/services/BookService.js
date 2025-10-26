@@ -1,14 +1,33 @@
 const { Book, Category, Publisher, BookImages, sequelize } = require('../models');
 const { Op, QueryTypes } = require('sequelize');
+const cacheHelper = require('../utils/cacheHelper');
+
+const CACHE_KEYS = {
+  ALL_BOOKS: 'books:all',
+  BOOK_BY_ID: (id) => `books:${id}`,
+  BOOKS_BY_CATEGORY: (catId) => `books:category:${catId}`,
+};
+
+const CACHE_TTL = {
+  BOOKS_LIST: 3600,     // 1 hour
+  BOOK_DETAIL: 1800,    // 30 minutes
+  BOOKS_CATEGORY: 1800, // 30 minutes
+};
 
 const getAllBooks = async () => {
-  return await Book.findAll({
-    include: [
-      { model: Category, as: 'category', attributes: ['id', 'name'] },
-      { model: Publisher, as: 'publisher', attributes: ['id', 'name'] },
-      { model: BookImages, as: 'images', attributes: ['id', 'image_path'] }
-    ]
-  });
+  return await cacheHelper.getOrSet(
+    CACHE_KEYS.ALL_BOOKS,
+    async () => {
+      return await Book.findAll({
+        include: [
+          { model: Category, as: 'category', attributes: ['id', 'name'] },
+          { model: Publisher, as: 'publisher', attributes: ['id', 'name'] },
+          { model: BookImages, as: 'images', attributes: ['id', 'image_path'] }
+        ]
+      });
+    },
+    CACHE_TTL.BOOKS_LIST
+  );
 };
 
 const createBook = async (bookData, files = []) => {
@@ -30,6 +49,8 @@ const createBook = async (bookData, files = []) => {
     }
 
     // Return with associations so frontend sees images immediately
+    // Invalidate cache after create
+    await cacheHelper.del(CACHE_KEYS.ALL_BOOKS);
     const created = await Book.findByPk(book.id, {
       include: [
         { model: Category, as: 'category', attributes: ['id', 'name'] },
@@ -66,6 +87,8 @@ const updateBook = async (id, bookData, files = []) => {
     }
   });
 
+  // Invalidate cache after update
+  await cacheHelper.del(CACHE_KEYS.ALL_BOOKS);
   // Return with associations updated
   return await Book.findByPk(id, {
     include: [
@@ -79,6 +102,8 @@ const updateBook = async (id, bookData, files = []) => {
 const deleteBook = async (id) => {
   const book = await Book.findByPk(id);
   await book.destroy();
+  // Invalidate cache after delete
+  await cacheHelper.del(CACHE_KEYS.ALL_BOOKS);
   return { success: true };
 };
 

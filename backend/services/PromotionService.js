@@ -1,21 +1,44 @@
 const { Promotion, Book, sequelize } = require('../models');
 const { Op, QueryTypes } = require('sequelize');
+const cacheHelper = require('../utils/cacheHelper');
+
+const CACHE_KEYS = {
+  ALL_PROMOTIONS: 'promotions:all',
+  AVAILABLE_PROMOTIONS: 'promotions:available',
+};
+
+const CACHE_TTL = {
+  PROMOTIONS_LIST: 3600,    // 1 hour
+  AVAILABLE_PROMOTIONS: 1800, // 30 minutes
+};
 
 const getAllPromotions = async () => {
-  return await Promotion.findAll({
-    include: [{ model: Book, as: 'books', through: { attributes: [] } }],
-  });
+  return await cacheHelper.getOrSet(
+      CACHE_KEYS.ALL_PROMOTIONS,
+      async () => {
+          return await Promotion.findAll({
+              include: [{ model: Book, as: 'books', through: { attributes: [] } }],
+          });
+      },
+      CACHE_TTL.PROMOTIONS_LIST
+  );
 };
 
 // Deprecated in new schema; retained as no-op returning currently active promotions for compatibility
 const getAvailablePromotions = async () => {
-  return await Promotion.findAll({
-    where: {
-      start_date: { [Op.lte]: new Date() },
-      end_date: { [Op.gte]: new Date() },
-    },
-    include: [{ model: Book, as: 'books', through: { attributes: [] } }],
-  });
+  return await cacheHelper.getOrSet(
+      CACHE_KEYS.AVAILABLE_PROMOTIONS,
+      async () => {
+          return await Promotion.findAll({
+              where: {
+                  start_date: { [Op.lte]: new Date() },
+                  end_date: { [Op.gte]: new Date() },
+              },
+              include: [{ model: Book, as: 'books', through: { attributes: [] } }],
+          });
+      },
+      CACHE_TTL.AVAILABLE_PROMOTIONS
+  );
 };
 
 // Helper: find conflicting book IDs for a date range (overlap rule)
@@ -96,6 +119,8 @@ const addPromotion = async (promotionData) => {
   if (Array.isArray(bookIds) && bookIds.length > 0) {
     await promo.setBooks(bookIds);
   }
+  // Invalidate promotion caches
+  await cacheHelper.delMany([CACHE_KEYS.ALL_PROMOTIONS, CACHE_KEYS.AVAILABLE_PROMOTIONS]);
   return await Promotion.findByPk(promo.id, {
     include: [{ model: Book, as: 'books', through: { attributes: [] } }],
   });
@@ -125,6 +150,8 @@ const updatePromotion = async (id, promotionData) => {
   if (Array.isArray(bookIds)) {
     await promo.setBooks(bookIds);
   }
+  // Invalidate promotion caches
+  await cacheHelper.delMany([CACHE_KEYS.ALL_PROMOTIONS, CACHE_KEYS.AVAILABLE_PROMOTIONS]);
   return await Promotion.findByPk(id, {
     include: [{ model: Book, as: 'books', through: { attributes: [] } }],
   });
@@ -134,6 +161,8 @@ const deletePromotion = async (id) => {
   const promo = await Promotion.findByPk(id);
   if (!promo) throw new Error('Promotion not found');
   await promo.destroy();
+  // Invalidate promotion caches
+  await cacheHelper.delMany([CACHE_KEYS.ALL_PROMOTIONS, CACHE_KEYS.AVAILABLE_PROMOTIONS]);
   return { success: true };
 };
 

@@ -1,12 +1,27 @@
 const { Rating, User, Book, sequelize } = require('../models');
 const { Op } = require('sequelize');
+const cacheHelper = require('../utils/cacheHelper');
+
+const CACHE_KEYS = {
+  RATINGS_BY_BOOK: (bookId) => `ratings:book:${bookId}`,
+};
+
+const CACHE_TTL = {
+  RATINGS: 600, // 10 minutes (vì ratings hay thay đổi)
+};
 
 const getAllRatingsByBookID = async (bookID) => {
-  return await Rating.findAll({
-    where: { book_id: bookID },
-    include: [{ model: User, attributes: ['full_name'] }],
-    order: [['created_at', 'DESC']]
-  });
+  return await cacheHelper.getOrSet(
+      CACHE_KEYS.RATINGS_BY_BOOK(bookID),
+      async () => {
+          return await Rating.findAll({
+              where: { book_id: bookID },
+              include: [{ model: User, attributes: ['full_name'] }],
+              order: [['created_at', 'DESC']]
+          });
+      },
+      CACHE_TTL.RATINGS
+  );
 };
 
 const hasPurchasedBook = async (userID, bookID) => {
@@ -26,6 +41,8 @@ const rateBook = async (userID, bookID, ratingValue, comment) => {
     existing.comment = comment;
     existing.created_at = new Date();
     await existing.save();
+    // Invalidate cache
+    await cacheHelper.del(CACHE_KEYS.RATINGS_BY_BOOK(bookID));
     return { message: 'Rating updated' };
   } else {
     await Rating.create({
@@ -35,6 +52,8 @@ const rateBook = async (userID, bookID, ratingValue, comment) => {
       comment,
       created_at: new Date(),
     });
+    // Invalidate cache
+    await cacheHelper.del(CACHE_KEYS.RATINGS_BY_BOOK(bookID));
     return { message: 'Rating created' };
   }
 };

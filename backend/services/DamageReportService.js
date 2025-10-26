@@ -1,17 +1,32 @@
 const { DamageReport, DamageReportItem, User, Book } = require('../models');
+const cacheHelper = require('../utils/cacheHelper');
+
+const CACHE_KEYS = {
+  ALL_DAMAGE_REPORTS: 'damage-reports:all',
+};
+
+const CACHE_TTL = {
+  DAMAGE_REPORTS_LIST: 900, // 15 minutes
+};
 
 const getAllDamageReports = async () => {
-  return await DamageReport.findAll({
-    include: [
-      { model: User, as: 'creator', attributes: ['full_name'] },
-      { 
-        model: DamageReportItem, 
-        as: 'items', 
-        include: [{ model: Book, as: 'book', attributes: ['title'] }] 
-      }
-    ],
-    order: [['created_at', 'DESC']]
-  });
+  return await cacheHelper.getOrSet(
+      CACHE_KEYS.ALL_DAMAGE_REPORTS,
+      async () => {
+          return await DamageReport.findAll({
+              include: [
+                  { model: User, as: 'creator', attributes: ['full_name'] },
+                  { 
+                      model: DamageReportItem, 
+                      as: 'items', 
+                      include: [{ model: Book, as: 'book', attributes: ['title'] }] 
+                  }
+              ],
+              order: [['created_at', 'DESC']]
+          });
+      },
+      CACHE_TTL.DAMAGE_REPORTS_LIST
+  );
 };
 
 const createDamageReport = async (report) => {
@@ -56,6 +71,8 @@ const createDamageReport = async (report) => {
     }
   }
 
+  // Invalidate cache
+  await cacheHelper.del(CACHE_KEYS.ALL_DAMAGE_REPORTS);
   return damageReport;
 };
 
@@ -69,6 +86,8 @@ const deleteDamageReport = async (id) => {
   await DamageReportItem.destroy({ where: { report_id: id } });
   await damageReport.destroy();
   
+  // Invalidate cache
+  await cacheHelper.del(CACHE_KEYS.ALL_DAMAGE_REPORTS);
   return { message: "Xóa báo cáo hư hỏng thành công" };
 };
 
