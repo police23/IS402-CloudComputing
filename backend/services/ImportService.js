@@ -184,8 +184,8 @@ const getStockChartData = async () => {
         attributes: ['id', 'name']
       }
     ],
-    attributes: ['id', 'title', 'stock', 'category_id'],
-    order: [['stock', 'DESC']]
+    attributes: ['id', 'title', 'quantity_in_stock', 'category_id'],
+    order: [['quantity_in_stock', 'DESC']]
   });
   
   return books;
