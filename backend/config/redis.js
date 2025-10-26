@@ -3,9 +3,12 @@ import Redis from "ioredis";
 const redisClient = new Redis({
   host: process.env.REDIS_HOST, // mybookstore-redis.redis.cache.windows.net
   port: process.env.REDIS_PORT || 6380,
-  password: process.env.REDIS_PASSWORD,
   username: "default", 
-  tls: {},              
+  password: process.env.REDIS_PASSWORD, 
+  tls: {
+    rejectUnauthorized: false, 
+  },
+  connectTimeout: 10000, 
 });
 
 redisClient.on("connect", () => {

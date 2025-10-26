@@ -42,7 +42,7 @@ class CacheHelper {
       const serialized = typeof value === 'string' ? value : JSON.stringify(value);
       
       if (ttl) {
-        await redis.setex(key, ttl, serialized);
+        await redis.set(key, serialized, { EX: ttl });
       } else {
         await redis.set(key, serialized);
       }
@@ -159,7 +159,7 @@ class CacheHelper {
    */
   static async incr(key, increment = 1) {
     try {
-      const result = await redis.incrby(key, increment);
+      const result = await redis.incrBy(key, increment);
       return result;
     } catch (err) {
       console.error(`Cache INCR error for key ${key}:`, err);
