@@ -21,8 +21,19 @@ const sequelize = new Sequelize(
 
 sequelize
   .authenticate()
-  .then(() => {
+  .then(async () => {
     console.log('✅ Connected to MySQL successfully.');
+    // ===============================
+    // 🧹 Reset connection pool Azure
+    // ===============================
+    try {
+      await sequelize.connectionManager.close();
+      await sequelize.connectionManager.initPools();
+
+      console.log('🔁 Sequelize connection pool refreshed successfully.');
+    } catch (poolErr) {
+      console.warn('⚠️ Warning: Could not refresh pool:', poolErr.message);
+    }
   })
   .catch((err) => {
     console.error('❌ MySQL connection error:', err);
