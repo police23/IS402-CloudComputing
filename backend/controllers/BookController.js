@@ -67,9 +67,15 @@ const getOldStockBooks = async (req, res) => {
   try {
     const months = req.query.months ? parseInt(req.query.months) : 2;
     const books = await bookService.getOldStockBooks(months);
-    res.json(books);
+    res.json({
+      success: true,
+      data: books
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch old stock books' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to fetch old stock books' 
+    });
   }
 };
 

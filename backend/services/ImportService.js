@@ -184,11 +184,17 @@ const getStockChartData = async () => {
         attributes: ['id', 'name']
       }
     ],
-    attributes: ['id', 'title', 'quantity_in_stock', 'category_id'],
-    order: [['quantity_in_stock', 'DESC']]
+    attributes: ['id', 'title', 'price', 'quantity_in_stock'],
+    order: [['quantity_in_stock', 'DESC']],
+    raw: false
   });
   
-  return books;
+  // Map dữ liệu: đổi quantity_in_stock thành stock
+  return books.map(book => ({
+    ...book.dataValues,
+    stock: book.quantity_in_stock,
+    category: book.category
+  }));
 };
 
 module.exports = {

@@ -110,13 +110,25 @@ const deleteBook = async (id) => {
 const getOldStockBooks = async (months = 2) => {
   const now = new Date();
   const compareDate = new Date(now.setMonth(now.getMonth() - months));
-  return await Book.findAll({
+  const books = await Book.findAll({
     where: {
       updated_at: { [Op.lte]: compareDate },
       quantity_in_stock: { [Op.gt]: 0 }
     },
-    order: [['updated_at', 'ASC']]
+    include: [
+      { model: Category, as: 'category', attributes: ['id', 'name'] }
+    ],
+    attributes: ['id', 'title', 'price', 'quantity_in_stock', 'updated_at'],
+    order: [['updated_at', 'ASC']],
+    raw: false
   });
+  
+  // Map dữ liệu: đổi quantity_in_stock thành stock
+  return books.map(book => ({
+    ...book.dataValues,
+    stock: book.quantity_in_stock,
+    category: book.category
+  }));
 };
 
 const getBookById = async (id) => {
