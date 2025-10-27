@@ -1,5 +1,6 @@
-require('dotenv').config();
-const { Sequelize } = require('sequelize');
+import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -7,15 +8,18 @@ const sequelize = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 3306,
-    dialect: 'mysql',
-    logging: false,
+    dialect: process.env.DB_DIALECT,
+    port: process.env.DB_PORT,
     dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
+      ssl: process.env.DB_SSL === 'true',
     },
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
+    },
+    logging: false,
   }
 );
 
@@ -23,20 +27,18 @@ sequelize
   .authenticate()
   .then(async () => {
     console.log('✅ Connected to MySQL successfully.');
-    // ===============================
-    // 🧹 Reset connection pool Azure
-    // ===============================
-    try {
-      await sequelize.connectionManager.close();
-      await sequelize.connectionManager.initPools();
 
-      console.log('🔁 Sequelize connection pool refreshed successfully.');
+    // 🔁 Health check thay vì đóng pool
+    try {
+      await sequelize.query('SELECT 1');
+      console.log('🔁 Connection health check OK.');
     } catch (poolErr) {
-      console.warn('⚠️ Warning: Could not refresh pool:', poolErr.message);
+      console.warn('⚠️ Connection check failed, reinitializing pool...');
+      sequelize.connectionManager.initPools();
     }
   })
   .catch((err) => {
     console.error('❌ MySQL connection error:', err);
   });
 
-module.exports = sequelize;
+export default sequelize;
