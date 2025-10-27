@@ -23,22 +23,20 @@ const sequelize = new Sequelize(
   }
 );
 
-sequelize
-  .authenticate()
-  .then(async () => {
+// ✅ Chỉ kiểm tra kết nối, KHÔNG đóng pool
+const initializeDatabase = async () => {
+  try {
+    await sequelize.authenticate();
     console.log('✅ Connected to MySQL successfully.');
 
-    // 🔁 Health check thay vì đóng pool
-    try {
-      await sequelize.query('SELECT 1');
-      console.log('🔁 Connection health check OK.');
-    } catch (poolErr) {
-      console.warn('⚠️ Connection check failed, reinitializing pool...');
-      sequelize.connectionManager.initPools();
-    }
-  })
-  .catch((err) => {
-    console.error('❌ MySQL connection error:', err);
-  });
+    // Health check (kiểm tra kết nối)
+    await sequelize.query('SELECT 1');
+    console.log('🔁 Connection health check OK.');
+  } catch (err) {
+    console.error('❌ MySQL connection error:', err.message);
+  }
+};
+
+initializeDatabase();
 
 export default sequelize;
