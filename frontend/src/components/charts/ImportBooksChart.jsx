@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Line, Chart } from "react-chartjs-2";
+import { Line, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
+  LineController,
+  BarController,
   LineElement,
   PointElement,
   BarElement,
@@ -16,7 +18,7 @@ import * as XLSX from "xlsx";
 import "./ImportBooksChart.css"; // CSS riêng cho ImportBooksTable
 import { getImportDataByMonth, getImportDataByYear } from "../../services/ImportService";
 
-ChartJS.register(LineElement, PointElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(LineController, BarController, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 // Function to render daily view
 function renderDailyView(dailyData, month, year) {

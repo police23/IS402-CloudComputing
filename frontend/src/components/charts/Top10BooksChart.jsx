@@ -2,6 +2,7 @@ import React from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
+  BarController,
   BarElement,
   CategoryScale,
   LinearScale,
@@ -13,7 +14,7 @@ import html2canvas from "html2canvas";
 import * as XLSX from "xlsx";
 import "./Top10BooksChart.css";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const Top10BooksTable = ({ books, month, year }) => {
   // Ensure books is always an array

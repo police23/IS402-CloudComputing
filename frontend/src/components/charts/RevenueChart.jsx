@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Chart } from "react-chartjs-2";
 import {
   Chart as ChartJS,
+  LineController,
   LineElement,
   PointElement,
   CategoryScale,
@@ -9,12 +10,13 @@ import {
   Tooltip,
   Legend,
   BarElement,
+  BarController,
 } from "chart.js";
 import * as XLSX from 'xlsx';
 import { getBookRevenueDetailsByYear, getBookRevenueDetailsByMonth } from "../../services/ReportService";
 import "./RevenueChart.css";
 
-ChartJS.register(LineElement, PointElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(LineController, BarController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const typeLabels = {
   all: "Tất cả",
