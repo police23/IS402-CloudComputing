@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Chart } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   LineController,
@@ -16,7 +16,7 @@ import * as XLSX from 'xlsx';
 import { getBookRevenueDetailsByYear, getBookRevenueDetailsByMonth } from "../../services/ReportService";
 import "./RevenueChart.css";
 
-ChartJS.register(LineController, BarController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(LineController, BarController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend, BarElement);
 
 const typeLabels = {
   all: "Tất cả",
@@ -435,7 +435,7 @@ const RevenueTable = ({ data, year, month, viewType = "monthly", type = "all" })
         </div>
       </div>
       <div id="revenue-chart">
-        <Chart type='bar' data={chartData} options={options} height={130} />
+        <Bar data={chartData} options={options} height={130} />
       </div>
       <div className="revenue-summary">
         <h4>Tổng kết năm {year}</h4>
@@ -689,7 +689,7 @@ const renderDailyView = (dailyData, month, year, isExporting, setIsExporting) =>
         </div>
       </div>
       <div id="revenue-chart-daily">
-        <Chart type='bar' data={chartData} options={options} height={130} />
+        <Bar data={chartData} options={options} height={130} />
       </div>
       <div className="revenue-summary">
         <h4>Tổng kết tháng {month}/{year}</h4>

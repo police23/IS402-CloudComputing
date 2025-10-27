@@ -246,7 +246,7 @@ function renderDailyView(dailyData, month, year) {
         </div>
       </div>
       <div id="import-chart-daily">
-        <Chart type='bar' data={chartData} options={options} height={130} />
+        <Bar data={chartData} options={options} height={130} />
       </div>
       <div className="revenue-summary">
         <h4>Tổng kết tháng {month}/{year}</h4>
@@ -575,7 +575,7 @@ const ImportBooksTable = ({ data, year, month, viewType = "monthly" }) => {
         </div>
       </div>
       <div id="import-chart">
-        <Chart type='bar' data={chartData} options={options} height={130} />
+        <Bar data={chartData} options={options} height={130} />
       </div>
       <div className="revenue-summary">
         <h4>Tổng kết năm {year}</h4>
