@@ -6,7 +6,7 @@ import './OrderSuccessPage.css';
 function OrderSuccessPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { orderInfo } = location.state || {};
+  // Không còn hiển thị thông tin chi tiết đơn hàng trên trang này theo yêu cầu
 
   return (
     <div className="order-success-page">
@@ -40,14 +40,7 @@ function OrderSuccessPage() {
           </div>
           <h1 className="order-success-title">Đặt hàng thành công!</h1>
           <p className="order-success-desc">Cảm ơn bạn đã mua hàng tại <b>nhà sách Cánh Diều</b>.<br/>Chúng tôi sẽ liên hệ xác nhận và giao hàng sớm nhất.</p>
-          {orderInfo && (
-            <div className="order-info-box">
-              <h3 className="order-info-title">Thông tin đơn hàng</h3>
-              <div className="order-info-row"><b>Mã đơn hàng:</b> <span className="order-info-code">{orderInfo.orderCode || orderInfo.id || '-'}</span></div>
-              <div className="order-info-row"><b>Phương thức thanh toán:</b> <span className="order-info-method">{orderInfo.paymentMethod === 'online' ? 'ZaloPay' : 'Thanh toán khi nhận hàng (COD)'}</span></div>
-              <div className="order-info-row"><b>Tổng tiền:</b> <span className="order-info-total">{orderInfo.total && orderInfo.total.toLocaleString('vi-VN')}đ</span></div>
-            </div>
-          )}
+          {/* Yêu cầu: bỏ phần hiển thị thông tin đơn hàng */}
           <div className="order-success-actions">
             <button className="btn-back-home" onClick={() => navigate('/')}>Về trang chủ</button>
             <button className="btn-view-orders" onClick={() => navigate('/my-orders')}>Xem đơn hàng của tôi</button>

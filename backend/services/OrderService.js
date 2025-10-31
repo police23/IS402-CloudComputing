@@ -1,4 +1,4 @@
-const { Order, OrderDetail, OrderAssignment, User, ShippingMethod, Book } = require('../models');
+const { sequelize, Order, OrderDetail, OrderAssignment, User, ShippingMethod, Book } = require('../models');
 const { Op } = require('sequelize');
 
 const getOrdersByUserID = async (userID, page = 1, pageSize = 10) => {
@@ -75,31 +75,49 @@ const getOrdersByShipperID = async (shipperID, status, page = 1, pageSize = 10) 
 const createOrder = async (orderData) => {
   const { userID, shipping_method_id, shipping_address, promotion_code, total_amount,
     shipping_fee, discount_amount, final_amount, payment_method, orderDetails } = orderData;
-  
-  const order = await Order.create({
-    user_id: userID,
-    order_date: new Date(),
-    shipping_method_id,
-    shipping_address,
-    promotion_code: promotion_code || null,
-    total_amount,
-    shipping_fee,
-    discount_amount,
-    final_amount,
-    payment_method,
-    status: 'pending'
+
+  return await sequelize.transaction(async (t) => {
+    // Tạo đơn hàng
+    const order = await Order.create({
+      user_id: userID,
+      order_date: new Date(),
+      shipping_method_id,
+      shipping_address,
+      promotion_code: promotion_code || null,
+      total_amount,
+      shipping_fee,
+      discount_amount,
+      final_amount,
+      payment_method,
+      status: 'pending'
+    }, { transaction: t });
+
+    // Kiểm tra tồn kho và tạo chi tiết đơn – đồng thời trừ tồn kho
+    for (const detail of orderDetails) {
+      const book = await Book.findByPk(detail.book_id, { transaction: t, lock: t.LOCK.UPDATE });
+      if (!book) throw new Error(`Book ${detail.book_id} not found`);
+      const currentStock = Number(book.quantity_in_stock) || 0;
+      const qty = Number(detail.quantity) || 0;
+      if (qty <= 0) throw new Error('Invalid order quantity');
+      if (currentStock < qty) {
+        throw new Error(`Số lượng tồn không đủ cho sách "${book.title}". Còn ${currentStock}, đặt ${qty}.`);
+      }
+
+      // Trừ tồn kho
+      book.quantity_in_stock = currentStock - qty;
+      await book.save({ transaction: t });
+
+      // Lưu chi tiết đơn
+      await OrderDetail.create({
+        order_id: order.id,
+        book_id: detail.book_id,
+        quantity: qty,
+        unit_price: detail.unit_price
+      }, { transaction: t });
+    }
+
+    return order;
   });
-  
-  for (const detail of orderDetails) {
-    await OrderDetail.create({
-      order_id: order.id,
-      book_id: detail.book_id,
-      quantity: detail.quantity,
-      unit_price: detail.unit_price
-    });
-  }
-  
-  return order;
 };
 
 const confirmOrder = async (orderId) => {
@@ -126,11 +144,38 @@ const completeOrder = async (orderId) => {
 };
 
 const cancelOrder = async (orderId) => {
-  const order = await Order.findByPk(orderId);
-  if (!order) throw new Error("Order not found");
-  order.status = 'cancelled';
-  await order.save();
-  return { success: true, message: 'Đơn hàng đã được hủy thành công' };
+  return await sequelize.transaction(async (t) => {
+    const order = await Order.findByPk(orderId, { transaction: t });
+    if (!order) throw new Error("Order not found");
+
+    // Nếu đã hủy rồi thì không cộng tồn kho lần nữa (idempotent)
+    if (order.status === 'cancelled') {
+      return { success: true, message: 'Đơn hàng đã ở trạng thái hủy' };
+    }
+
+    // Chỉ khôi phục tồn kho nếu đơn chưa giao/hoàn tất
+    if (['delivered', 'completed'].includes(order.status)) {
+      order.status = 'cancelled';
+      await order.save({ transaction: t });
+      return { success: true, message: 'Đơn đã hoàn tất, chuyển trạng thái hủy (không hoàn kho)' };
+    }
+
+    // Lấy chi tiết đơn để hoàn kho
+    const details = await OrderDetail.findAll({ where: { order_id: orderId } , transaction: t});
+    for (const d of details) {
+      const book = await Book.findByPk(d.book_id, { transaction: t, lock: t.LOCK.UPDATE });
+      if (book) {
+        const currentStock = Number(book.quantity_in_stock) || 0;
+        const qty = Number(d.quantity) || 0;
+        book.quantity_in_stock = currentStock + qty;
+        await book.save({ transaction: t });
+      }
+    }
+
+    order.status = 'cancelled';
+    await order.save({ transaction: t });
+    return { success: true, message: 'Đơn hàng đã được hủy và tồn kho đã được khôi phục' };
+  });
 };
 
 const assignOrderToShipper = async (orderId, shipperId, assignedBy) => {

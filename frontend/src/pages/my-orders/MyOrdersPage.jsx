@@ -146,44 +146,52 @@ const MyOrdersPage = () => {
         alert('Đã hủy đơn hàng thành công!');
         setShowOrderDetails(false);
         setSelectedOrder(null);
-        // Gọi lại API để cập nhật danh sách đơn hàng
+        // Gọi lại API để cập nhật danh sách đơn hàng (giữ nguyên paging hiện tại)
         setLoading(true);
         let response;
         if (filter === 'all') {
-          response = await getUserOrders();
+          response = await getUserOrders(page, pageSize);
         } else if (filter === 'pending') {
-          response = await getProcessingOrdersByUserID();
+          response = await getProcessingOrdersByUserID(page, pageSize);
         } else if (filter === 'confirmed') {
-          response = await getConfirmedOrdersByUserID();
+          response = await getConfirmedOrdersByUserID(page, pageSize);
         } else if (filter === 'delivering') {
-          response = await getDeliveringOrdersByUserID();
+          response = await getDeliveringOrdersByUserID(page, pageSize);
         } else if (filter === 'delivered') {
-          response = await getDeliveredOrdersByUserID();
+          response = await getDeliveredOrdersByUserID(page, pageSize);
         } else if (filter === 'cancelled') {
-          response = await getCancelledOrdersByUserID();
+          response = await getCancelledOrdersByUserID(page, pageSize);
         } else {
-          response = await getUserOrders();
+          response = await getUserOrders(page, pageSize);
         }
-        const mappedOrders = (response.data || response).map(order => ({
-          id: order.id,
-          orderNumber: String(order.id),
-          orderDate: order.order_date,
-          status: order.status,
-          totalAmount: order.total_amount,
-          discountAmount: order.discount_amount,
-          shippingFee: order.shipping_fee,
-          finalAmount: order.final_amount,
-          items: (order.orderDetails || []).map(item => ({
-            id: item.id,
-            name: item.title,
-            quantity: item.quantity,
-            price: item.unit_price
-          })),
-          shippingAddress: order.shipping_address,
-          shippingMethod: order.shipping_method_name,
-          paymentMethod: order.payment_method === 'online' ? 'ZaloPay' : 'Thanh toán khi nhận hàng'
-        }));
+
+        // Chuẩn hóa dữ liệu trả về theo cùng format với fetchOrders ở useEffect
+        const apiData = response.data || response;
+        const ordersData = apiData.orders || [];
+        const mappedOrders = Array.isArray(ordersData)
+          ? ordersData.map(order => ({
+              id: order.id,
+              orderNumber: String(order.id),
+              orderDate: order.order_date,
+              status: order.status,
+              totalAmount: order.total_amount,
+              discountAmount: order.discount_amount,
+              shippingFee: order.shipping_fee,
+              finalAmount: order.final_amount,
+              items: (order.details || order.orderDetails || []).map(item => ({
+                id: item.id,
+                name: item.Book?.title || item.title,
+                quantity: item.quantity,
+                price: item.unit_price
+              })),
+              shippingAddress: order.shipping_address,
+              shippingMethod: order.shippingMethod?.name || order.shipping_method_name,
+              paymentMethod: order.payment_method === 'online' ? 'ZaloPay' : 'Thanh toán khi nhận hàng'
+            }))
+          : [];
+
         setOrders(mappedOrders);
+        setTotal(apiData.total || 0);
         setLoading(false);
       } catch (error) {
         console.error('Error canceling order:', error);

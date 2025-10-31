@@ -23,8 +23,9 @@ function getAppTransId() {
 
 exports.createZaloPayPayment = async (req, res) => {
   try {
-    const { amount, orderInfo, redirectUrl } = req.body;
-    const embed_data = {};
+  const { amount, orderInfo, redirectUrl } = req.body;
+  // ZaloPay dùng embed_data.redirecturl để điều hướng trình duyệt sau khi thanh toán
+  const embed_data = { redirecturl: redirectUrl };
     const items = [];
     const app_trans_id = getAppTransId();
     const order = {
@@ -34,11 +35,13 @@ exports.createZaloPayPayment = async (req, res) => {
       app_time: Date.now(),
       amount,
       item: JSON.stringify(items),
-      embed_data: JSON.stringify(embed_data),
+  embed_data: JSON.stringify(embed_data),
       description: orderInfo,
       bank_code: '',
-      callback_url: redirectUrl, // callback cho backend
-      redirect_url: redirectUrl  // redirect cho frontend (nếu ZaloPay yêu cầu)
+  // callback_url là webhook cho backend (nếu có). Tạm thời dùng cùng giá trị để tránh null
+  callback_url: redirectUrl,
+  // Một số phiên bản SDK vẫn đọc redirect_url; đặt trùng để dự phòng
+  redirect_url: redirectUrl
     };
     // MAC
     const data = `${zalopayAppId}|${order.app_trans_id}|${order.app_user}|${order.amount}|${order.app_time}|${order.embed_data}|${order.item}`;

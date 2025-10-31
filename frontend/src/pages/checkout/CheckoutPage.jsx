@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './CheckoutPage.css';
 import PublicHeader from '../../components/common/PublicHeader';
-import { getCart } from '../../services/CartService';
+import { getCart, clearCart } from '../../services/CartService';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAddresses } from '../../services/AddressService';
 import { getShippingMethods } from '../../services/ShippingMethodService';
@@ -269,13 +269,30 @@ function CheckoutPage() {
       console.log('Order payload gửi lên backend:', orderPayload);
       
       // Gửi đơn hàng
-      const response = await axiosInstance.post('/orders', orderPayload);
-      console.log('Order response:', response.data);
+  const response = await axiosInstance.post('/orders', orderPayload);
+  console.log('Order response:', response.data);
+  const createdData = response?.data?.data || response?.data || {};
+      // Xóa giỏ hàng sau khi tạo đơn thành công
+      try {
+        await clearCart();
+      } catch (e) {
+        console.warn('Không thể xóa giỏ hàng ngay sau khi đặt, sẽ bỏ qua:', e?.message || e);
+      }
+      setCartItems([]);
       
       // Xử lý phương thức thanh toán
       if (paymentMethod === 'online') {
         const paymentInfo = `Thanh toán đơn hàng cho ${shippingInfo.fullName}`;
-        const redirectUrl = window.location.origin + '/zalopay-result';
+        // Lấy mã đơn/mã hiển thị từ response để gắn vào redirect URL
+  const createdId = createdData.orderId || createdData.id;
+  const createdCode = createdData.orderCode || createdData.order_code;
+        // Sau khi thanh toán thành công, cho ZaloPay điều hướng thẳng về trang xác nhận
+        // kèm query để trang OrderSuccess có thể đọc được nếu không có state
+        const search = new URLSearchParams({
+          orderId: createdId ? String(createdId) : '',
+          orderCode: createdCode ? String(createdCode) : ''
+        }).toString();
+        const redirectUrl = `${window.location.origin}/order-success${search ? `?${search}` : ''}`;
         const res = await createZaloPayPayment({
           amount: total,
           orderInfo: paymentInfo,
@@ -292,8 +309,8 @@ function CheckoutPage() {
       
       // Chuyển hướng đến trang đặt hàng thành công
       const orderInfo = {
-        id: response.data.orderId || response.data.id,
-        orderCode: response.data.orderCode || response.data.order_code,
+        id: createdData.orderId || createdData.id,
+        orderCode: createdData.orderCode || createdData.order_code,
         total: total,
         paymentMethod: paymentMethod
       };

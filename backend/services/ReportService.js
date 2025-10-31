@@ -1,7 +1,8 @@
 const { sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
 
-const getRevenueByYearOnline = async (year) => {
+// Doanh thu theo năm (bỏ hậu tố 'Online')
+const getRevenueByYear = async (year) => {
     if (!year) throw new Error("Thiếu tham số năm");
     
     const results = await sequelize.query(
@@ -21,7 +22,8 @@ const getRevenueByYearOnline = async (year) => {
     return results;
 };
 
-const getDailyRevenueByMonthOnline = async (month, year) => {
+// Doanh thu theo ngày trong tháng (bỏ hậu tố 'Online')
+const getDailyRevenueByMonth = async (month, year) => {
     if (!month || !year) {
         throw new Error("Thiếu tham số tháng hoặc năm");
     }
@@ -66,40 +68,35 @@ const getTotalRevenueByMonth = async (month, year) => {
     };
 };
 
-const getDailyRevenueByMonth = async (month, year) => {
-    if (!month || !year) {
-        throw new Error("Thiếu tham số tháng hoặc năm");
-    }
-    
-    const results = await sequelize.query(
-        `SELECT DAY(o.order_date) AS day,
-                SUM(od.quantity * od.unit_price) AS totalRevenue,
-                SUM(od.quantity) AS totalSold
-         FROM orders o
-         JOIN order_details od ON o.id = od.order_id
-         WHERE MONTH(o.order_date) = ? AND YEAR(o.order_date) = ?
-         GROUP BY DAY(o.order_date)
-         ORDER BY DAY(o.order_date)`,
-        {
-            replacements: [month, year],
-            type: QueryTypes.SELECT
-        }
-    );
-    return results;
-};
+// (Đã gộp vào hàm cùng tên ở trên)
 
-const getTop10MostSoldBooksOnline = async (month, year) => {
+// Top 10 sách bán chạy (bỏ hậu tố 'Online')
+const getTop10MostSoldBooks = async (month, year) => {
     if (!month || !year) {
         throw new Error("Thiếu tham số tháng hoặc năm");
     }
     
+    // Lấy thêm đường dẫn ảnh đại diện của sách (ảnh đầu tiên theo id nhỏ nhất)
     const results = await sequelize.query(
-        `SELECT b.id, b.title, SUM(od.quantity) AS total_sold
+        `SELECT 
+            b.id,
+            b.title,
+            fi.image_path AS image_path,
+            SUM(od.quantity) AS total_sold
          FROM order_details od
          JOIN orders o ON od.order_id = o.id
          JOIN books b ON od.book_id = b.id
+         LEFT JOIN (
+            SELECT bi1.book_id, bi1.image_path
+            FROM book_images bi1
+            INNER JOIN (
+                SELECT book_id, MIN(id) AS min_id
+                FROM book_images
+                GROUP BY book_id
+            ) first ON first.book_id = bi1.book_id AND first.min_id = bi1.id
+         ) fi ON fi.book_id = b.id
          WHERE MONTH(o.order_date) = ? AND YEAR(o.order_date) = ?
-         GROUP BY b.id, b.title
+         GROUP BY b.id, b.title, fi.image_path
          ORDER BY total_sold DESC
          LIMIT 10`,
         {
@@ -114,9 +111,6 @@ const getTop10MostSoldBooksOnline = async (month, year) => {
 const getBookRevenueDetailsByYear = async (year, type = 'all') => {
     if (!year) {
         throw new Error("Thiếu tham số năm");
-    }
-    if (type === 'offline') {
-        throw new Error("Loại thống kê 'offline' không được hỗ trợ");
     }
     const query = `
         SELECT 
@@ -145,9 +139,6 @@ const getBookRevenueDetailsByMonth = async (month, year, type = 'all') => {
     if (!month || !year) {
         throw new Error("Thiếu tham số tháng hoặc năm");
     }
-    if (type === 'offline') {
-        throw new Error("Loại thống kê 'offline' không được hỗ trợ");
-    }
     const query = `
         SELECT 
             b.id, 
@@ -171,11 +162,10 @@ const getBookRevenueDetailsByMonth = async (month, year, type = 'all') => {
 };
 
 module.exports = {
-    getTop10MostSoldBooksOnline,
+    getTop10MostSoldBooks,
     getTotalRevenueByMonth,
     getDailyRevenueByMonth,
-    getDailyRevenueByMonthOnline,
-    getRevenueByYearOnline,
+    getRevenueByYear,
     getBookRevenueDetailsByYear,
     getBookRevenueDetailsByMonth
 };

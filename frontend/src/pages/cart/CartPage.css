@@ -83,7 +83,8 @@
 /* Content */
 .checkout-content {
   display: grid !important;
-  grid-template-columns: 80% 20% !important;
+  /* Tăng phần sản phẩm, giảm phần tổng đơn hàng cùng một lượng */
+  grid-template-columns: 82% 18% !important;
   gap: 24px !important;
   align-items: start !important;
 }
@@ -189,7 +190,7 @@
 }
 
 .item-title {
-  font-size: 16px;
+  font-size: 15px; /* giảm nhẹ kích thước tiêu đề sản phẩm */
   font-weight: 600;
   color: #2d3748;
   margin: 0;
@@ -234,7 +235,7 @@
   border: none;
   background: #f7fafc;
   color: #4a5568;
-  font-size: 16px;
+  font-size: 15px; /* giảm nhẹ kích thước nút +/- */
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -257,6 +258,7 @@
   justify-content: center;
   background: #fff;
   font-weight: 500;
+  font-size: 15px; /* giảm nhẹ kích thước số lượng */
 }
 
 .item-total {
@@ -266,7 +268,7 @@
 .total-price {
   font-weight: bold;
   color: #6ec6c6;
-  font-size: 16px;
+  font-size: 15px; /* giảm nhẹ cỡ chữ tổng tiền mỗi dòng */
 }
 
 .btn-remove {

@@ -129,7 +129,7 @@ export const getTop10MostSoldBooksAll = async (month, year) => {
         ? (book.image_path.startsWith('/uploads')
             ? (import.meta.env.VITE_API_BASE_URL?.replace('/api', '')) + book.image_path
             : book.image_path)
-        : '/assets/no-image.png',
+        : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"><rect width="300" height="400" fill="%23eef2f3"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2399a" font-family="Arial" font-size="16">No Image</text></svg>',
       total_sold: book.total_sold
     }));
   } catch (error) {

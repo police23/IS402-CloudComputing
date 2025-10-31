@@ -199,7 +199,17 @@ function HomePage() {
       const path = book.images[0].image_path;
       return path?.startsWith('/uploads') ? BACKEND_URL + path : path;
     }
-    return '/assets/no-image.png';
+    // SVG data URI placeholder to avoid broken image when no asset exists
+    return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"><rect width="300" height="400" fill="%23eef2f3"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2399a" font-family="Arial" font-size="16">No Image</text></svg>';
+  };
+
+  // Chuẩn hóa giá: nếu discounted_price rỗng/0/không nhỏ hơn giá gốc
+  // thì coi như không có khuyến mãi -> dùng giá gốc cho cả hai trường
+  const normalizePricing = (original, discounted) => {
+    const o = Number(original || 0);
+    let d = Number(discounted);
+    if (!Number.isFinite(d) || d <= 0 || d >= o) d = o;
+    return { original: o, discounted: d };
   };
 
   // Merge pricing for Latest
@@ -207,12 +217,13 @@ function HomePage() {
     const pv = pricingMap[book.id] || {};
     const original = pv.original_price ?? book.original_price ?? book.price;
     const discounted = pv.discounted_price ?? book.discounted_price ?? book.price;
+    const { original: o, discounted: d } = normalizePricing(original, discounted);
     return {
       id: book.id,
       name: book.title || book.name,
       image: resolveImage(book),
-      originalPrice: Number(original || 0),
-      discountedPrice: Number(discounted || 0)
+      originalPrice: o,
+      discountedPrice: d
     };
   });
 
@@ -221,12 +232,13 @@ function HomePage() {
     const pv = pricingMap[book.id] || {};
     const original = pv.original_price ?? book.original_price ?? book.price;
     const discounted = pv.discounted_price ?? book.discounted_price ?? book.price;
+    const { original: o, discounted: d } = normalizePricing(original, discounted);
     return {
       id: book.id,
       name: book.name || book.title,
       image: resolveImage(book),
-      originalPrice: Number(original || 0),
-      discountedPrice: Number(discounted || 0)
+      originalPrice: o,
+      discountedPrice: d
     };
   });
 
